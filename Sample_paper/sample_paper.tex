@@ -565,8 +565,8 @@ the object's contents have been moved and all required references have been
 updated. The authors note that all relocating collectors, and by extension all
 compacting collectors, transplant objects~\cite{Iyengar:Collie}.
 
-Each object in an application's memory has a \emph{referrer set}. This set
-identifies the precise set of all references pointing to the object. 
+Each object in an application's memory has a \emph{referrer set}. This is the precise set 
+of all references pointing to the object. 
 An object has a \emph{transplantation state} consisting of the object's contents 
 and the object's referrer set. This definition builds on the general requirements
 for completing an object transplantation outlined by Iyengar et al. These
@@ -574,12 +574,79 @@ requirements include: all copies of an object's contents should remain consisten
 until transplantation is completed and after transplantation, there cannot be any
 references that point to the object's from-space location in its referrer set~\cite{Iyengar:Collie}.
 
-\todo[inline]{Might need to add more background. Wait to see how discussing the algorithm goes.}
+\todo[inline]{Might need to add more background. Wait to see how discussing the algorithm goes. Add: mirrored to-space, zero-copy translation.}
 
 \subsection{The Collie Protocol}
 \label{sec:collieAlgorithm}
 
-More stuff
+In their work to use a TM system to support concurrent thread 
+synchronization, Iyengar et al. conceive of the first theoretical, 
+but not practical, barrier-free compacting algorithm. From this,
+they introduce a wait-free read barrier into the algorithm that has a bounded,
+constant triggering time. That is, the synchronization barrier they introduce 
+is certain not to cause time overheads over a constant value.
+This is done to make the compaction algorithm practical and concurrent
+such that it can be used in the overall Collie GC algorithm.
+We will discuss both the theoretical compaction algorithm as well
+as the modified concurrent implementation here.
+
+\subsubsection{Theoretical Barrier-free Compaction Algorithm}
+\label{sec:collieAlgorithmNoBarriers}
+
+In discussing the barrier-free compaction algorithm, some assumptions
+are made about the transplantation state of objects. We assume the 
+object's contents that the compactor is transplanting are 
+consistent across the application. Additionally, we assume the referrer
+set of an object only includes references residing within the heap. 
+This means no thread stacks have additional references to the
+object. Together, these assumptions ensure the compactor has access
+to the precise transplantation state of the object. This effectively
+means all knowledge of the object is contained on the heap, and 
+it is consistent across the entire heap, which simplifies set-up for
+the compaction algorithm.
+
+The compaction algorithm uses TM semantics to complete an object's
+transplantation. The operations for transplantation are stored as a
+transactional procedure. These operations include: the compactor 
+starting a memory transaction, it "protecting" the referrer set, 
+the object being copied to its new location and the references in the 
+referrer set being updated to point to the new location of the object.
+After, the transaction is \emph{committed}; the to-space object contents
+and the reference values pointing to the object's to-space location
+are finalized, which completes the transaction.
+
+By the compactor "protecting" the referrer set, we mean the algorithm
+writes to each of its references so they cannot be read from. 
+Reads from the referrer set could expand, and thus modify, it. This could result
+in references to the object being created that the transactional procedure
+was not aware of when it started, so they are not updated to point to 
+the new object location when it is finishing. Thus, for the transaction to
+ensure all references are up-to-date upon completion, the referrer set needs
+to be protected.
+
+This brings us to discussing why this compaction algorithm is not concurrent,
+nor is it practical. If the aforementioned transactional procedure is not
+modified, there will be a gap between the transaction beginning and
+the entire referrer set being written to and protected. This gap allows 
+the referrer set to expand without the transaction knowing about it
+as discussed.
+
+To prevent this, the transaction must be started inside a \emph{global safepoint}.
+A global safepoint is requested by a thread and is a moment when all application 
+threads are paused such that operations can be performed without having to worry 
+about external interference. As a global safepoint requires pausing application
+threads, this breaks concurrency. Within the global safepoint, the precise referrer
+set is constructed, the transaction is started, and the referrer set is protected.
+After this, the safepoint ends and other threads are allowed to continue concurrently
+while TM semantics will ensure the relocation and remapping portions of compaction
+are safe.
+
+%Talk more about operations that would cause the transaction to be aborted and give examples.
+
+\subsubsection{Implemented Compaction Algorithm}
+\label{sec:collieAlgorithmImplementation}
+
+more stuff
 
 \subsection{Summary of Results}
 \label{sec:collieResults}
