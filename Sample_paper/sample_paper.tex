@@ -91,6 +91,63 @@ proceedings paper, rather than with giving rigorous descriptions
 or explanations of such commands. Section~\ref{sec:body} introduces the main
 examples of formatting, and Section~\ref{sec:conclusions} wraps things up. 
 
+\section{Background}
+\label{sec:background}
+
+\todo[inline]{Just through stuff from outline in this section for now.}
+
+This is where I explain terminology and aspects of GC and parallel 
+computing that are necessary to understand my paper (If there is 
+enough information in each subsection, I should maybe forego the 
+background and just make them all sections)
+
+\subsection{Garbage Collection}
+\label{sec:garbageCollection}
+
+References and the heap (if not done in the introduction)
+
+General process flow GC algorithms tend to follow
+
+Specific GC algorithms/techniques my researched papers will 
+refer to and common techniques needed to understand my paper 
+(Pauseless, tracing/marking, more)
+
+Start introducing some terminology relevant to single processor 
+garbage collectors such as: stop-the-world, fragmentation, compaction, 
+tracing, reference remapping, etc.
+
+Explain the three typical aspects of compaction 
+(relocation/copying, remapping, and reclamation: 
+reclamation is often just done through the other two)
+
+\subsection{Parallel Processing}
+\label{sec:parallelProcessing}
+
+Threads: the virtual form of a processor (might need to 
+explain virtualization or abstraction)
+
+Issues experienced in parallel computing and reasons why it 
+is difficult to perform effectively like: deadlock, race conditions, 
+etc. (Real brief, but I feel the audience needs to have some idea of 
+why progress in this area doesn't happen overnight. It also seems 
+necessary for explaining barriers)
+
+Typical ways of mitigating challenges experienced in parallel 
+computing (synchronization, barriers/locks)
+
+\subsection{Parallel Processing as it Applies to Garbage Collection}
+\label{sec:parallelProcessingGarbageCollection}
+
+Bring audience's attention back to the original focus introduced 
+of wanting to use parallel computing to improve GC
+
+Introduce new terminology for GC that depends on parallel processing 
+in order to show some more specific ways in which parallel processing 
+can be used to improve GC (mutator threads, parallelism, concurrency, etc.)
+
+Describe the focus: Concurrent Compaction (If this has enough information, 
+it could be moved out of being a component in a subsection)
+
 \section{The {\secit Body} of The Paper}
 \label{sec:body}
 
@@ -450,6 +507,30 @@ to create camera-ready copy, but may be converted
 to other forms -- e.g. HTML. If you inadvertently omit
 some or all of the \texttt{\textbackslash def}s recompilation will
 be, to say the least, problematic.
+
+\section{The Collie Collector}
+\label{sec:collie}
+
+Stuff
+
+\subsection{Additional Background}
+\label{sec:collieBackground}
+
+\todo[inline]{I'll probably want to change this subsection title.}
+
+Things
+
+\subsection{The Collie Protocol}
+\label{sec:collieAlgorithm}
+
+More stuff
+
+\subsection{Summary of Results}
+\label{sec:collieResults}
+
+\todo[inline]{Again, another name for this subsection could be good.}
+
+More things
 
 \section{Conclusions}
 \label{sec:conclusions}
