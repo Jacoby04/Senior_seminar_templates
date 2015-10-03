@@ -550,7 +550,31 @@ to be aborted and the other allowed to play out.
 \label{sec:collieBackground}
 %I'll probably want to change this subsection title.
 
-Things
+% Two possible changes to come here. If C4 also does reclamation the "easy way"
+% as described by FPP, then mentioning it in background and elsewhere can probably
+% be simplified to a simple note of that being how it's handled by all the algorithms
+% I discuss. Also, Might not need the refresher on relocation and remapping if talked
+% about recently before.
+With their use of a TM system for synchronizing concurrent compaction,
+Iyengar et al. introduce new terminology. As discussed, compaction of
+memory requires relocation of the object and remapping of references to
+the object; the Collie does reclamation by labeling the from-space as freed.
+An object \emph{transplantation} is consists of both the relocation and 
+remapping of an object. A transplantation has not been completed until
+the object's contents have been moved and all required references have been
+updated. The authors note that all relocating collectors, and by extension all
+compacting collectors, transplant objects~\cite{Iyengar:Collie}.
+
+Each object in an application's memory has a \emph{referrer set}. This set
+identifies the precise set of all references pointing to the object. 
+An object has a \emph{transplantation state} consisting of the object's contents 
+and the object's referrer set. This definition builds on the general requirements
+for completing an object transplantation outlined by Iyengar et al. These
+requirements include: all copies of an object's contents should remain consistent
+until transplantation is completed and after transplantation, there cannot be any
+references that point to the object's from-space location in its referrer set~\cite{Iyengar:Collie}.
+
+\todo[inline]{Might need to add more background. Wait to see how discussing the algorithm goes.}
 
 \subsection{The Collie Protocol}
 \label{sec:collieAlgorithm}
