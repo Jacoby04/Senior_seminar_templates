@@ -23,7 +23,7 @@
 %%% REMEMBER TO CHANGE THE SEMESTER AND YEAR AS NEEDED
 \conferenceinfo{UMM CSci Senior Seminar Conference, December 2015}{Morris, MN}
 
-\title{UMM CSci Senior Seminar LaTeX template}
+\title{Parallel Processing in Garbage Collection: An Examination of Concurrent Compaction Techniques}
 
 \numberofauthors{1}
 
@@ -34,36 +34,20 @@
 % affiliation/address with \affaddr, and tag the
 % e-mail address with \email.
 \alignauthor
-Chris S. Student\\
+Jacob P. Opdahl\\
 	\affaddr{Division of Science and Mathematics}\\
 	\affaddr{University of Minnesota, Morris}\\
 	\affaddr{Morris, Minnesota, USA 56267}\\
-	\email{cssxxxx00000@morris.umn.edu}
+	\email{opdah023@morris.umn.edu}
 }
 
 \maketitle
 \begin{abstract}
-This paper provides a sample of a \LaTeX\ document which conforms,
-somewhat loosely, to the formatting guidelines for the University of
-Minnesota, Morris, Computer Science Senior Seminar proceedings.
-It is based heavily on (and takes material directly from) a similar document 
-illustrating the format of the ACM SIG Proceedings, which we have based our
-proceedings format on.
-
-The original ACM document tried to include
-\begin{quote}
-every imaginable sort
-of ``bells and whistles", such as a subtitle, footnotes on
-title, subtitle and authors, as well as in the text, and
-every optional component (e.g. Acknowledgments, Additional
-Authors, Appendices), not to mention examples of
-equations, theorems, tables and figures.
-\end{quote}
-
-We've removed many of the more esoteric tricks here because either
-they'll never be used (e.g., multiple authors) or are used \emph{very}
-rarely (e.g., appendices). Refer to the original ACM document for more
-of those fancy examples.
+This paper provides an overview of garbage collection (GC) and parallel
+processing as well as how parallel processing applies to GC.
+With that knowledge as our foundation, we will examine in detail various
+algorithms that perform compaction of fragmented memory during garbage 
+collection concurrently to the application running.
 % The current paper format *only* allows inline comments using the todo
 % macro. That's kind of a bummer, and it would be neat if someone figured
 % out how to change the acmconf style to allow this. I suspect it isn't *hard*
@@ -71,10 +55,12 @@ of those fancy examples.
 \todo[inline]{Needs more work}
 \end{abstract}
 
-\keywords{ACM proceedings, \LaTeX, text tagging}
+\keywords{Garbage Collection, GC, Concurrent, Compaction, Continuously Concurrent Compacting Collector (C4), Collie, Field Pinning Protocol (FPP)}
 
 \section{Introduction}
 \label{sec:introduction}
+
+\todo[inline, color=green]{General introduction left in here until I work on it.}
 
 The \textit{proceedings} are the records of a conference, and conference
 editors like ACM seek to give their conference by-products a uniform,
@@ -89,8 +75,6 @@ a specified live area (18 $\times$ 23.5 cm [7" $\times$ 9.25"]) centered on
 the page, specified size of margins (2.54cm [1"] top and
 bottom and 1.9cm [.75"] left and right; specified column width
 (8.45cm [3.33"]) and gutter size (.083cm [.33"]).
-
-\todo[inline, color=green]{I really like this section.}
 
 The good news is, with only a handful of manual
 settings,\footnote{One of these, the \texttt{\textbackslash alignauthor} command, 
