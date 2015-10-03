@@ -511,7 +511,40 @@ be, to say the least, problematic.
 \section{The Collie Collector}
 \label{sec:collie}
 
-Here, we describe the Collie collector~\cite{Iyengar:Collie}.
+We now look at the concurrent compaction technique used within the 
+Collie garbage collector~\cite{Iyengar:Collie}. Like C4, the Collie is 
+a fully concurrent compacting collector. It 
+uses a tracing algorithm based on the one implemented in C4 for 
+marking which objects are garbage. Likewise, the Collie uses a read
+barrier similar to the Loaded Value Barrier (LVB) in C4 for 
+compaction.
+
+% TM isn't so much a concrete type of storage, but rather an abstraction
+% used to describe memory that has been specified by a transaction procedure
+% The TM itself is the software, hardware, or both that makes this detection
+% of transaction memory possible
+The Collie's compaction algorithm sets itself apart due to its use of a \emph{transactional memory} 
+(TM) system as a concurrency control alternative to barriers. TM systems allow
+sections of code to function 
+analogously to \emph{transactions} in database systems, 
+which are a series of operations performed as one unit where they either all
+occur or none occur~\cite{wiki:atomicity}.
+For example, consider updating the inventory of a store; this may involve updating
+the price, quantity and distributor for various items. 
+If a person was updating information regarding an item, they would 
+want all three attributes of the item to be updated or none at all. Having
+only a subset of the attributes updated could cause confusion.
+TM systems allow a series
+of operations that modify memory to be placed in
+a \emph{transactional procedure}, much like a database transaction.
+The TM system then monitors the access of concurrent threads to \emph{transactional variables}:
+memory that is modified by a transactional procedure.
+Concurrent threads will continue to operate in parallel until they try to modify
+the same transactional variable. At this time, behavior can be specified as to how 
+the conflict should play out, but the general pattern would be for one transaction
+to be aborted and the other allowed to play out.
+\todo[inline]{Add a citation here. (I mostly used stack overflow...)}
+
 
 \subsection{Additional Background}
 \label{sec:collieBackground}
