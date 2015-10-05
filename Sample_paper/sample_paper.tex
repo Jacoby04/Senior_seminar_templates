@@ -526,7 +526,7 @@ compaction.
 The Collie's compaction algorithm sets itself apart due to its use of a \emph{transactional memory} 
 (TM) system as a concurrency control alternative to barriers. TM systems allow
 sections of code to function 
-analogously to \emph{transactions} in database systems, 
+analogously to \emph{transactions} from database systems, 
 which are a series of operations performed as one unit where they either all
 occur or none occur~\cite{wiki:atomicity}.
 For example, consider updating the inventory of a store; this may involve updating
@@ -557,9 +557,9 @@ to be aborted and the other allowed to play out.
 % about recently before.
 With their use of a TM system for synchronizing concurrent compaction,
 Iyengar et al. introduce new terminology. As discussed, compaction of
-memory requires relocation of the object and remapping of references to
-the object; the Collie does reclamation by labeling the from-space as freed.
-An object \emph{transplantation} is consists of both the relocation and 
+memory requires relocation of objects and remapping of references to
+the objects; the Collie does reclamation by labeling the from-space as freed.
+An object \emph{transplantation} consists of both the relocation and 
 remapping of an object. A transplantation has not been completed until
 the object's contents have been moved and all required references have been
 updated. The authors note that all relocating collectors, and by extension all
@@ -592,18 +592,6 @@ as the modified concurrent implementation here.
 
 \subsubsection{Theoretical Barrier-free Compaction Algorithm}
 \label{sec:collieAlgorithmNoBarriers}
-
-In discussing the barrier-free compaction algorithm, some assumptions
-are made about the transplantation state of objects. We assume the 
-object's contents that the compactor is transplanting are 
-consistent across the application. Additionally, we assume the referrer
-set of an object only includes references residing within the heap. 
-This means no thread stacks have additional references to the
-object. Together, these assumptions ensure the compactor has access
-to the precise transplantation state of the object. This effectively
-means all knowledge of the object is contained on the heap, and 
-it is consistent across the entire heap, which simplifies set-up for
-the compaction algorithm.
 
 The compaction algorithm uses TM semantics to complete an object's
 transplantation. The operations for transplantation are stored as a
