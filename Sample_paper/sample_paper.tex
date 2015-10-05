@@ -649,7 +649,11 @@ additional background.}
 \subsubsection{Implemented Compaction Algorithm}
 \label{sec:collieAlgorithmImplementation}
 
-more stuff
+Now, we examine the concurrent compaction algorithm that builds on the idea of
+using a TM system for individual object transplantation, but foregoes the goal 
+of doing so in a barrier-free manner. Like the compaction algorithm in the C4 
+collector, this algorithm compacts at page granularity and uses a quick release 
+technique to quickly free physical memory backing the from-space.
 
 \subsection{Summary of Results}
 \label{sec:collieResults}
