@@ -612,24 +612,39 @@ the new object location when it is finishing. Thus, for the transaction to
 ensure all references are up-to-date upon completion, the referrer set needs
 to be protected.
 
-This brings us to discussing why this compaction algorithm is not concurrent,
-nor is it practical. If the aforementioned transactional procedure is not
+This brings us to discussing why this compaction algorithm is not concurrent. 
+If the aforementioned transactional procedure is not
 modified, there will be a gap between the transaction beginning and
 the entire referrer set being written to and protected. This gap allows 
 the referrer set to expand without the transaction knowing about it
 as discussed.
 
 To prevent this, the transaction must be started inside a \emph{global safepoint}.
-A global safepoint is requested by a thread and is a moment when all application 
-threads are paused such that operations can be performed without having to worry 
-about external interference. As a global safepoint requires pausing application
-threads, this breaks concurrency. Within the global safepoint, the precise referrer
+A global safepoint is requested by a thread and is a moment when all 
+threads are paused such that operations can be performed by the requesting thread without having to worry 
+about references in the application changing. As a global safepoint requires pausing application
+threads, this breaks concurrency.
+Note that a safepoint differs from a barrier in GC. In a safepoint,
+all threads are allowed to reach a certain point then their execution is simply paused.
+A barrier works by telling threads how to behave if multiple try to access the same
+memory. Thus, using a global safepoint does not break the goal of barrier-free compaction.
+Within the global safepoint, the precise referrer
 set is constructed, the transaction is started, and the referrer set is protected.
 After this, the safepoint ends and other threads are allowed to continue concurrently
 while TM semantics will ensure the relocation and remapping portions of compaction
 are safe.
 
-%Talk more about operations that would cause the transaction to be aborted and give examples.
+While it does not require traditional barriers, the cost of not using them effectively
+requires stop-the-world phases. Global safepoints would need to be enacted for every 
+object that is relocated. Thus, the number of stop-the-world pauses that would occur
+during this barrier-free compaction is what makes it impractical.
+
+\todo[inline]{Need references. Again, I used mostly random articles...}
+\todo[inline]{Do you feel I need to explicitly state what would cause the transactional
+memory to kick in and handle concurrency issues? I think I covered it enough with the
+additional background.}
+
+%Talk more about operations that would cause the transaction to be aborted and give examples?
 
 \subsubsection{Implemented Compaction Algorithm}
 \label{sec:collieAlgorithmImplementation}
