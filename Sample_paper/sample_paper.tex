@@ -107,6 +107,19 @@ necessary for explaining barriers)
 Typical ways of mitigating challenges experienced in parallel 
 computing (synchronization, barriers/locks)
 
+\todo[inline]{Decided a portion I wrote for my current section, Collie,
+should be included in the general background. Trowing what I wrote here
+for now. Will be rewritten later.}
+A \emph{global safepoint} is requested by a thread and is a moment when all 
+threads are paused such that operations can be performed by the requesting thread without having to worry 
+about references in the application changing. As a global safepoint requires pausing application
+threads, this breaks concurrency.
+Note that a safepoint differs from a barrier in GC. In a safepoint,
+all threads are allowed to reach a certain point then their execution is simply paused.
+A barrier works by telling threads how to behave if multiple try to access the same
+memory. Thus, using a global safepoint does not break the goal of barrier-free compaction
+~\cite{Humble:2015}.
+
 \subsection{Parallel Processing as it Applies to Garbage Collection}
 \label{sec:parallelProcessingGarbageCollection}
 
@@ -131,28 +144,30 @@ To be done at a later date...
 \label{sec:collie}
 
 We now look at the concurrent compaction technique used within the 
-Collie garbage collector~\cite{Iyengar:Collie}. Like C4, the Collie is 
-a fully concurrent compacting collector. It 
+Collie garbage collector described by Iynegar et al.~\cite{Iyengar:Collie}. 
+Like C4, the Collie is a fully concurrent compacting collector. It 
 uses a tracing algorithm based on the one implemented in C4 for 
 marking which objects are garbage. Likewise, the Collie uses a read
 barrier similar to the Loaded Value Barrier (LVB) in C4 for 
 compaction.
 
-% TM isn't so much a concrete type of storage, but rather an abstraction
-% used to describe memory that has been specified by a transaction procedure
-% The TM itself is the software, hardware, or both that makes this detection
-% of transaction memory possible
-The Collie's compaction algorithm sets itself apart due to its use of a \emph{transactional memory} 
-(TM) system as a concurrency control alternative to barriers. TM systems allow
+
+\subsection{Transactional Memory}
+\label{sec:collieTM}
+The Collie's compaction algorithm sets itself apart due to its use 
+of a \emph{transactional memory} (TM) system as a concurrency control 
+alternative to barriers~\cite{Iyengar:Collie}. TM systems allow
 sections of code to function 
 analogously to \emph{transactions} from database systems, 
-which are a series of operations performed as one unit where they either all
-occur or none occur~\cite{wiki:atomicity}.
+which are a series of operations performed as one unit where 
+they occur in an all-or-none manner~\cite{wiki:atomicity}.
+
 For example, consider updating the inventory of a store; this may involve updating
 the price, quantity and distributor for various items. 
 If a person was updating information regarding an item, they would 
 want all three attributes of the item to be updated or none at all. Having
 only a subset of the attributes updated could cause confusion.
+
 TM systems allow a series
 of operations that modify memory to be placed in
 a \emph{transactional procedure}, much like a database transaction.
@@ -162,11 +177,12 @@ Concurrent threads will continue to operate in parallel until they try to modify
 the same transactional variable. At this time, behavior can be specified as to how 
 the conflict should play out, but the general pattern would be for one transaction
 to be aborted and the other allowed to play out.
-\todo[inline]{Add a citation here. (I mostly used stack overflow...)}
+When a transaction is completed, its changes are \emph{committed}; any changes 
+made to memory by the transaction are finalized~\cite{wiki:transactional-memory}.
 
 
-\subsection{Additional Background}
-\label{sec:collieBackground}
+\subsection{Object Transplantation}
+\label{sec:collieTransplantation}
 %I'll probably want to change this subsection title.
 
 % Two possible changes to come here. If C4 also does reclamation the "easy way"
@@ -174,42 +190,43 @@ to be aborted and the other allowed to play out.
 % be simplified to a simple note of that being how it's handled by all the algorithms
 % I discuss. Also, Might not need the refresher on relocation and remapping if talked
 % about recently before.
-With their use of a TM system for synchronizing concurrent compaction,
-Iyengar et al. introduce new terminology. As discussed, compaction of
+With the use of a TM system for synchronizing concurrent compaction,
+new terminology is introduced for understanding the Collie 
+compactor~\cite{Iyengar:Collie}. As discussed, compaction of
 memory requires relocation of objects and remapping of references to
 the objects; the Collie does reclamation by labeling the from-space as freed.
 An object \emph{transplantation} consists of both the relocation and 
 remapping of an object. A transplantation has not been completed until
 the object's contents have been moved and all required references have been
-updated. The authors note that all relocating collectors, and by extension all
-compacting collectors, transplant objects~\cite{Iyengar:Collie}.
+updated. All relocating collectors, and by extension all
+compacting collectors, transplant objects.
 
 Each object in an application's memory has a \emph{referrer set}. This is the precise set 
 of all references pointing to the object. 
 An object has a \emph{transplantation state} consisting of the object's contents 
 and the object's referrer set. This definition builds on the general requirements
-for completing an object transplantation outlined by Iyengar et al. These
+for completing an object transplantation. These
 requirements include: all copies of an object's contents should remain consistent
 until transplantation is completed and after transplantation, there cannot be any
-references that point to the object's from-space location in its referrer set~\cite{Iyengar:Collie}.
+references that point to the object's from-space location in its referrer set.
 
 \todo[inline]{Might need to add more background. Wait to see how discussing the algorithm goes. Add: mirrored to-space, zero-copy translation.}
 
 \subsection{The Collie Protocol}
 \label{sec:collieAlgorithm}
 
-In their work to use a TM system to support concurrent thread 
-synchronization, Iyengar et al. conceive of the first theoretical, 
-but not practical, barrier-free compacting algorithm. From this,
+While working to use a TM system to support concurrent thread 
+synchronization, the first theoretical, 
+but not practical, barrier-free compacting algorithm is 
+conceived~\cite{Iyengar:Collie}. From this,
 they introduce a wait-free read barrier into the algorithm that has a bounded,
-constant triggering time. That is, the synchronization barrier they introduce 
-is certain not to cause time overheads over a constant value.
+constant triggering time.
 This is done to make the compaction algorithm practical and concurrent
-such that it can be used in the overall Collie GC algorithm.
+so it can be used in the overall Collie GC algorithm.
 We will discuss both the theoretical compaction algorithm as well
 as the modified concurrent implementation here.
 
-\subsubsection{Theoretical Barrier-free Compaction Algorithm}
+\subsubsection{Theoretical, Barrier-free Compaction Algorithm}
 \label{sec:collieAlgorithmNoBarriers}
 
 The compaction algorithm uses TM semantics to complete an object's
@@ -218,15 +235,14 @@ transactional procedure. These operations include: the compactor
 starting a memory transaction, it "protecting" the referrer set, 
 the object being copied to its new location and the references in the 
 referrer set being updated to point to the new location of the object.
-After, the transaction is \emph{committed}; the to-space object contents
-and the reference values pointing to the object's to-space location
-are finalized, which completes the transaction.
+After the final steps modifying the transplantation state of the object,
+the transaction is committed.
 
 By the compactor "protecting" the referrer set, we mean the algorithm
 writes to each of its references so they cannot be read from. 
 Reads from the referrer set could expand, and thus modify, it. This could result
 in references to the object being created that the transactional procedure
-was not aware of when it started, so they are not updated to point to 
+was not aware of when starting, so they are not updated to point to 
 the new object location when it is finishing. Thus, for the transaction to
 ensure all references are up-to-date upon completion, the referrer set needs
 to be protected.
@@ -238,15 +254,7 @@ the entire referrer set being written to and protected. This gap allows
 the referrer set to expand without the transaction knowing about it
 as discussed.
 
-To prevent this, the transaction must be started inside a \emph{global safepoint}.
-A global safepoint is requested by a thread and is a moment when all 
-threads are paused such that operations can be performed by the requesting thread without having to worry 
-about references in the application changing. As a global safepoint requires pausing application
-threads, this breaks concurrency.
-Note that a safepoint differs from a barrier in GC. In a safepoint,
-all threads are allowed to reach a certain point then their execution is simply paused.
-A barrier works by telling threads how to behave if multiple try to access the same
-memory. Thus, using a global safepoint does not break the goal of barrier-free compaction.
+To prevent this, the transaction must be started inside a global safepoint.
 Within the global safepoint, the precise referrer
 set is constructed, the transaction is started, and the referrer set is protected.
 After this, the safepoint ends and other threads are allowed to continue concurrently
