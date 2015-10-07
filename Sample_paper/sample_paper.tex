@@ -23,7 +23,7 @@
 %%% REMEMBER TO CHANGE THE SEMESTER AND YEAR AS NEEDED
 \conferenceinfo{UMM CSci Senior Seminar Conference, December 2015}{Morris, MN}
 
-\title{Parallel Processing in Garbage Collection: An Examination of Concurrent Compaction Techniques}
+\title{An Examination of Concurrent Compaction Techniques in JVM Garbage Collection}
 
 \numberofauthors{1}
 
@@ -43,8 +43,9 @@ Jacob P. Opdahl\\
 
 \maketitle
 \begin{abstract}
-This paper provides an overview of garbage collection (GC) and parallel
-processing as well as how parallel processing applies to GC.
+This paper provides an overview of garbage collection (GC) of memory and parallel
+processing as well as how parallel processing applies to GC; particularly, these
+concepts are focused on within the context of the Java Virtual Machine (JVM).
 With that knowledge as our foundation, we will examine in detail various
 algorithms that perform compaction of fragmented memory during garbage 
 collection concurrently to the application running.
@@ -108,7 +109,7 @@ Typical ways of mitigating challenges experienced in parallel
 computing (synchronization, barriers/locks)
 
 \todo[inline]{Decided a portion I wrote for my current section, Collie,
-should be included in the general background. Trowing what I wrote here
+should be included in the general background. Throwing what I wrote here
 for now. Will be rewritten later.}
 A \emph{global safepoint} is requested by a thread and is a moment when all 
 threads are paused such that operations can be performed by the requesting thread without having to worry 
@@ -119,6 +120,8 @@ all threads are allowed to reach a certain point then their execution is simply 
 A barrier works by telling threads how to behave if multiple try to access the same
 memory. Thus, using a global safepoint does not break the goal of barrier-free compaction
 ~\cite{Humble:2015}.
+
+Also, talk about checkpoints here.
 
 \subsection{Parallel Processing as it Applies to Garbage Collection}
 \label{sec:parallelProcessingGarbageCollection}
@@ -199,10 +202,18 @@ An object \emph{transplantation} consists of both the relocation and
 remapping of an object. A transplantation has not been completed until
 the object's contents have been moved and all required references have been
 updated. All relocating collectors, and by extension all
-compacting collectors, transplant objects.
+compacting collectors, transplant objects. The Collie compactor attempts to 
+perform individual object transplantations within transactional procedures. 
 
 Each object in an application's memory has a \emph{referrer set}. This is the precise set 
-of all references pointing to the object. 
+of all references pointing to the object. It is crucial that an object's referrer set not
+be modified or expanded during the object's transplantation. Doing so could result
+in references to the object being created that the transactional procedure
+was not aware of when starting, so they are not updated to point to 
+the new object location when it is finishing. To avoid this, a referrer set can be
+\emph{protected} by writing to each reference within it and preventing it from
+being read temporarily.
+
 An object has a \emph{transplantation state} consisting of the object's contents 
 and the object's referrer set. This definition builds on the general requirements
 for completing an object transplantation. These
@@ -219,8 +230,9 @@ While working to use a TM system to support concurrent thread
 synchronization, the first theoretical, 
 but not practical, barrier-free compacting algorithm is 
 conceived~\cite{Iyengar:Collie}. From this,
-they introduce a wait-free read barrier into the algorithm that has a bounded,
-constant triggering time.
+a wait-free read barrier as well as
+the concepts of a \emph{mirrored-to-space} and 
+\emph{zero-copy transplantation} are introduced into the algorithm.
 This is done to make the compaction algorithm practical and concurrent
 so it can be used in the overall Collie GC algorithm.
 We will discuss both the theoretical compaction algorithm as well
@@ -230,57 +242,58 @@ as the modified concurrent implementation here.
 \label{sec:collieAlgorithmNoBarriers}
 
 The compaction algorithm uses TM semantics to complete an object's
-transplantation. The operations for transplantation are stored as a
+transplantation~\cite{Iyengar:Collie}. The operations for transplantation are stored as a
 transactional procedure. These operations include: the compactor 
-starting a memory transaction, it "protecting" the referrer set, 
+starting a memory transaction, it protecting the referrer set, 
 the object being copied to its new location and the references in the 
 referrer set being updated to point to the new location of the object.
 After the final steps modifying the transplantation state of the object,
 the transaction is committed.
 
-By the compactor "protecting" the referrer set, we mean the algorithm
-writes to each of its references so they cannot be read from. 
-Reads from the referrer set could expand, and thus modify, it. This could result
-in references to the object being created that the transactional procedure
-was not aware of when starting, so they are not updated to point to 
-the new object location when it is finishing. Thus, for the transaction to
-ensure all references are up-to-date upon completion, the referrer set needs
-to be protected.
-
-This brings us to discussing why this compaction algorithm is not concurrent. 
 If the aforementioned transactional procedure is not
 modified, there will be a gap between the transaction beginning and
 the entire referrer set being written to and protected. This gap allows 
 the referrer set to expand without the transaction knowing about it
 as discussed.
 
-To prevent this, the transaction must be started inside a global safepoint.
+To prevent this, the transactional procedure must be started inside a global safepoint.
 Within the global safepoint, the precise referrer
 set is constructed, the transaction is started, and the referrer set is protected.
 After this, the safepoint ends and other threads are allowed to continue concurrently
-while TM semantics will ensure the relocation and remapping portions of compaction
-are safe.
+while TM semantics will ensure the actual individual object transplantation portion
+of compaction is safe.
 
-While it does not require traditional barriers, the cost of not using them effectively
-requires stop-the-world phases. Global safepoints would need to be enacted for every 
+This brings us to why this compaction algorithm is not concurrent. 
+While it does not require traditional barriers, the safepoint solution to
+controlling the referrer set
+requires stop-the-world phases. These global safepoints would need to be enacted for every 
 object that is relocated. Thus, the number of stop-the-world pauses that would occur
-during this barrier-free compaction is what makes it impractical.
+during this barrier-free compaction algorithm make it impractical.
 
-\todo[inline]{Need references. Again, I used mostly random articles...}
-\todo[inline]{Do you feel I need to explicitly state what would cause the transactional
-memory to kick in and handle concurrency issues? I think I covered it enough with the
-additional background.}
+% Might want a summary with a final figure of the pseudo-code for the algorithm.
 
+%Do you feel I need to explicitly state what would cause the transactional
+%memory to kick in and handle concurrency issues? I think I covered it enough with the
+%additional background.
 %Talk more about operations that would cause the transaction to be aborted and give examples?
+
+
+\subsubsection{Aborting Compactor}
+\label{sec:collieAbortion}
+
+Things
+
 
 \subsubsection{Implemented Compaction Algorithm}
 \label{sec:collieAlgorithmImplementation}
 
 Now, we examine the concurrent compaction algorithm that builds on the idea of
 using a TM system for individual object transplantation, but foregoes the goal 
-of doing so in a barrier-free manner. Like the compaction algorithm in the C4 
+of doing so in a barrier-free manner~\cite{Iyengar:Collie}. Like the compaction algorithm in the C4 
 collector, this algorithm compacts at page granularity and uses a quick release 
 technique to quickly free physical memory backing the from-space.
+
+
 
 \subsection{Summary of Results}
 \label{sec:collieResults}
