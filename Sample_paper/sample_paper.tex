@@ -133,6 +133,8 @@ Introduce new terminology for GC that depends on parallel processing
 in order to show some more specific ways in which parallel processing 
 can be used to improve GC (mutator threads, parallelism, concurrency, etc.)
 
+Explain Latency vs throughput
+
 Describe the focus: Concurrent Compaction (If this has enough information, 
 it could be moved out of being a component in a subsection)
 
@@ -148,8 +150,10 @@ To be done at a later date...
 
 We now look at the concurrent compaction technique used within the 
 Collie garbage collector described by Iynegar et al.~\cite{Iyengar:Collie}. 
-Like C4, the Collie is a fully concurrent compacting collector. It 
-uses a tracing algorithm based on the one implemented in C4 for 
+Like C4, the Collie is a fully concurrent compacting collector.
+The intended use of the garbage collector is, once again, to
+be used on servers with multiple GB heaps and multiple GB/sec allocation rates. 
+It uses a tracing algorithm based on the one implemented in C4 for 
 marking which objects are garbage. Likewise, the Collie uses a read
 barrier similar to the Loaded Value Barrier (LVB) in C4 for 
 compaction~\cite{Tene:C4}.
@@ -373,7 +377,27 @@ correct the reference.
 \label{sec:collieResults}
 %Again, another name for this subsection could be good.
 
-More things
+Since the Collie uses a compactor that aborts on mutator interference to allow
+ concurrency, there are no copy-progress guarantees for the algorithm~\cite{Osterlund:FPP}.
+While extremely unlikely, this means a GC cycle could be performed without compacting
+any portion of the heap. Since the Collie reclaims memory by labeling the from-space as freed,
+this would mean no garbage is actually collected should this occur.
+
+The referrer sets built during the GC process are done per object. Keeping track of them
+will require extra space overhead. The amount of overhead this would cause is discussed in
+general terms, but no numbers are provided. It is noted that the overall space needed will 
+depend upon the specific storage mechanisms used, but these mechanisms are not 
+investigated~\cite{Iyengar:Collie}. However, allowing referrer set to take
+more space is shown to result in more memory being reclaimed.
+
+Like the C4 garbage collector, the Collie collector is tested against a modified
+variant of the Pauseless collector~\cite{Iyengar:Collie}. Accordingly, it is 
+implemented on the same JVM that Pauseless runs on~\cite{Click:Pauseless}. For the 
+hardware specifications, refer to~\cite{Iyengar:Collie}. The goal of the Collie 
+collector to reduce latency compared to the Pauseless collector was achieved. 
+It also managed to increase throughput as a side-effect. 
+
+%Find out what I should do for these and get figures as needed.
 
 
 \section{Field Pinning Protocol}
