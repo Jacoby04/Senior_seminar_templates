@@ -152,7 +152,7 @@ Like C4, the Collie is a fully concurrent compacting collector. It
 uses a tracing algorithm based on the one implemented in C4 for 
 marking which objects are garbage. Likewise, the Collie uses a read
 barrier similar to the Loaded Value Barrier (LVB) in C4 for 
-compaction.
+compaction~\cite{Tene:C4}.
 
 
 \subsection{Transactional Memory}
@@ -322,16 +322,52 @@ process can terminate.
 \label{sec:collieAlgorithmImplementation}
 
 After a tracing phase at the start of the overall GC algorithm, the compaction of
-the heap, also known as the \emph{transplantation phase}, can begin~\cite{Iyengar:Collie}.
+the heap happens during the \emph{transplantation phase}~\cite{Iyengar:Collie}.
 At this time, it is known which objects are relocatable; that is, the compactor knows which 
 objects are not trash. Individual object transplantation will be done on relocatable objects 
 that successfully maintain stable referrer sets throughout the process.
+
 An object is deemed \emph{non-individually transplantable} (NIT) if its transplantation
 has to be aborted or if it fails to maintain a stable referrer set. 
 Any object that is deemed as such will be moved to mirrored-to-space by zero-copy 
-transplantation.
+transplantation. An object may be declared NIT during the tracing phase before transplantation
+if it violates requirement 1 for having a stable referrer set; discussion of details
+of how this occurs is orthogonal to the purposes of this paper.
 
+At the start of the transplantation phase, a pre-compaction checkpoint occurs.
+For all the relocatable objects, referrer sets have been established during the tracing phase.
+These referrer sets need to be stable referrer sets. As such, the objects are checked for 
+references to them in threads' stacks and registers. Any objects with these will be 
+marked NIT as their referrer sets fail to meet requirement 2 for being a stable referrer set.
+After the checkpoint, the compactor has a set of relocatable objects with currently stable referrer sets.
 
+The pre-compaction checkpoint also kicks off the LVB-style read barrier's first purpose. 
+The barrier will trigger on the load of a reference to an object that was 
+relocatable. Upon being triggered, the object will be marked NIT. This is done because
+the load operation adds another reference to the object's referrer set, which violates
+requirement 3 of having a stable referrer set.
+
+With the set of objects to be transplanted, the compactor uses transactional
+procedures to complete the individual object transplantations to to-space.
+The copying of an object can actually occur outside the transaction since any
+mutator access of the object will lead to triggering the LVB-style read barrier,
+which will render the object NIT. Thus, only the work of updating the referrer set
+is done in the transactional procedure. The transaction looks like:
+\begin{enumerate}
+\item Transaction is started
+\item References are checked to make sure none point to the mirrored-to-space location as this means the object had been changed to NIT by some previous, interrupting operation
+\item All references are changed to point from an object's from-space location to its new to-space location
+\item Memory transaction is committed
+\end{enumerate}
+If a transaction fails or is interrupted, as detected by the TM system, then the object is rendered NIT.
+
+After the transactional procedure either succeeds or fails for all of the objects that were
+relocatable with stable referrer sets, all that is left to do perform zero-copy transplantation
+on all NIT objects. To avoid an extra traversal of memory, this can be rolled into the next tracing
+phase, much like C4 does~\cite{Tene:C4}. The second purpose of the LVB-like barriercomes into play
+at this time. If a mutator thread attempts to access a NIT object before its accessing 
+reference is updated to mirrored-to-space, the barrier will prevent the thread and cause the mutator to 
+correct the reference.
 
 \subsection{Summary of Results}
 \label{sec:collieResults}
