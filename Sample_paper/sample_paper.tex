@@ -214,6 +214,16 @@ the new object location when it is finishing. To avoid this, a referrer set can 
 \emph{protected} by writing to each reference within it and preventing it from
 being read temporarily.
 
+There is also a notion of a \emph{stable} referrer set. An object has a stable referrer 
+set if the object's referrer set meets the following criteria:
+\begin{enumerate}
+\item Once the overall GC process begins, no references to the object may be written to the heap
+\item At the start of the object's transplantation, no threads contain references to the object in their stacks/registers
+\item Once transplantation is underway, no new references may be added to the object's transplantation state until it is complete
+\end{enumerate}
+This ensures the compactor is aware of all reference to the object
+and the references to the object go unchanged.
+
 An object has a \emph{transplantation state} consisting of the object's contents 
 and the object's referrer set. This definition builds on the general requirements
 for completing an object transplantation. These
@@ -281,17 +291,45 @@ during this barrier-free compaction algorithm make it impractical.
 \subsubsection{Aborting Compactor}
 \label{sec:collieAbortion}
 
-Things
+The compactor in the Collie GC algorithm uses barriers 
+and transactions that will abort the transplantation process of an object if the
+GC threads and mutator threads conflict to maintain concurrency~\cite{Iyengar:Collie}.
+However, objects that have their transplantation aborted would then be stuck
+in from-space, which would mean compaction is never performed. This is where
+the additions of a mirrored-to-space and zero-copy transplantation come into play.
+
+Mirrored-to-space is a virtual address space that corresponds to and is the same
+size as from-space. Mirrored-to-space memory pages are mapped to the same physical
+memory as their corresponding from-space pages are. For barrier test and compaction 
+termination purposes, mirrored-to-space is logically considered part of to-space.
+
+Mirrored-to-space is necessary to facilitate zero-copy transplantation that is 
+non-compacting between from-space and to-space. Since an object's contents are 
+already consistent between from-space and mirrored-to-space and mirrored-to-space
+is logically considered to be to-space, transplantation to "to-space"
+can be done without copying the object's contents. That is, zero-copy transplantation
+allows transplantation of an object from from-space to mirrored-to-space, which only
+requires correcting references.
+
+Ideally, the compaction algorithm will never have to use zero-copy transplantation
+as it does not actually compact the heap. The purpose of this is to ensure
+objects make it to "to-space" should their transplantations need to be aborted. 
+This allow mutators to continue working while also guaranteeing the compaction 
+process can terminate.
 
 
 \subsubsection{Implemented Compaction Algorithm}
 \label{sec:collieAlgorithmImplementation}
 
-Now, we examine the concurrent compaction algorithm that builds on the idea of
-using a TM system for individual object transplantation, but foregoes the goal 
-of doing so in a barrier-free manner~\cite{Iyengar:Collie}. Like the compaction algorithm in the C4 
-collector, this algorithm compacts at page granularity and uses a quick release 
-technique to quickly free physical memory backing the from-space.
+After a tracing phase at the start of the overall GC algorithm, the compaction of
+the heap, also known as the \emph{transplantation phase}, can begin~\cite{Iyengar:Collie}.
+At this time, it is known which objects are relocatable; that is, the compactor knows which 
+objects are not trash. Individual object transplantation will be done on relocatable objects 
+that successfully maintain stable referrer sets throughout the process.
+An object is deemed \emph{non-individually transplantable} (NIT) if its transplantation
+has to be aborted or if it fails to maintain a stable referrer set. 
+Any object that is deemed as such will be moved to mirrored-to-space by zero-copy 
+transplantation.
 
 
 
