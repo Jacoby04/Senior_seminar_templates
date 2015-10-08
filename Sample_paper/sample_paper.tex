@@ -206,8 +206,8 @@ An object \emph{transplantation} consists of both the relocation and
 remapping of an object. A transplantation has not been completed until
 the object's contents have been moved and all required references have been
 updated. All relocating collectors, and by extension all
-compacting collectors, transplant objects. The Collie compactor attempts to 
-perform individual object transplantations within transactional procedures. 
+compacting collectors, transplant objects. The Collie compactor 
+performs individual object transplantations within transactional procedures. 
 
 Each object in an application's memory has a \emph{referrer set}. This is the precise set 
 of all references pointing to the object. It is crucial that an object's referrer set not
@@ -225,7 +225,7 @@ set if the object's referrer set meets the following criteria:
 \item At the start of the object's transplantation, no threads contain references to the object in their stacks/registers
 \item Once transplantation is underway, no new references may be added to the object's transplantation state until it is complete
 \end{enumerate}
-This ensures the compactor is aware of all reference to the object
+This ensures the compactor is aware of all references to the object
 and the references to the object go unchanged.
 
 An object has a \emph{transplantation state} consisting of the object's contents 
@@ -233,9 +233,8 @@ and the object's referrer set. This definition builds on the general requirement
 for completing an object transplantation. These
 requirements include: all copies of an object's contents should remain consistent
 until transplantation is completed and after transplantation, there cannot be any
-references that point to the object's from-space location in its referrer set.
+references pointing to the object's from-space location in its referrer set.
 
-\todo[inline]{Might need to add more background. Wait to see how discussing the algorithm goes. Add: mirrored to-space, zero-copy translation.}
 
 \subsection{The Collie Protocol}
 \label{sec:collieAlgorithm}
@@ -261,7 +260,7 @@ transactional procedure. These operations include: the compactor
 starting a memory transaction, it protecting the referrer set, 
 the object being copied to its new location and the references in the 
 referrer set being updated to point to the new location of the object.
-After the final steps modifying the transplantation state of the object,
+After the final steps have modified the transplantation state of the object,
 the transaction is committed.
 
 If the aforementioned transactional procedure is not
@@ -295,12 +294,12 @@ during this barrier-free compaction algorithm make it impractical.
 \subsubsection{Aborting Compactor}
 \label{sec:collieAbortion}
 
-The compactor in the Collie GC algorithm uses barriers 
+The compactor implemented in the Collie GC algorithm uses barriers 
 and transactions that will abort the transplantation process of an object if the
 GC threads and mutator threads conflict to maintain concurrency~\cite{Iyengar:Collie}.
 However, objects that have their transplantation aborted would then be stuck
-in from-space, which would mean compaction is never performed. This is where
-the additions of a mirrored-to-space and zero-copy transplantation come into play.
+in from-space, which would mean compaction is never performed. This is why
+the additions of a mirrored-to-space and zero-copy transplantation are necessary.
 
 Mirrored-to-space is a virtual address space that corresponds to and is the same
 size as from-space. Mirrored-to-space memory pages are mapped to the same physical
@@ -342,7 +341,7 @@ At the start of the transplantation phase, a pre-compaction checkpoint occurs.
 For all the relocatable objects, referrer sets have been established during the tracing phase.
 These referrer sets need to be stable referrer sets. As such, the objects are checked for 
 references to them in threads' stacks and registers. Any objects with these will be 
-marked NIT as their referrer sets fail to meet requirement 2 for being a stable referrer set.
+marked NIT as their referrer sets fail to meet requirement 2 for being stable referrer sets.
 After the checkpoint, the compactor has a set of relocatable objects with currently stable referrer sets.
 
 The pre-compaction checkpoint also kicks off the LVB-style read barrier's first purpose. 
@@ -368,9 +367,9 @@ If a transaction fails or is interrupted, as detected by the TM system, then the
 After the transactional procedure either succeeds or fails for all of the objects that were
 relocatable with stable referrer sets, all that is left to do perform zero-copy transplantation
 on all NIT objects. To avoid an extra traversal of memory, this can be rolled into the next tracing
-phase, much like C4 does~\cite{Tene:C4}. The second purpose of the LVB-like barriercomes into play
+phase, much like C4 does~\cite{Tene:C4}. The second purpose of the LVB-like barrier comes into play
 at this time. If a mutator thread attempts to access a NIT object before its accessing 
-reference is updated to mirrored-to-space, the barrier will prevent the thread and cause the mutator to 
+reference is updated to mirrored-to-space, the barrier will prevent the thread and force it to 
 correct the reference.
 
 \subsection{Summary of Results}
@@ -387,8 +386,8 @@ The referrer sets built during the GC process are done per object. Keeping track
 will require extra space overhead. The amount of overhead this would cause is discussed in
 general terms, but no numbers are provided. It is noted that the overall space needed will 
 depend upon the specific storage mechanisms used, but these mechanisms are not 
-investigated~\cite{Iyengar:Collie}. However, allowing referrer set to take
-more space is shown to result in more memory being reclaimed.
+investigated~\cite{Iyengar:Collie}. However, allowing referrer sets to take
+more space is shown to result in more memory being reclaimed for each GC cycle.
 
 Like the C4 garbage collector, the Collie collector is tested against a modified
 variant of the Pauseless collector~\cite{Iyengar:Collie}. Accordingly, it is 
