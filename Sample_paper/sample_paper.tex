@@ -244,8 +244,8 @@ synchronization, the first theoretical,
 but not practical, barrier-free compacting algorithm is 
 conceived~\cite{Iyengar:Collie}. From this,
 a wait-free read barrier as well as
-the concepts of a \emph{mirrored-to-space} and 
-\emph{zero-copy transplantation} are introduced into the algorithm.
+the concepts of a mirrored-to-space and 
+zero-copy transplantation are introduced into the algorithm.
 This is done to make the compaction algorithm practical and concurrent
 so it can be used in the overall Collie GC algorithm.
 We will discuss both the theoretical compaction algorithm as well
@@ -258,7 +258,7 @@ The compaction algorithm uses TM semantics to complete an object's
 transplantation~\cite{Iyengar:Collie}. The operations for transplantation are stored as a
 transactional procedure. These operations include: the compactor 
 starting a memory transaction, it protecting the referrer set, 
-the object being copied to its new location and the references in the 
+the object being copied to its new location, and the references in the 
 referrer set being updated to point to the new location of the object.
 After the final steps have modified the transplantation state of the object,
 the transaction is committed.
@@ -266,8 +266,8 @@ the transaction is committed.
 If the aforementioned transactional procedure is not
 modified, there will be a gap between the transaction beginning and
 the entire referrer set being written to and protected. This gap allows 
-the referrer set to expand without the transaction knowing about it
-as discussed.
+the referrer set to expand without the transaction knowing about the 
+additional references.
 
 To prevent this, the transactional procedure must be started inside a global safepoint.
 Within the global safepoint, the precise referrer
@@ -279,7 +279,7 @@ of compaction is safe.
 This brings us to why this compaction algorithm is not concurrent. 
 While it does not require traditional barriers, the safepoint solution to
 controlling the referrer set
-requires stop-the-world phases. These global safepoints would need to be enacted for every 
+requires stop-the-world pauses. These global safepoints would need to be enacted for every 
 object that is relocated. Thus, the number of stop-the-world pauses that would occur
 during this barrier-free compaction algorithm make it impractical.
 
@@ -299,7 +299,7 @@ and transactions that will abort the transplantation process of an object if the
 GC threads and mutator threads conflict to maintain concurrency~\cite{Iyengar:Collie}.
 However, objects that have their transplantation aborted would then be stuck
 in from-space, which would mean compaction is never performed. This is why
-the additions of a mirrored-to-space and zero-copy transplantation are necessary.
+the additions of a \emph{mirrored-to-space} and \emph{zero-copy transplantation} are necessary.
 
 Mirrored-to-space is a virtual address space that corresponds to and is the same
 size as from-space. Mirrored-to-space memory pages are mapped to the same physical
@@ -364,12 +364,12 @@ is done in the transactional procedure. The transaction looks like:
 \end{enumerate}
 If a transaction fails or is interrupted, as detected by the TM system, then the object is rendered NIT.
 
-After the transactional procedure either succeeds or fails for all of the objects that were
-relocatable with stable referrer sets, all that is left to do perform zero-copy transplantation
+After the transactional procedure either succeeds or fails for the 
+relocatable objects with stable referrer sets, all that remains is to perform zero-copy transplantation
 on all NIT objects. To avoid an extra traversal of memory, this can be rolled into the next tracing
 phase, much like C4 does~\cite{Tene:C4}. The second purpose of the LVB-like barrier comes into play
-at this time. If a mutator thread attempts to access a NIT object before its accessing 
-reference is updated to mirrored-to-space, the barrier will prevent the thread and force it to 
+at this time. If a mutator thread attempts to access a NIT object before the 
+reference used is updated to mirrored-to-space, the barrier will prevent the thread and force it to 
 correct the reference.
 
 \subsection{Summary of Results}
@@ -377,7 +377,7 @@ correct the reference.
 %Again, another name for this subsection could be good.
 
 Since the Collie uses a compactor that aborts on mutator interference to allow
- concurrency, there are no copy-progress guarantees for the algorithm~\cite{Osterlund:FPP}.
+concurrency, there are no copy-progress guarantees for the algorithm~\cite{Osterlund:FPP}.
 While extremely unlikely, this means a GC cycle could be performed without compacting
 any portion of the heap. Since the Collie reclaims memory by labeling the from-space as freed,
 this would mean no garbage is actually collected should this occur.
