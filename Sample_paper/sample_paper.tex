@@ -83,7 +83,31 @@ specific to the programming language(s) it runs and the platform it runs on. All
 in this paper are implemented on a Java Virtual Machine (JVM), which is a virtual machine
 that is most commonly used to run Java programs.
 
+\todo[inline]{Note: above was a first attempt. I wasn't happy with it, so I am trying
+to consolidate it more and really make use of what a data structures student should know.}
 
+In object-oriented programming languages, the allocation and deallocation
+of space in memory for objects can be explicit or implicit. If done explicitly,
+a language is said to be \emph{unmanaged}, otherwise it is \emph{managed} 
+~\cite{msdn:managedVsUnmanaged}. Examples of unmanaged languages include 
+C and C++. Some managed languages are C\#, Java, and Python.
+Use of implicit memory management is beneficial to programmers as it allows
+using the robustness of an object-oriented language without worrying about
+details unrelated to what their program is intended to do; specifically, they do
+not have to worry about the details of memory allocation and deallocation.
+
+Memory for a program is not an unlimited resource. As such, managed languages
+must ensure objects that are no longer needed are removed from memory
+when appropriate. Dead objects, or \emph{garbage}, are objects that can be shown
+to be unreachable by the program~\cite{glossary:g}. Thus, garbage should be deallocated to 
+save space for new objects that will be created. In managed languages, the implicit
+deallocation of garbage is performed by a \emph{garbage collector}.
+A garbage collector is a sophisticated algorithm designed to detect
+and remove dead objects for us. We will focus on specific parts of the 
+garbage collection (GC) process performed by different Java Virtual Machines 
+(JVMs), software processes that run Java programs on computing systems~\cite{Lindblom:2011}.
+
+\todo[inline]{Cite Jeff's paper and that one site I am using.}
 
 
 \section{Background}
