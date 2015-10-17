@@ -167,7 +167,18 @@ it could be moved out of being a component in a subsection)
 \section{The C4 Collector}
 \label{sec:c4}
 
-To be done at a later date...
+%I think I got enough introductory info describing the context of C4
+%here. Might want to check with Elena.
+The first concurrent compaction algorithm we examine is implemented in the 
+Continuously Concurrent Compacting Collector (C4), which is a garbage collector 
+included in JVMs commercially shipped by Azul Systems~\cite{Tene:C4}. The 
+researchers, Iyengar et al., describe how C4 is an enhanced, generational variant
+of the Pauseless garbage collector~\cite{Click:Pauseless}. C4 is generational in 
+that the entire GC algorithm is independently utilized in both the young and old generations 
+concurrently; in addition, both generations have garbage collected concurrently 
+to the application running. 
+C4 is intended to be used in server environments with multiple GB heaps and 
+multiple GB/second allocation rates.
 
 
 \section{The Collie Collector}
