@@ -43,17 +43,18 @@ Jacob P. Opdahl\\
 
 \maketitle
 \begin{abstract}
-This paper provides an overview of garbage collection (GC) of memory and parallel
-processing as well as how parallel processing applies to GC; particularly, these
-concepts are focused on within the context of the Java Virtual Machine (JVM).
-With that knowledge as our foundation, we will examine in detail various
-algorithms that perform compaction of fragmented memory during garbage 
-collection concurrently to the application running.
+This paper provides an overview of garbage collection (GC) of memory 
+in programming languages and parallel processing as well as how 
+parallel processing applies to GC; particularly, these
+concepts are focused within the context of the Java Virtual Machine (JVM).
+We examine in detail various algorithms that perform compaction of fragmented 
+memory during garbage collection concurrently to the application running.
+The desire for such GC behavior stems from a desire to reduce stop-the-world
+pauses of an application.
 % The current paper format *only* allows inline comments using the todo
 % macro. That's kind of a bummer, and it would be neat if someone figured
 % out how to change the acmconf style to allow this. I suspect it isn't *hard*
 % but there are quite a few details that have to be sorted out in synchrony.
-\todo[inline]{Needs more work}
 \end{abstract}
 
 \keywords{Garbage Collection (GC), Concurrency, Compaction, Continuously Concurrent Compacting Collector (C4), Collie, Field Pinning Protocol (FPP)}
@@ -61,52 +62,32 @@ collection concurrently to the application running.
 \section{Introduction}
 \label{sec:introduction}
 
-In the field of computer science, software developers create programs using 
-\emph{programming languages}, which are sets of terms and rules for instructing
-computers to perform certain tasks. \emph{Object-oriented} programming (OOP) languages
-are languages following the programming paradigm of representing data as 
-objects in order to demonstrate data relationships in explicit manners.
-One way in which OOP
-languages are classified is by whether one is an \emph{unmanaged}
-or \emph{managed} language. While there are several differences between the 
-two categories, their names are derived based on how their languages handle
-memory for the programs written in them. Unmanaged languages rely on the programmer
-handling their own usage of memory, which includes allocating and deallocating
-space in memory for objects. On the other hand,
-managed languages tend to have automatic memory management provided for them through 
-the use of a \emph{virtual machine}. 
-
-For our purposes, a virtual machine can be thought
-of simply as an abstraction of a computer's processor that runs a program and provides
-certain features to the programming language it is designed for. A virtual machine is
-specific to the programming language(s) it runs and the platform it runs on. All algorithms discussed
-in this paper are implemented on a Java Virtual Machine (JVM), which is a virtual machine
-that is most commonly used to run Java programs.
-
-\todo[inline]{Note: above was a first attempt. I wasn't happy with it, so I am trying
-to consolidate it more and really make use of what a data structures student should know.}
-
 In object-oriented programming languages, the allocation and deallocation
-of space in memory for objects can be explicit or implicit. If done explicitly,
-a language is said to be \emph{unmanaged}, otherwise it is \emph{managed} 
-~\cite{msdn:managedVsUnmanaged}. Examples of unmanaged languages include 
-C and C++. Some managed languages are C\#, Java, and Python.
-Use of implicit memory management is beneficial to programmers as it allows
-using the robustness of an object-oriented language without worrying about
+of memory for objects can be explicit or implicit. If done implicitly,
+a language is said to have \emph{automatic memory management}. Some languages 
+with automatic memory management are C\#, Java, and Python.
+Use of automatic memory management is beneficial to programmers as it provides
+the robustness of an object-oriented language without worrying about
 details unrelated to what their program is intended to do; specifically, they do
-not have to worry about the details of memory allocation and deallocation.
+not have to worry about the details of memory allocation and deallocation. 
+However, programmers also do not have control over how memory management occurs
+, which can have negative impacts on application performance.
 
-Memory for a program is not an unlimited resource. As such, managed languages
+Memory for a program is not an unlimited resource. As such, automatic memory management
 must ensure objects that are no longer needed are removed from memory
 when appropriate. Dead objects, or \emph{garbage}, are objects that can be shown
 to be unreachable by the program~\cite{glossary:g}. Thus, garbage should be deallocated to 
-save space for new objects that will be created. In managed languages, the implicit
-deallocation of garbage is performed by a \emph{garbage collector}.
+save space for new objects that will be created. The algorithm used to perform implicit
+deallocation of garbage is referred to as a \emph{garbage collector}.
 A garbage collector is a sophisticated algorithm designed to detect
-and remove dead objects for us. We will focus on specific parts of the 
+and remove dead objects. We will focus on specific parts of the 
 garbage collection (GC) process performed by different Java Virtual Machines 
 (JVMs), software processes that run Java programs on computing systems~\cite{Lindblom:2011}.
 
+\todo[inline]{Still need to talk briefly about why parallel GC is becoming necessary.
+Might also want to say what kind of BG will be introduced and what algorithms I will look at? 
+If I do, I will likely leave out implementation details of GC algorithms until their introductory
+parts of their sections.}
 
 \section{Background}
 \label{sec:background}
@@ -267,17 +248,20 @@ set if the object's referrer set meets the following criteria:
 \begin{enumerate}
 \item Once the overall GC process begins, no references to the object may be written to the heap
 \item At the start of the object's transplantation, no threads contain references to the object in their stacks/registers
-\item Once transplantation is underway, no new references may be added to the object's transplantation state until it is complete
+\item Once transplantation is underway, no new references may be added to the object's \emph{transplantation state} until it is complete
 \end{enumerate}
 This ensures the compactor is aware of all references to the object
 and the references to the object go unchanged.
 
-An object has a \emph{transplantation state} consisting of the object's contents 
+An object has a transplantation state consisting of the object's contents 
 and the object's referrer set. This definition builds on the general requirements
 for completing an object transplantation. These
 requirements include: all copies of an object's contents should remain consistent
 until transplantation is completed and after transplantation, there cannot be any
 references pointing to the object's from-space location in its referrer set.
+
+%Note to self: consider removing chunk where I mention the general requirements for completing an individual
+%object transplantation.
 
 
 \subsection{The Collie Protocol}
