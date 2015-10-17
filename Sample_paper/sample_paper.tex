@@ -176,9 +176,26 @@ researchers, Iyengar et al., describe how C4 is an enhanced, generational varian
 of the Pauseless garbage collector~\cite{Click:Pauseless}. C4 is generational in 
 that the entire GC algorithm is independently utilized in both the young and old generations 
 concurrently; in addition, both generations have garbage collected concurrently 
-to the application running. 
+to the application running. For set condemnation, C4 uses a tracing-style algorithm.
 C4 is intended to be used in server environments with multiple GB heaps and 
 multiple GB/sec allocation rates.
+
+
+\subsection{Loaded Value Barrier}
+\label{sec:c4LVB}
+
+C4 uses a barrier referred to as the \emph{Loaded Value Barrier} (LVB) to 
+maintain concurrency throughout the GC process~\cite{Tene:C4}. The LVB 
+places invariants on each object reference value as it is loaded from memory.
+One of the invariants relates to the tracing portion of the GC algorithm, so
+it is not discussed here. The other invariant effectively states that a loaded
+reference value must point to the location of the object that currently has the
+object's contents that are safely accessible. If the invariant does not hold
+when a reference is loaded, the barrier will trigger and execute code to correct
+the situation. The code executed depends on what causes the trigger
+and is discussed later.
+
+
 
 
 \section{The Collie Collector}
@@ -193,6 +210,7 @@ to make sure there are no references (haha) to the old theoretical section I had
 all things that need background info receive it earlier (make a list). Need to update results with numbers
 and remove the conclusion-y stuff for the conclusion section. Basically, if you're a professor or adviser 
 and you read this for the section draft, it's not worth reading again yet.}
+\todo[inline, color=green]{Stuff I've worked on modifying from the above list: introduction.}
 
 \todo[inline]{Also, consider what aspects of Collie directly come from C4 as well as which ones are
 important/different enough to talk about once again.}
@@ -229,11 +247,11 @@ TM systems allow a series
 of operations that modify memory to be placed in
 a \emph{transactional procedure}, much like a database transaction.
 The TM system then monitors the access of concurrent threads to \emph{transactional variables}:
-memory that is modified by a transactional procedure.
-Concurrent threads will continue to operate in parallel until they try to modify
+memory modified by a transactional procedure.
+Concurrent threads will operate in parallel until they try to modify
 the same transactional variable. At this time, behavior can be specified as to how 
-the conflict should play out, but the general pattern would be for one transaction
-to be aborted and the other allowed to play out.
+the conflict should resolve, but the general pattern would be for one transaction
+to be aborted and the other allowed to continue.
 When a transaction is completed, its changes are \emph{committed}; any changes 
 made to memory by the transaction are finalized~\cite{wiki:transactional-memory}.
 
