@@ -178,7 +178,7 @@ that the entire GC algorithm is independently utilized in both the young and old
 concurrently; in addition, both generations have garbage collected concurrently 
 to the application running. 
 C4 is intended to be used in server environments with multiple GB heaps and 
-multiple GB/second allocation rates.
+multiple GB/sec allocation rates.
 
 
 \section{The Collie Collector}
@@ -194,15 +194,18 @@ all things that need background info receive it earlier (make a list). Need to u
 and remove the conclusion-y stuff for the conclusion section. Basically, if you're a professor or adviser 
 and you read this for the section draft, it's not worth reading again yet.}
 
+\todo[inline]{Also, consider what aspects of Collie directly come from C4 as well as which ones are
+important/different enough to talk about once again.}
+
 We now look at the concurrent compaction technique used within the 
-Collie garbage collector described by Iynegar et al.~\cite{Iyengar:Collie}. 
-Like C4, the Collie is a fully concurrent compacting collector.
-The intended use of the garbage collector is, once again, to
-be used on servers with multiple GB heaps and multiple GB/sec allocation rates. 
-It uses a tracing algorithm based on the one implemented in C4 for 
-marking which objects are garbage. Likewise, the Collie uses a read
-barrier similar to the Loaded Value Barrier (LVB) in C4 for 
-compaction~\cite{Tene:C4}.
+Collie garbage collector described by Iynegar et al.~\cite{Iyengar:Collie};
+with the exception of Gehringer, they were the researchers who worked on the C4 algorithm.
+As such, Collie utilizes modified versions of several techniques within C4, such as:
+the tracing algorithm, the LVB, page-granularity compaction, self-healing, and quick-release behavior.
+Only the LVB is modified in significant ways for the purposes of compaction in Collie,
+so the rest of the techniques are not re-discussed here. Additionally, the Collie
+collector is also designed with server environments in mind. Collie is implemented and tested in 
+the same production quality Azul JVM that the Pauseless garbage collector is implemented in~\cite{Click:Pauseless}. However, it has not been made commercially available.
 
 
 \subsection{Transactional Memory}
