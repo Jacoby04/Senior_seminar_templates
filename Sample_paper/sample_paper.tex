@@ -133,7 +133,7 @@ necessary for explaining barriers)
 Typical ways of mitigating challenges experienced in parallel 
 computing (synchronization, barriers/locks)
 
-\todo[inline]{Decided a portion I wrote for my current section, Collie,
+\todo[inline]{Decided a portion I wrote for Collie
 should be included in the general background. Throwing what I wrote here
 for now. Will be rewritten later.}
 A \emph{global safepoint} is requested by a thread and is a moment when all 
@@ -173,6 +173,16 @@ To be done at a later date...
 \section{The Collie Collector}
 \label{sec:collie}
 
+\todo[inline]{Implemented some feedback received from Elena on the section draft. Mostly just removed
+the subsubsection on the theoretical implementation. Still need to
+update the introduction to explain who the creators are, that they are the same as those who made C4,
+if the algorithm has actually been implemented and where, what the type of environment is it is defined for,
+that it pulls a lot from C4, etc. Also, need to think of where figures and examples can be used. Need
+to make sure there are no references (haha) to the old theoretical section I had. Need to make sure
+all things that need background info receive it earlier (make a list). Need to update results with numbers
+and remove the conclusion-y stuff for the conclusion section. Basically, if you're a professor or adviser 
+and you read this for the section draft, it's not worth reading again yet.}
+
 We now look at the concurrent compaction technique used within the 
 Collie garbage collector described by Iynegar et al.~\cite{Iyengar:Collie}. 
 Like C4, the Collie is a fully concurrent compacting collector.
@@ -186,6 +196,7 @@ compaction~\cite{Tene:C4}.
 
 \subsection{Transactional Memory}
 \label{sec:collieTM}
+
 The Collie's compaction algorithm sets itself apart due to its use 
 of a \emph{transactional memory} (TM) system as a concurrency control 
 alternative to barriers~\cite{Iyengar:Collie}. TM systems allow
@@ -215,7 +226,6 @@ made to memory by the transaction are finalized~\cite{wiki:transactional-memory}
 
 \subsection{Object Transplantation}
 \label{sec:collieTransplantation}
-%I'll probably want to change this subsection title.
 
 % Two possible changes to come here. If C4 also does reclamation the "easy way"
 % as described by FPP, then mentioning it in background and elsewhere can probably
@@ -267,57 +277,6 @@ references pointing to the object's from-space location in its referrer set.
 \subsection{The Collie Protocol}
 \label{sec:collieAlgorithm}
 
-While working to use a TM system to support concurrent thread 
-synchronization, the first theoretical, 
-but not practical, barrier-free compacting algorithm is 
-conceived~\cite{Iyengar:Collie}. From this,
-a wait-free read barrier as well as
-the concepts of a mirrored-to-space and 
-zero-copy transplantation are introduced into the algorithm.
-This is done to make the compaction algorithm practical and concurrent
-so it can be used in the overall Collie GC algorithm.
-We will discuss both the theoretical compaction algorithm as well
-as the modified concurrent implementation here.
-
-\subsubsection{Theoretical, Barrier-free Compaction Algorithm}
-\label{sec:collieAlgorithmNoBarriers}
-
-The compaction algorithm uses TM semantics to complete an object's
-transplantation~\cite{Iyengar:Collie}. The operations for transplantation are stored as a
-transactional procedure. These operations include: the compactor 
-starting a memory transaction, it protecting the referrer set, 
-the object being copied to its new location, and the references in the 
-referrer set being updated to point to the new location of the object.
-After the final steps have modified the transplantation state of the object,
-the transaction is committed.
-
-If the aforementioned transactional procedure is not
-modified, there will be a gap between the transaction beginning and
-the entire referrer set being written to and protected. This gap allows 
-the referrer set to expand without the transaction knowing about the 
-additional references.
-
-To prevent this, the transactional procedure must be started inside a global safepoint.
-Within the global safepoint, the precise referrer
-set is constructed, the transaction is started, and the referrer set is protected.
-After this, the safepoint ends and other threads are allowed to continue concurrently
-while TM semantics will ensure the actual individual object transplantation portion
-of compaction is safe.
-
-This brings us to why this compaction algorithm is not concurrent. 
-While it does not require traditional barriers, the safepoint solution to
-controlling the referrer set
-requires stop-the-world pauses. These global safepoints would need to be enacted for every 
-object that is relocated. Thus, the number of stop-the-world pauses that would occur
-during this barrier-free compaction algorithm make it impractical.
-
-% Might want a summary with a final figure of the pseudo-code for the algorithm.
-
-%Do you feel I need to explicitly state what would cause the transactional
-%memory to kick in and handle concurrency issues? I think I covered it enough with the
-%additional background.
-%Talk more about operations that would cause the transaction to be aborted and give examples?
-
 
 \subsubsection{Aborting Compactor}
 \label{sec:collieAbortion}
@@ -349,24 +308,26 @@ This allow mutators to continue working while also guaranteeing the compaction
 process can terminate.
 
 
-\subsubsection{Implemented Compaction Algorithm}
+\subsubsection{Compaction Implementation}
 \label{sec:collieAlgorithmImplementation}
 
 After a tracing phase at the start of the overall GC algorithm, the compaction of
 the heap happens during the \emph{transplantation phase}~\cite{Iyengar:Collie}.
 At this time, it is known which objects are relocatable; that is, the compactor knows which 
-objects are not trash. Individual object transplantation will be done on relocatable objects 
+objects are not trash. The compaction algorithm uses TM semantics to complete an object's
+transplantation. The operations for transplantation are stored as a
+transactional procedure. Individual object transplantation will be done on relocatable objects 
 that successfully maintain stable referrer sets throughout the process.
 
 An object is deemed \emph{non-individually transplantable} (NIT) if its transplantation
 has to be aborted or if it fails to maintain a stable referrer set. 
 Any object that is deemed as such will be moved to mirrored-to-space by zero-copy 
 transplantation. An object may be declared NIT during the tracing phase before transplantation
-if it violates requirement 1 for having a stable referrer set; discussion of details
+if it violates requirement 1 for having a stable referrer set; discussion
 of how this occurs is orthogonal to the purposes of this paper.
 
 At the start of the transplantation phase, a pre-compaction checkpoint occurs.
-For all the relocatable objects, referrer sets have been established during the tracing phase.
+For all relocatable objects, referrer sets have been established during the tracing phase.
 These referrer sets need to be stable referrer sets. As such, the objects are checked for 
 references to them in threads' stacks and registers. Any objects with these will be 
 marked NIT as their referrer sets fail to meet requirement 2 for being stable referrer sets.
@@ -400,6 +361,7 @@ at this time. If a mutator thread attempts to access a NIT object before the
 reference used is updated to mirrored-to-space, the barrier will prevent the thread and force it to 
 correct the reference.
 
+
 \subsection{Summary of Results}
 \label{sec:collieResults}
 %Again, another name for this subsection could be good.
@@ -424,7 +386,7 @@ hardware specifications, refer to~\cite{Iyengar:Collie}. The goal of the Collie
 collector to reduce latency compared to the Pauseless collector was achieved. 
 It also managed to increase throughput as a side-effect. 
 
-%Find out what I should do for these and get figures as needed.
+%Find out what I should do for these and get figures as needed. - See feedback from Elena on section.
 
 
 \section{Field Pinning Protocol}
