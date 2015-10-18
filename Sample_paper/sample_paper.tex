@@ -524,20 +524,6 @@ correct the reference.
 
 \subsection{Collie Results Summary}
 \label{sec:collieResults}
-%Again, another name for this subsection could be good.
-
-Since the Collie uses a compactor that aborts on mutator interference to allow
-concurrency, there are no copy-progress guarantees for the algorithm~\cite{Osterlund:FPP}.
-While extremely unlikely, this means a GC cycle could be performed without compacting
-any portion of the heap. Since the Collie reclaims memory by labeling the from-space as freed,
-this would mean no garbage is actually collected should this occur.
-
-The referrer sets built during the GC process are done per object. Keeping track of them
-will require extra space overhead. The amount of overhead this would cause is discussed in
-general terms, but no numbers are provided. It is noted that the overall space needed will 
-depend upon the specific storage mechanisms used, but these mechanisms are not 
-investigated~\cite{Iyengar:Collie}. However, allowing referrer sets to take
-more space is shown to result in more memory being reclaimed for each GC cycle.
 
 Like the C4 garbage collector, the Collie collector is tested against a modified
 variant of the Pauseless collector~\cite{Iyengar:Collie}. Accordingly, it is 
@@ -561,7 +547,39 @@ To be done at a later date...
 To be done at a later date...
 
 Just throwing some general final statements about each algorithm in here as I write about
-them. At this point, this is not menat to be cohesive in any way.
+them. At this point, this is not meant to be cohesive in any way.
+
+\emph{C4}
+
+%Not sure what else to say for this. It's a pretty solid algorithm.
+As was shown in its experimentation, C4 is fully capable of sustaining pauseless application
+behavior for its intended environment. C4 demonstrated two-orders of magnitude improvement
+over the two non-concurrently compacting GC algorithms it was compared against. C4 is
+fully concurrent, all of its main phases execute without hindering application behavior,
+but the implementation of C4 tested does actually use some very brief stop-the-world synchronization
+techniques between these phases. These synchronizations cause pauses in the sub-millisecond range, so
+they are not significant enough for to make C4 not be considered pauseless. Future work 
+on the C4 could include scaling it up to larger heaps and 
+finding a way to remove the between phases synchronizations.
+
+\emph{Collie}
+
+Since the Collie uses a compactor that aborts on mutator interference to allow
+concurrency, there are no copy-progress guarantees for the algorithm~\cite{Osterlund:FPP}.
+While extremely unlikely, this means a GC cycle could be performed without compacting
+any portion of the heap. Since the Collie reclaims memory by labeling the from-space as freed,
+this would mean no garbage is actually collected should this occur.
+
+The referrer sets built during the GC process are done per object. Keeping track of them
+will require extra space overhead. The amount of overhead this would cause is discussed in
+general terms, but no numbers are provided. It is noted that the overall space needed will 
+depend upon the specific storage mechanisms used, but these mechanisms are not 
+investigated~\cite{Iyengar:Collie}. However, allowing referrer sets to take
+more space is shown to result in more memory being reclaimed for each GC cycle.
+
+\emph{FPP}
+
+Things
 
 
 \section*{Acknowledgments}
