@@ -210,7 +210,29 @@ that might be loaded again later is also fixed. This is possible because the LVB
 is checked directly following reference load but before the reference is used.
 Self-healing helps reduce the occurrence of the read barrier triggers.
 
+\subsection{Concurrent Relocation}
+\label{sec:c4Relocation}
 
+The relocation aspect of compaction in the Collie occurs on a per-\emph{page}
+basis, where a page is a fixed-length, contiguous block of virtual memory
+that is backed by a contiguous block of physical storage~\cite{wiki:page}\cite{Tene:C4}.
+To quickly empty virtual pages, the most sparsely populated pages are relocated
+first. The from space in this relocation is actually from pages, and the to space
+is to pages. From pages are any with garbage
+and are marked as such during the tracing phase.
+
+When all living objects are relocated from a page marked for relocation,
+the C4 compactor will utilize a \emph{Quick Release} method. In order to quickly recycle
+physical memory sources, the physical memory backing the page will be marked as freed
+as soon as the last object has been moved to a to page. Because the objects have already 
+been transferred to new page, the contents of the from pages are no longer needed. Thus,
+the physical memory backing it can be put to use immediately. The virtual memory for the
+from page will still be in use until all references have been remapped, but this allows
+for efficient recycling of physical memory.
+
+To support concurrent relocation, pages that are being relocated are protected. 
+The LVB will trigger when encountering a reference pointing to an object
+that is protected.
 
 
 \section{The Collie Collector}
