@@ -249,7 +249,7 @@ stores object forwarding information outside of a from page. Thus, when a refere
 a from page is loaded, LVB has the mutator check the forwarding table rather than the
 from page to see where an object has moved to.
 
-The key point to understand here is GC threads do the most work. They simply
+The key point here is GC threads do the most work. They simply
 move objects from the from pages. Meanwhile, the LVB protects pages being 
 relocated with the previously mentioned invariant. The LVB is checked for every reference load
 done by a mutator thread, so every time a thread adds a reference to its 
@@ -257,19 +257,44 @@ stack or register. In the case of compaction, we care if the mutator is trying
 to access an object on a protected page. If it is, the barrier will trigger 
 handling code. This can be seen in the pseudocode. Assuming the issue with the
 reference came from compaction, as opposed to tracing, the object the reference
-points to will be checked for if it has been relocated; if it has not been, the
+points to will be checked for its relocation state; if it has not been relocated, the
 thread will relocate it. Once the thread knows it has been relocated, by itself
 or a GC thread, it will update get the object's relocated position. Using this,
-a compare and swap operation is performed to change the original location
+a method is performed to change the original location
 the invalid reference was loaded from (this is also performed for tracing triggers).
 
 \todo[inline]{Get some nice way of showing pseudocode...}
 
 
-\subsection{Lazy Remapping}
-\label{sec:c4Lazy}
+\subsection{Concurrent Remapping}
+\label{sec:c4Remapping}
 
-Stuff
+To maintain concurrency while updating all references to the now relocated
+objects, the C4 compaction algorithm uses two techniques~\cite{Tene:C4}. The first is
+referred to as \emph{lazy remapping}. This essentially allows the mutator
+threads to continue updating references as they trigger the LVB. In order for
+the remapping phase of compacting GC to end, all live references must be updated.
+This could go on indefinitely if lazy remapping alone is relied upon.
+
+To finish remapping, a traversal of live references must be performed to
+ensure they are all updated, like the traversal performed to trace which
+objects are now garbage. Since no physical resources are being held due
+to Quick Release and lazy remapping does not disrupt mutator operations,
+the remapping traversal is pushed off until another GC cycle starts. That
+is, C4 will have the remapping of one GC cycle be performed while the tracing
+of another cycle is beginning. This works since both processes need to traverse
+the same object and reference graphs to find all reachable references. To
+visually see how this works, examine Figure~\ref{fig:c4Cycle}.
+
+\todo[inline]{Make the figure greyscale/black-and-white accessible.}
+
+\begin{figure}
+\centering
+\psfig{file=c4Mapping_rough_figure.pdf,width =3in}
+\caption{C4 GC cycle. Remapping and Tracing are rolled into one traversal.
+(taken from \cite{Tene:C4})}
+\label{fig:c4Cycle}
+\end{figure}
 
 
 \section{The Collie Collector}
