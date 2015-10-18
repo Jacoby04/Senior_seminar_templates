@@ -284,7 +284,7 @@ the remapping traversal is pushed off until another GC cycle starts. That
 is, C4 will have the remapping of one GC cycle be performed while the tracing
 of another cycle is beginning. This works since both processes need to traverse
 the same object and reference graphs to find all reachable references. To
-visually see how this works, examine Figure~\ref{fig:c4Cycle}.
+visualize how this works, examine Figure~\ref{fig:c4Cycle}.
 
 \todo[inline]{Make the figure greyscale/black-and-white accessible.}
 
@@ -295,6 +295,35 @@ visually see how this works, examine Figure~\ref{fig:c4Cycle}.
 (taken from \cite{Tene:C4})}
 \label{fig:c4Cycle}
 \end{figure}
+
+
+\subsection{C4 Results Summary}
+\label{sec:c4Results}
+
+Experiments done with the implemented C4 algorithm were meant to show the
+benefits of using an algorithm that is simultaneously generational and concurrent~\cite{Tene:C4}.
+C4 is tested against a modified C4 algorithm that is not generational. Additionally,
+it is tested against two algorithms that do not perform concurrent compaction. 
+All GC algorithms were tested on the same hardware; the setup was a
+2 socket, 12 core Intel x5680 server with 96 GB of memory. The test exhibited
+an allocation rate of about 1.2GB/sec, and there were live sets of objects on 
+the heap consistently at a size of around 2.5GB; the actual heap size was allowed 
+to grow though, indicating greater amounts of garbage on the heap. The applications were run long
+enough to ensure multiple full heap GC cycles were performed and at least one
+significant compaction event occurred.
+
+The primary performance metric monitored was the worst-case response times
+of the servers responding to requests while experiencing the workloads
+described above. This gives a sense of how much garbage collection slows
+an application's responses to clients. C4 maintained the smallest 
+range of worst-case response times and it did so across the largest range of heap sizes.
+The worst-case response times were usually in the range of 0.01-0.1secs. 
+These response times are fast enough to be considered \emph{pauseless}. 
+The non-generational version of C4 could also reach pauseless thresholds,
+but the range of heap sizes it could do so for was far more limited. Where standard
+C4 sustained pauseless operation for heap sizes of 5-35GB, the modified C4 could
+only do so for heaps sizes of 15-35GB. The non-concurrently compacting
+collectors had multi-second worst-case response times for all heap sizes experienced.
 
 
 \section{The Collie Collector}
@@ -493,7 +522,7 @@ reference used is updated to mirrored-to-space, the barrier will prevent the thr
 correct the reference.
 
 
-\subsection{Summary of Results}
+\subsection{Collie Results Summary}
 \label{sec:collieResults}
 %Again, another name for this subsection could be good.
 
@@ -530,6 +559,9 @@ To be done at a later date...
 \label{sec:conclusions}
 
 To be done at a later date...
+
+Just throwing some general final statements about each algorithm in here as I write about
+them. At this point, this is not menat to be cohesive in any way.
 
 
 \section*{Acknowledgments}
