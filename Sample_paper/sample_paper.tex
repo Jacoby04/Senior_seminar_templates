@@ -180,7 +180,7 @@ it is not discussed here. The other invariant states that a loaded
 reference value must point to the location of the object that currently has the
 object's contents that are safely accessible. 
 In other words, if an object is being relocated, references to it must point 
-to the the object wherever it can be safely accessed, be it the from or to 
+to the the object wherever it can be safely accessed, be it the from or to-
 space. If the invariant does not hold
 when a reference is loaded, the barrier will trigger and execute code to correct
 the situation. The code executed depends on what causes the trigger
@@ -204,8 +204,8 @@ The relocation aspect of compaction in the Collie occurs on a per-\emph{page}
 basis, where a page is a fixed-length, contiguous block of virtual memory
 that is backed by a contiguous block of physical storage~\cite{wiki:page}\cite{Tene:C4}.
 To quickly empty virtual pages, the most sparsely populated pages are relocated
-first. The from space in this relocation is actually from pages, and the to space
-is to pages. From pages are pages with garbage
+first. The from-space in this relocation is actually from-pages, and the to-space
+is to-pages. From-pages are pages with garbage
 and are marked as such during the tracing phase.
 
 % Maybe could get rid of this later if space is needed and just stick to the pseudocode.
@@ -229,16 +229,16 @@ When all living objects are relocated from a page marked for relocation,
 the C4 compactor will utilize a \emph{Quick Release} method. In order to quickly recycle
 physical memory sources, the physical memory backing the page will be marked as freed
 as soon as the last object has been moved to a to page. Because the objects have already 
-been transferred to new page, the contents of the from pages are no longer needed. Thus,
-the physical memory backing it can be put to use immediately. The from page's virtual 
+been transferred to new page, the contents of the from-pages are no longer needed. Thus,
+the physical memory backing it can be put to use immediately. The from-page's virtual 
 addresses will be in use until all references have been remapped, but this 
 allows for efficient recycling of physical memory. This is made possible as the C4 compactor
-stores object forwarding information outside of a from page. Thus, when a reference to
-a from page is loaded, LVB has the mutator check the forwarding table rather than the
-from page to see where an object has moved to.
+stores object forwarding information outside of a from-page. Thus, when a reference to
+a from-page is loaded, LVB has the mutator check the forwarding table rather than the
+from-page to see where an object has moved to.
 
 The key point here is GC threads do the most work. They simply
-move objects from the from pages. Meanwhile, the LVB protects pages being 
+move objects from the from-pages. Meanwhile, the LVB protects pages being 
 relocated with the previously mentioned invariant. The LVB is checked for every reference load
 done by a mutator thread, so every time a thread adds a reference to its 
 stack or register. In the case of compaction, we care if the mutator is trying 
@@ -272,7 +272,9 @@ the remapping traversal is pushed off until another GC cycle starts. That
 is, C4 will have the remapping of one GC cycle be performed while the tracing
 of another cycle is beginning. This works since both processes need to traverse
 the same object and reference graphs to find all reachable references. To
-visualize how this works, examine Figure~\ref{fig:c4Cycle}.
+visualize how this works, examine Figure~\ref{fig:c4Cycle}. After this
+is done, all references to from-pages are now gone. Thus, the virtual resource
+can be freed and reclamation of memory is now entirely complete. 
 
 \todo[inline]{Make the figure greyscale/black-and-white accessible.}
 
@@ -324,12 +326,8 @@ if the algorithm has actually been implemented and where, what the type of envir
 that it pulls a lot from C4, etc. Also, need to think of where figures and examples can be used. Need
 to make sure there are no references (haha) to the old theoretical section I had. Need to make sure
 all things that need background info receive it earlier (make a list). Need to update results with numbers
-and remove the conclusion-y stuff for the conclusion section. Basically, if you're a professor or adviser 
-and you read this for the section draft, it's not worth reading again yet.}
-\todo[inline, color=green]{Stuff I've worked on modifying from the above list: introduction, conclusion and results.}
-
-\todo[inline]{Also, consider what aspects of Collie directly come from C4 as well as which ones are
-important/different enough to talk about once again.}
+and remove the conclusion-y stuff for the conclusion section.}
+\todo[inline, color=green]{Stuff I've worked on modifying from the above list: introduction, conclusion and results, example of zero-copy transplantation, no references to old theoretical section, made a list of bg info (hopefully didn't miss anything), considered what the Collie builds upon from C4. That should be about everything. For professors, this should be worth reading again.}
 
 We now look at the concurrent compaction technique used within the 
 Collie garbage collector described by Iynegar et al.~\cite{Iyengar:Collie};
@@ -442,11 +440,24 @@ termination purposes, mirrored-to-space is logically considered part of to-space
 
 Mirrored-to-space is necessary to facilitate zero-copy transplantation that is 
 non-compacting between from-space and to-space. Since an object's contents are 
-already consistent between from-space and mirrored-to-space and mirrored-to-space
+already consistent between from space and mirrored-to-space and mirrored-to-space
 is logically considered to be to-space, transplantation to "to-space"
 can be done without copying the object's contents. That is, zero-copy transplantation
 allows transplantation of an object from from-space to mirrored-to-space, which only
 requires correcting references.
+
+As an example, say we have an object stored in memory. As discussed before, all references
+to this object are actually references to its virtual page location. This virtual page
+is backed up by some contiguous, physical memory equivalent in size to the page. 
+Mirrored-to-space is simply another page that is assigned to the same section of physical memory. 
+The only difference between this mirrored-to-space and the page our object is stored on
+is references to the object used by mutators point to its virtual page.
+Zero-copy transplantation swaps this. All references to the object are
+updated to point from the original virtual page to mirrored-to-space, which
+is just another virtual page. Thus, we get the name \emph{zero-copy} translation
+because our object is never moved in physical memory; the object simply
+swaps virtual pages for the purposes of the compactor believing all of from-space
+has been compacted.
 
 Ideally, the compaction algorithm will never have to use zero-copy transplantation
 as it does not actually compact the heap. The purpose of this is to ensure
@@ -471,7 +482,7 @@ has to be aborted or if it fails to maintain a stable referrer set.
 Any object that is deemed as such will be moved to mirrored-to-space by zero-copy 
 transplantation. An object may be declared NIT during the tracing phase before transplantation
 if it violates requirement 1 for having a stable referrer set; discussion
-of how this occurs is orthogonal to the purposes of this paper.
+of how this occurs is beyond the scope of this paper of this paper, see~\cite{Iyengar:Collie}.
 
 At the start of the transplantation phase, a pre-compaction checkpoint occurs.
 For all relocatable objects, referrer sets have been established during the tracing phase.
@@ -502,12 +513,11 @@ If a transaction fails or is interrupted, as detected by the TM system, then the
 
 After the transactional procedure either succeeds or fails for the 
 relocatable objects with stable referrer sets, all that remains is to perform zero-copy transplantation
-on all NIT objects. To avoid an extra traversal of memory, this can be rolled into the next tracing
-phase, much like C4 does~\cite{Tene:C4}. The second purpose of the LVB-like barrier comes into play
-at this time. If a mutator thread attempts to access a NIT object before the 
-reference used is updated to mirrored-to-space, the barrier will prevent the thread and force it to 
-correct the reference.
-
+on all NIT objects. Just like the C4 compactor, Collie will do this lazily. This is the second purpose
+of the LVB-like barrier; as mutators try to access NIT object before their references are updated to
+point to mirrored-to-space, the barrier will force them to correct the references. Also like C4, Collie
+rolls the full traversal of memory to finish zero-copy transplantation of all NIT objects into the next
+tracing phase.
 
 \subsection{Collie Results Summary}
 \label{sec:collieResults}
