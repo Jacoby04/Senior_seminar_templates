@@ -112,11 +112,12 @@ refer to and common techniques needed to understand my paper
 
 Start introducing some terminology relevant to single processor 
 garbage collectors such as: stop-the-world, fragmentation, compaction, 
-tracing, reference remapping, etc.
+tracing, reference remapping, reclamation etc.
 
-Explain the three typical aspects of compaction 
-(relocation/copying, remapping, and reclamation: 
-reclamation is often just done through the other two)
+Explain the two typical aspects of compaction 
+(relocation/copying and remapping: 
+reclamation in compacting garbage collectors is often done through these
+by just labeling memory as free.)
 
 \subsection{Parallel Processing}
 \label{sec:parallelProcessing}
@@ -132,19 +133,6 @@ necessary for explaining barriers)
 
 Typical ways of mitigating challenges experienced in parallel 
 computing (synchronization, barriers/locks)
-
-\todo[inline]{Decided a portion I wrote for Collie
-should be included in the general background. Throwing what I wrote here
-for now. Will be rewritten later.}
-A \emph{global safepoint} is requested by a thread and is a moment when all 
-threads are paused such that operations can be performed by the requesting thread without having to worry 
-about references in the application changing. As a global safepoint requires pausing application
-threads, this breaks concurrency.
-Note that a safepoint differs from a barrier in GC. In a safepoint,
-all threads are allowed to reach a certain point then their execution is simply paused.
-A barrier works by telling threads how to behave if multiple try to access the same
-memory. Thus, using a global safepoint does not break the goal of barrier-free compaction
-~\cite{Humble:2015}.
 
 Also, talk about checkpoints here.
 
@@ -304,9 +292,9 @@ Experiments done with the implemented C4 algorithm were meant to show the
 benefits of using an algorithm that is simultaneously generational and concurrent~\cite{Tene:C4}.
 C4 is tested against a modified C4 algorithm that is not generational. Additionally,
 it is tested against two algorithms that do not perform concurrent compaction. 
-All GC algorithms were tested on the same hardware; the setup was a
-2 socket, 12 core Intel x5680 server with 96 GB of memory. The test exhibited
-an allocation rate of about 1.2GB/sec, and there were live sets of objects on 
+All GC algorithms were tested on the same hardware; for specifications, see~\cite{Tene:C4}. The test exhibited
+a workload with
+an allocation rate of about 1.2GB/sec and live sets of objects on 
 the heap consistently at a size of around 2.5GB; the actual heap size was allowed 
 to grow though, indicating greater amounts of garbage on the heap. The applications were run long
 enough to ensure multiple full heap GC cycles were performed and at least one
@@ -338,7 +326,7 @@ to make sure there are no references (haha) to the old theoretical section I had
 all things that need background info receive it earlier (make a list). Need to update results with numbers
 and remove the conclusion-y stuff for the conclusion section. Basically, if you're a professor or adviser 
 and you read this for the section draft, it's not worth reading again yet.}
-\todo[inline, color=green]{Stuff I've worked on modifying from the above list: introduction.}
+\todo[inline, color=green]{Stuff I've worked on modifying from the above list: introduction, conclusion and results.}
 
 \todo[inline]{Also, consider what aspects of Collie directly come from C4 as well as which ones are
 important/different enough to talk about once again.}
@@ -349,9 +337,11 @@ with the exception of Gehringer, they were the researchers who worked on the C4 
 As such, Collie utilizes modified versions of several techniques within C4, such as:
 the tracing algorithm, the LVB, page-granularity compaction, self-healing, and quick-release behavior.
 Only the LVB is modified in significant ways for the purposes of compaction in Collie,
-so the rest of the techniques are not re-discussed here. Additionally, the Collie
+so the rest of the techniques are not re-discussed here; however, the other 
+techniques are still playing parts in the compaction process. Additionally, the Collie
 collector is also designed with server environments in mind. Collie is implemented and tested in 
-the same production quality Azul JVM that the Pauseless garbage collector is implemented in~\cite{Click:Pauseless}. However, it has not been made commercially available.
+the same production quality Azul JVM that the Pauseless garbage collector is implemented in
+~\cite{Click:Pauseless}. However, it has not been made commercially available.
 
 
 \subsection{Transactional Memory}
@@ -366,15 +356,17 @@ which are a series of operations performed as one unit where
 they occur in an all-or-none manner~\cite{wiki:atomicity}.
 
 For example, consider updating the inventory of a store; this may involve updating
-the price, quantity and distributor for various items. 
-If a person was updating information regarding an item, they would 
-want all three attributes of the item to be updated or none at all. Having
-only a subset of the attributes updated could cause confusion.
+the price, quantity, and distributor for various items. 
+If a person updates information regarding an item, they would 
+want all or none of the item's attributes to be updated. Having
+only a subset of the attributes updated could cause confusion. A transaction
+would ensure an item goes unchanged if the process of updating the item's info 
+is started and then aborted before completion
 
 TM systems allow a series
-of operations that modify memory to be placed in
+of operations modifying memory to be placed in
 a \emph{transactional procedure}, much like a database transaction.
-The TM system then monitors the access of concurrent threads to \emph{transactional variables}:
+The TM system then monitors the access of concurrent threads to \emph{transactional variables},
 memory modified by a transactional procedure.
 Concurrent threads will operate in parallel until they try to modify
 the same transactional variable. At this time, behavior can be specified as to how 
@@ -387,21 +379,16 @@ made to memory by the transaction are finalized~\cite{wiki:transactional-memory}
 \subsection{Object Transplantation}
 \label{sec:collieTransplantation}
 
-% Two possible changes to come here. If C4 also does reclamation the "easy way"
-% as described by FPP, then mentioning it in background and elsewhere can probably
-% be simplified to a simple note of that being how it's handled by all the algorithms
-% I discuss. Also, Might not need the refresher on relocation and remapping if talked
-% about recently before.
 With the use of a TM system for synchronizing concurrent compaction,
 new terminology is introduced for understanding the Collie 
 compactor~\cite{Iyengar:Collie}. As discussed, compaction of
 memory requires relocation of objects and remapping of references to
-the objects; the Collie does reclamation by labeling the from-space as freed.
+the objects.
 An object \emph{transplantation} consists of both the relocation and 
-remapping of an object. A transplantation has not been completed until
+remapping of an object. A transplantation is not complete until
 the object's contents have been moved and all required references have been
 updated. All relocating collectors, and by extension all
-compacting collectors, transplant objects. The Collie compactor 
+compacting collectors, transplant objects. The Collie's compactor 
 performs individual object transplantations within transactional procedures. 
 
 Each object in an application's memory has a \emph{referrer set}. This is the precise set 
@@ -411,7 +398,7 @@ in references to the object being created that the transactional procedure
 was not aware of when starting, so they are not updated to point to 
 the new object location when it is finishing. To avoid this, a referrer set can be
 \emph{protected} by writing to each reference within it and preventing it from
-being read temporarily.
+being loaded temporarily.
 
 There is also a notion of a \emph{stable} referrer set. An object has a stable referrer 
 set if the object's referrer set meets the following criteria:
@@ -421,7 +408,7 @@ set if the object's referrer set meets the following criteria:
 \item Once transplantation is underway, no new references may be added to the object's \emph{transplantation state} until it is complete
 \end{enumerate}
 This ensures the compactor is aware of all references to the object
-and the references to the object go unchanged.
+and references to the object go unchanged.
 
 An object has a transplantation state consisting of the object's contents 
 and the object's referrer set. This definition builds on the general requirements
@@ -525,14 +512,26 @@ correct the reference.
 \subsection{Collie Results Summary}
 \label{sec:collieResults}
 
-Like the C4 garbage collector, the Collie collector is tested against a modified
-variant of the Pauseless collector~\cite{Iyengar:Collie}. Accordingly, it is 
-implemented on the same JVM that Pauseless runs on~\cite{Click:Pauseless}. For the 
-hardware specifications, refer to~\cite{Iyengar:Collie}. The goal of the Collie 
-collector to reduce latency compared to the Pauseless collector was achieved. 
-It also managed to increase throughput as a side-effect. 
+The main goal of the Collie collector is to maintain high mutator responsiveness
+during compaction~\cite{Iyengar:Collie}. The Collie is tested 
+against a modified variant of the Pauseless collector~\cite{Click:Pauseless}.
+Accordingly, both collectors are implemented on the same JVM. For the hardware
+specifications used for testing, refer to~\cite{Iyengar:Collie}. The Collie
+utilizes several aspects of the C4 collector, which in turn builds upon the Pauseless
+collector. This provides an effective comparison to see how the main differences, 
+use of transactional memory and an aborting compactor, affect performance. 
 
-%Find out what I should do for these and get figures as needed. - See feedback from Elena on section.
+To examine mutator responsiveness, \emph{minimum mutator utilization} (MMU) is measured.
+MMU is the minimum percentage of mutators being utilized over a period of time~\cite{Bacon:MMU}. Ideally,
+MMU would always be at 100\% so all mutators are being used. This provides an indicator
+of the latency. MMUs were taken from various time periods during which
+compaction was running and was compared between the two algorithms. Comparisons were done
+with both a 128MB heap and a 512MB heap. For all time windows, the Collie compactor
+had higher MMUs than Pauseless. Collie did not go below a 70\% mutator utilization 
+rate whereas Pauseless ranged over the whole spectrum of values. This is 
+likely because the aborting nature of Collie
+lends itself to ensuring mutator response time despite potentially impacting the
+amount of memory compacted.
 
 
 \section{Field Pinning Protocol}
@@ -547,7 +546,8 @@ To be done at a later date...
 To be done at a later date...
 
 Just throwing some general final statements about each algorithm in here as I write about
-them. At this point, this is not meant to be cohesive in any way.
+them. At this point, this is not meant to be cohesive in any way at the moment. Feel free
+to look at it though.
 
 \emph{C4}
 
@@ -576,6 +576,11 @@ general terms, but no numbers are provided. It is noted that the overall space n
 depend upon the specific storage mechanisms used, but these mechanisms are not 
 investigated~\cite{Iyengar:Collie}. However, allowing referrer sets to take
 more space is shown to result in more memory being reclaimed for each GC cycle.
+
+Collie is not made generational at this time, but it could be done similarly
+to how C4 does so, which would improve performance. (I believe the paper
+mentions some other ways Collie could be improved by borrowing from other
+GC algorithms.)
 
 \emph{FPP}
 
