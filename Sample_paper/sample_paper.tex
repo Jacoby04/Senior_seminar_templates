@@ -184,16 +184,31 @@ multiple GB/sec allocation rates.
 \subsection{Loaded Value Barrier}
 \label{sec:c4LVB}
 
+\todo[inline]{Consider adding in how single-pass reference mapping comes from this.}
+
 C4 uses a barrier referred to as the \emph{Loaded Value Barrier} (LVB) to 
 maintain concurrency throughout the GC process~\cite{Tene:C4}. The LVB 
 places invariants on each object reference value as it is loaded from memory.
 One of the invariants relates to the tracing portion of the GC algorithm, so
-it is not discussed here. The other invariant effectively states that a loaded
+it is not discussed here. The other invariant states that a loaded
 reference value must point to the location of the object that currently has the
-object's contents that are safely accessible. If the invariant does not hold
+object's contents that are safely accessible. 
+In other words, if an object is being relocated, references to it must point 
+to the the object wherever it can be safely accessed, be it the from or to 
+space. If the invariant does not hold
 when a reference is loaded, the barrier will trigger and execute code to correct
 the situation. The code executed depends on what causes the trigger
 and is discussed later.
+
+In order to prevent repetitive barrier triggers from a single incorrect reference,
+the LVB uses a \emph{self-healing} technique. Whenever a reference triggers LVB
+due to the reference not meeting an invariant, it will perform the rectifying code
+necessary to fix the reference. Additionally, the barrier will go to the memory
+location the reference was loaded from and fix the the source of the reference. This
+ensures not only the loaded reference being used is fixed, but the stored reference
+that might be loaded again later is also fixed. This is possible because the LVB 
+is checked directly following reference load but before the reference is used.
+Self-healing helps reduce the occurrence of the read barrier triggers.
 
 
 
