@@ -184,8 +184,6 @@ multiple GB/sec allocation rates.
 \subsection{Loaded Value Barrier}
 \label{sec:c4LVB}
 
-\todo[inline]{Consider adding in how single-pass reference mapping comes from this.}
-
 C4 uses a barrier referred to as the \emph{Loaded Value Barrier} (LVB) to 
 maintain concurrency throughout the GC process~\cite{Tene:C4}. The LVB 
 places invariants on each object reference value as it is loaded from memory.
@@ -210,6 +208,7 @@ that might be loaded again later is also fixed. This is possible because the LVB
 is checked directly following reference load but before the reference is used.
 Self-healing helps reduce the occurrence of the read barrier triggers.
 
+
 \subsection{Concurrent Relocation}
 \label{sec:c4Relocation}
 
@@ -218,21 +217,59 @@ basis, where a page is a fixed-length, contiguous block of virtual memory
 that is backed by a contiguous block of physical storage~\cite{wiki:page}\cite{Tene:C4}.
 To quickly empty virtual pages, the most sparsely populated pages are relocated
 first. The from space in this relocation is actually from pages, and the to space
-is to pages. From pages are any with garbage
+is to pages. From pages are pages with garbage
 and are marked as such during the tracing phase.
+
+% Maybe could get rid of this later if space is needed and just stick to the pseudocode.
+To support concurrent relocation, pages being relocated are protected. 
+The LVB will trigger for mutator threads encountering a reference pointing to an object
+on a protected page. If the object has been relocated already, LVB will
+obtain the new location for the mutator. If the object is being relocated, 
+LVB will cause the mutator to wait
+for the GC thread to finish before continuing to work.
+If the object has not started relocation, LVB has the mutator thread 
+escalate its movement status by moving the object itself. After any of 
+these situations, the LVB will also cause the mutator thread to update 
+the reference to the new location and heal the source location of the reference.
+Without any mutator accesses, the GC threads will relocate the objects but
+will not remap references at this time. If an object
+spans multiple pages, \emph{page shattering} is used to relocate chunks of
+it at a time sequentially while minimizing interruptions to mutators;
+finer details of this can be read here~\cite{Tene:C4}.
 
 When all living objects are relocated from a page marked for relocation,
 the C4 compactor will utilize a \emph{Quick Release} method. In order to quickly recycle
 physical memory sources, the physical memory backing the page will be marked as freed
 as soon as the last object has been moved to a to page. Because the objects have already 
 been transferred to new page, the contents of the from pages are no longer needed. Thus,
-the physical memory backing it can be put to use immediately. The virtual memory for the
-from page will still be in use until all references have been remapped, but this allows
-for efficient recycling of physical memory.
+the physical memory backing it can be put to use immediately. The from page's virtual 
+addresses will be in use until all references have been remapped, but this 
+allows for efficient recycling of physical memory. This is made possible as the C4 compactor
+stores object forwarding information outside of a from page. Thus, when a reference to
+a from page is loaded, LVB has the mutator check the forwarding table rather than the
+from page to see where an object has moved to.
 
-To support concurrent relocation, pages that are being relocated are protected. 
-The LVB will trigger when encountering a reference pointing to an object
-that is protected.
+The key point to understand here is GC threads do the most work. They simply
+move objects from the from pages. Meanwhile, the LVB protects pages being 
+relocated with the previously mentioned invariant. The LVB is checked for every reference load
+done by a mutator thread, so every time a thread adds a reference to its 
+stack or register. In the case of compaction, we care if the mutator is trying 
+to access an object on a protected page. If it is, the barrier will trigger 
+handling code. This can be seen in the pseudocode. Assuming the issue with the
+reference came from compaction, as opposed to tracing, the object the reference
+points to will be checked for if it has been relocated; if it has not been, the
+thread will relocate it. Once the thread knows it has been relocated, by itself
+or a GC thread, it will update get the object's relocated position. Using this,
+a compare and swap operation is performed to change the original location
+the invalid reference was loaded from (this is also performed for tracing triggers).
+
+\todo[inline]{Get some nice way of showing pseudocode...}
+
+
+\subsection{Lazy Remapping}
+\label{sec:c4Lazy}
+
+Stuff
 
 
 \section{The Collie Collector}
