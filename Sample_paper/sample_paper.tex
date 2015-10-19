@@ -561,7 +561,27 @@ of OpenJDK 9~\cite{Detlefs:G1}.
 \subsection{Hazard Pointers}
 \label{sec:fppHazard}
 
-things
+The key component driving FPP is the \emph{hazard pointer} (HP). HPs
+are typically used in manual memory management of objects to allow lock-free 
+data structures. The idea is all threads contain a list of HPs.
+The HPs point to objects in memory the thread is accessing, or \emph{pin} it.
+When a thread is finished accessing an object, it drops the HP.
+The HPs allow for asynchronous relocation of an object. So long as an object
+is pinned by a mutator, it cannot be relocated. Once all threads have
+unpinned the object, it is ready to be relocated collaboratively.
+By collaboratively, we mean the last thread to drop the HP to the object
+will hold the final responsibility for copying the object.
+When discussing the theoretical construction of the algorithm, it is discussed
+at a granularity of pinning individual fields rather than objects, thus \emph{Field} Pinning
+Protocol. 
+
+While it is explained in more detail below, an example of how hazard pointers 
+work on a high-level is useful. Imagine someone brings cake to a party. Anyone 
+wanting cake must make it known to others by having a plate, otherwise the 
+cake is liable to be moved to the fridge. The people are effectively pinning the cake.
+Once everyone has had their share of cake, it should be moved. This can
+be done safely when no one has plates any longer, so no one has the cake pinned.
+The last person to discard their plate will be responsible for relocating the cake.
 
 
 \subsection{Tricoloring}
