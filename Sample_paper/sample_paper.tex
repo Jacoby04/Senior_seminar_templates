@@ -681,7 +681,27 @@ or setting a timer.
 \subsection{FPP Results Summary}
 \label{sec:fppResults}
 
-things
+As mentioned, FPP was implemented in the G1 garbage collector for testing purposes~\cite{Osterlund:FPP}. 
+Appropriately, the modified G1 collector utilizing FPP for relocation is tested against the
+unmodified G1 collector. This was tested in a largely standard MacBook Pro; for the 
+hardware details, see~\cite{Osterlund:FPP}. Metrics
+examined include throughput and latency.
+
+For testing throughput, running times were captured while running benchmarks on each
+JVM. Tests were run using 512MB heap sizes. Before measuring running times of the 
+benchmarks, 10 warm-up iterations were run.
+The added checks for HPs as well as attempting to relocate objects resulted
+in roughly a 15\% loss to throughput on average. Thus, the G1 with FPP experienced consistent
+performance overhead compared to the standard G1 collector.
+
+For latency, the h2 benchmark from DaCapo is used; for details, see~\cite{Blackburn:DaCapo}.
+This benchmark was chosen due to being memory intensive and using an 8GB heap;
+this makes latency issues more apparent.
+Additionally, latency is measured using the jHiccup tool developed by Azul Systems.
+Compared to its host garbage collector, G1 with FPP improved latency at all time
+intervals examined. On average, latency was improved by around 50\%. That means
+pause times were about half as long on average. Latency was also shown to occur
+mostly as a result of host garbage collector activities such as tracing and remapping.
 
 
 \section{Conclusions}
@@ -733,10 +753,13 @@ GC algorithms.)
 \emph{FPP}
 
 As FPP seeks to be easily implemented into a range of host garbage collectors, 
-it does not require special hardware or operating system requirements.
+it does not require special hardware or operating system requirements. FPP
+is primarily designed for tracing garbage collectors that divide the heap
+into more than one region. 
 FPP is mentioned to be implementable within the Pauseless garbage collector,
 which we have discussed heavily influenced both the C4 and Collie garbage collectors.
 It seems likely that it could also be implemented into either of them as a result.
+FPP has copy-progress guarantees as well.
 
 
 \section*{Acknowledgments}
