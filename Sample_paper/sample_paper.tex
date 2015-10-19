@@ -59,6 +59,7 @@ pauses of an application.
 
 \keywords{Garbage Collection (GC), Concurrency, Compaction, Continuously Concurrent Compacting Collector (C4), Collie, Field Pinning Protocol (FPP)}
 
+
 \section{Introduction}
 \label{sec:introduction}
 
@@ -84,20 +85,25 @@ and remove dead objects. We will focus on specific parts of the
 garbage collection (GC) process performed by different Java Virtual Machines 
 (JVMs), software processes that run Java programs on computing systems~\cite{Lindblom:2011}.
 
-\todo[inline]{Still need to talk briefly about why parallel GC is becoming necessary.
+\todo[inline]{THIS IS NOT COMPLETE YET. Still need to talk briefly about why parallel GC is becoming necessary.
 Might also want to say what kind of BG will be introduced and what algorithms I will look at? 
 If I do, I will likely leave out implementation details of GC algorithms until their introductory
 parts of their sections.}
 
+
 \section{Background}
 \label{sec:background}
 
-\todo[inline]{Just threw stuff from outline in this section for now.}
+\todo[inline]{Just threw stuff from outline in this section for now.
+Made a list of most bg each specific section needs so I ensure I cover
+what is needed and nothing more for space. Still haven't
+changed this portion since the outline}
 
 This is where I explain terminology and aspects of GC and parallel 
 computing that are necessary to understand my paper (If there is 
 enough information in each subsection, I should maybe forego the 
 background and just make them all sections)
+
 
 \subsection{Garbage Collection}
 \label{sec:garbageCollection}
@@ -119,6 +125,7 @@ Explain the two typical aspects of compaction
 reclamation in compacting garbage collectors is often done through these
 by just labeling memory as free.)
 
+
 \subsection{Parallel Processing}
 \label{sec:parallelProcessing}
 
@@ -135,6 +142,7 @@ Typical ways of mitigating challenges experienced in parallel
 computing (synchronization, barriers/locks)
 
 Also, talk about checkpoints here.
+
 
 \subsection{Parallel Processing as it Applies to Garbage Collection}
 \label{sec:parallelProcessingGarbageCollection}
@@ -319,15 +327,8 @@ collectors had multi-second worst-case response times for all heap sizes experie
 \section{The Collie Collector}
 \label{sec:collie}
 
-\todo[inline]{Implemented some feedback received from Elena on the section draft. Mostly just removed
-the subsubsection on the theoretical implementation. Still need to
-update the introduction to explain who the creators are, that they are the same as those who made C4,
-if the algorithm has actually been implemented and where, what the type of environment is it is defined for,
-that it pulls a lot from C4, etc. Also, need to think of where figures and examples can be used. Need
-to make sure there are no references (haha) to the old theoretical section I had. Need to make sure
-all things that need background info receive it earlier (make a list). Need to update results with numbers
-and remove the conclusion-y stuff for the conclusion section.}
-\todo[inline, color=green]{Stuff I've worked on modifying from the above list: introduction, conclusion and results, example of zero-copy transplantation, no references to old theoretical section, made a list of bg info (hopefully didn't miss anything), considered what the Collie builds upon from C4. That should be about everything. For professors, this should be worth reading again.}
+\todo[inline, color=green]{For professors, this should be modified enough
+since my section draft to be worth reading again (or at least skimming for the main differences).}
 
 We now look at the concurrent compaction technique used within the 
 Collie garbage collector described by Iynegar et al.~\cite{Iyengar:Collie};
@@ -519,6 +520,7 @@ point to mirrored-to-space, the barrier will force them to correct the reference
 rolls the full traversal of memory to finish zero-copy transplantation of all NIT objects into the next
 tracing phase.
 
+
 \subsection{Collie Results Summary}
 \label{sec:collieResults}
 
@@ -563,9 +565,9 @@ of OpenJDK 9~\cite{Detlefs:G1}.
 
 The key component driving FPP is the \emph{hazard pointer} (HP)~\cite{Osterlund:FPP}. HPs
 are typically used in manual memory management of objects to allow lock-free 
-data structures. The idea is all threads contain a list of HPs.
+data structures. All threads contain a list of HPs.
 The HPs point to objects in memory the thread is accessing, or \emph{pin} it.
-When a thread is finished accessing an object, it drops the HP.
+When a thread finishes accessing an object, it drops the HP.
 The HPs allow for asynchronous relocation of an object. So long as an object
 is pinned by a mutator, it cannot be relocated as it is still in use. Once all threads have
 unpinned the object, it is ready to be relocated collaboratively.
@@ -656,7 +658,7 @@ attempt to copy the object:
 \item Scan other threads for HPs to begin transition into sync state. If HPs found,
 blame all relevant threads and move along
 \item Tentatively enter sync state
-\item Scan once more for HPs once again passing blame if found and moving along
+\item Scan once more for HPs passing blame if found and moving along
 \item Now in sync state, proceed to copy the object keeping in mind further
 pins will still impede the copy
 \end{enumerate}
