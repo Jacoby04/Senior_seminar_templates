@@ -547,7 +547,44 @@ amount of memory compacted.
 \section{Field Pinning Protocol}
 \label{sec:fpp}
 
-To be done at a later date...
+Last, we examine concurrent compaction in GC through the Field Pinning
+Protocol (FPP) designed by \"{O}sterlund and L\"{o}we~\cite{Osterlund:FPP}.
+FPP describes a lock-free process for performing the relocation aspect
+of concurrent compaction. The remapping phase as well as other portions
+of GC are left up to the host garbage collector that this
+protocol is implemented within. FPP is compliant with the Java Native Interface
+to allow for integration into a JVM. For purposes of testing, the FPP approach to
+relocation is implemented within the Garbage-First GC algorithm in the HotSpot JVM 
+of OpenJDK 9~\cite{Detlefs:G1}.
+
+
+\subsection{Hazard Pointers}
+\label{sec:fppHazard}
+
+things
+
+
+\subsection{Tricoloring}
+\label{sec:fppColoring}
+
+things
+
+
+\subsection{The Blame Game}
+\label{sec:fppBlame}
+
+things
+
+\subsection{Copy Racing}
+\label{sec:fppCopy}
+
+things
+
+
+\subsection{FPP Results Summary}
+\label{sec:fppResults}
+
+things
 
 
 \section{Conclusions}
@@ -568,7 +605,10 @@ over the two non-concurrently compacting GC algorithms it was compared against. 
 fully concurrent, all of its main phases execute without hindering application behavior,
 but the implementation of C4 tested does actually use some very brief stop-the-world synchronization
 techniques between these phases. These synchronizations cause pauses in the sub-millisecond range, so
-they are not significant enough for to make C4 not be considered pauseless. Future work 
+they are not significant enough for to make C4 not be considered pauseless. To be 
+implemented for use on a Linux platform, C4 requires improvements to the default 
+virtual mapping rates that Linux provides. In other words, default Linux platforms 
+do not support high enough allocation rates to run C4 effectively. Future work 
 on the C4 could include scaling it up to larger heaps and 
 finding a way to remove the between phases synchronizations.
 
@@ -594,7 +634,11 @@ GC algorithms.)
 
 \emph{FPP}
 
-Things
+As FPP seeks to be easily implemented into a range of host garbage collectors, 
+it does not require special hardware or operating system requirements.
+FPP is mentioned to be implementable within the Pauseless garbage collector,
+which we have discussed heavily influenced both the C4 and Collie garbage collectors.
+It seems likely that it could also be implemented into either of them as a result.
 
 
 \section*{Acknowledgments}
