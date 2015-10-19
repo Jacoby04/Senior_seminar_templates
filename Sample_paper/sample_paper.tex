@@ -567,7 +567,7 @@ data structures. The idea is all threads contain a list of HPs.
 The HPs point to objects in memory the thread is accessing, or \emph{pin} it.
 When a thread is finished accessing an object, it drops the HP.
 The HPs allow for asynchronous relocation of an object. So long as an object
-is pinned by a mutator, it cannot be relocated. Once all threads have
+is pinned by a mutator, it cannot be relocated as it is still in use. Once all threads have
 unpinned the object, it is ready to be relocated collaboratively.
 By collaboratively, we mean the last thread to drop the HP to the object
 will hold the final responsibility for copying the object.
@@ -575,7 +575,7 @@ When discussing the theoretical construction of the algorithm, it is discussed
 at a granularity of pinning individual fields rather than objects, thus \emph{Field} Pinning
 Protocol. 
 
-While it is explained in more detail below, an example of how hazard pointers 
+While it is explained in more detail below, an example of how HPs 
 work on a high-level is useful. Imagine someone brings cake to a party. Anyone 
 wanting cake must make it known to others by having a plate, otherwise the 
 cake is liable to be moved to the fridge. The people are effectively pinning the cake.
@@ -596,18 +596,86 @@ being relocated or is awaiting relocation. Copy-gray object's have their from-sp
 point to their to-space destination and their to-space destination point to a location in
 memory holding the status of the object. Last, a \emph{copy-black} object is one that has
 been relocated but still requires remapping. Copy-black objects no longer require the extra
-status information.
+status information. FPP moves objects marked for relocation from a copy-white state to
+a copy-black state without any types of checkpoints.
 
 
-\subsection{The Blame Game}
-\label{sec:fppBlame}
-
-things
-
-\subsection{Copy Racing}
+\subsection{Collaborative Copying and Blame}
 \label{sec:fppCopy}
 
-things
+We now discuss in more depth how the collaborative relocation of 
+non-garbage objects occurs. When a thread impedes another thread's
+attempt to copy an object, because its HP prevents copying,
+the impeding thread is \emph{blamed} for the 
+interruption~\cite{Osterlund:FPP}. As such, it becomes responsible for ensuring 
+the object is relocated. GC threads will not interrupt
+mutator threads or other GC threads because they do not actually access 
+the object and pin it. Thus, a GC thread cannot receive blame;
+only mutator threads can "steal" responsibility for moving an object
+from another thread. 
+
+At the start of FPP relocation, GC threads will attempt to copy
+objects immediately after shading all objects marked for relocation
+copy-gray. At this time, blaming is disabled. That is, mutator threads
+impeding these copy attempts will not have to attempt to move the objects
+after using them. 
+
+After the first round of attempting to copy objects, the GC threads
+will once again try to copy the remaining copy-gray objects. If a mutator 
+thread impedes the copy attempt by accessing the object and pinning it with
+a HP, the mutator will be blamed. Once the mutator is done accessing the
+object and unpins it, it will attempt to perform the copy itself. If there
+are any other mutators with HPs to the object at that time, the mutator 
+trying to copy the object will be impeded. Blame will once again be passed
+along to any other mutators with HPs to the object. This sequence will
+continue to occur until a mutator tries to copy the object while no other
+mutators contain HPs to the object. 
+
+When an object is copy-gray, it has an additional copy state associated
+with it. The object is in an \emph{async} state if it is in from-space
+and needs to be copied. It is in a \emph{sync} state if there is
+ongoing relocation between from and to-space and the object needs to
+be protected. The protection at this time ensures that the copy is impeded 
+should another mutator pin the object while the object is in a sync state. 
+Finally, an object is \emph{copied} if it was moved
+successfully during the sync state. At this time, the object can be marked
+copy-black once the additional status memory is removed.
+
+The process followed by mutator threads during the relocation phase when 
+accessing an object is as follows:
+\begin{enumerate}
+\item Pin the object by adding a HP
+\item Read the state of the object. This tells the thread whether the object
+has already been copied
+\item Mutate/use the object. Since the object is pinned, the thread can 
+do so without worry
+\item Unpin the object when it is no longer needed
+\item If the object was blamed due to impeding another thread's copy attempt, 
+attempt to copy the object:
+\begin{enumerate}
+\item Scan other threads for HPs to begin transition into sync state. If HPs found,
+blame all relevant threads and move along
+\item Tentatively enter sync state
+\item Scan once more for HPs once again passing blame if found and moving along
+\item Now in sync state, proceed to copy the object keeping in mind further
+pins will still impede the copy
+\end{enumerate}
+\end{enumerate}
+
+It is possible for an
+object not to move because it is continually pinned. How this terminates 
+depends on the host GC algorithm used. When using the Garbage-First (G1) algorithm,
+this process continues until all objects are moved or another GC cycle starts.
+If objects are still copy-gray when another cycle begins, they are automatically
+marked for relocation again. Allowing mutators to continue passing blame works
+in G1 because, like C4 and Collie, the algorithm will roll up remapping into the next
+GC cycle's tracing phase. Example alternatives include setting a max number of impediments
+or setting a timer.
+
+% So I debated whether I should've went into as much detail as I did (sync, async, copied 
+% particularly). Depending on how adviser feedback goes, I may tri too scale back the 
+% technical aspects here. If I do so, I will extend the cake example to elaborate
+% on how new mutators impeding move/"clean-up" works.
 
 
 \subsection{FPP Results Summary}
@@ -623,7 +691,8 @@ To be done at a later date...
 
 Just throwing some general final statements about each algorithm in here as I write about
 them. At this point, this is not meant to be cohesive in any way at the moment. Feel free
-to look at it though.
+to look at it though; let me now what you think should stick around and what is definitely
+not needed.
 
 \emph{C4}
 
