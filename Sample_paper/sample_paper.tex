@@ -509,20 +509,20 @@ tracing phase.
 \label{sec:collieResults}
 
 The main goal of the Collie collector is to maintain high mutator responsiveness
-during compaction~\cite{Iyengar:Collie}. The Collie is tested 
+during compaction~\cite{Iyengar:Collie}. The Collie was tested 
 against a modified variant of the Pauseless collector~\cite{Click:Pauseless}.
-Accordingly, both collectors are implemented on the same JVM. For the hardware
+Accordingly, both collectors were implemented on the same JVM. For hardware
 specifications used for testing, refer to~\cite{Iyengar:Collie}. The Collie
 utilizes several aspects of the C4 collector, which in turn builds upon the Pauseless
 collector. This provides an effective comparison to see how the main differences, 
-use of transactional memory and an aborting compactor, affect performance. 
+use of transactional memory and an aborting compactor, affect responsiveness. 
 
 To examine mutator responsiveness, \emph{minimum mutator utilization} (MMU) is measured.
 MMU is the minimum percentage of mutators being utilized over a period of time~\cite{Bacon:MMU}. Ideally,
 MMU would always be at 100\% so all mutators are being used. This provides an indicator
 of the latency. MMUs were taken from various time periods during which
 compaction was running and was compared between the two algorithms. Comparisons were done
-with both a 128MB heap and a 512MB heap. For all time windows, the Collie compactor
+with a 128MB heap and a 512MB heap. For all time windows, the Collie compactor
 had higher MMUs than Pauseless. Collie did not go below a 70\% mutator utilization 
 rate whereas Pauseless ranged over the whole spectrum of values. This is 
 likely because the aborting nature of Collie
