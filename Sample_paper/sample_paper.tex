@@ -424,32 +424,29 @@ size as from-space. Mirrored-to-space memory pages are mapped to the same physic
 memory as their corresponding from-space pages. For barrier test and compaction 
 termination purposes, mirrored-to-space is logically considered part of to-space.
 
-Mirrored-to-space is necessary to facilitate zero-copy transplantation that is 
-non-compacting between from-space and to-space. Since an object's contents are 
-already consistent between from space and mirrored-to-space and mirrored-to-space
-is logically considered to be to-space, transplantation to "to-space"
+Mirrored-to-space is necessary to facilitate non-compacting, zero-copy transplantation 
+between from-space and to-space. An object's contents are 
+consistent between from-space and mirrored-to-space and mirrored-to-space
+is logically considered to be to-space. Thus, transplantation to "to-space"
 can be done without copying the object's contents. That is, zero-copy transplantation
 allows transplantation of an object from from-space to mirrored-to-space, which only
-requires correcting references.
+requires correcting references. The purpose of this is to ensure
+an object makes it to "to-space" should its transplantation need 
+to be aborted because mutators need to access it.
 
+% Could make a cake example instead if this isn't really helpful.
 As an example, say we have an object stored in memory. As discussed before, all references
 to this object are actually references to its virtual page location. This virtual page
 is backed up by some contiguous, physical memory equivalent in size to the page. 
 Mirrored-to-space is simply another page that is assigned to the same section of physical memory. 
-The only difference between this mirrored-to-space and the page our object is stored on
+The only difference between mirrored-to-space and the page our object is stored on
 is references to the object used by mutators point to its virtual page.
 Zero-copy transplantation swaps this. All references to the object are
-updated to point from the original virtual page to mirrored-to-space, which
-is just another virtual page. Thus, we get the name \emph{zero-copy} translation
+updated to point from the virtual page to mirrored-to-space. 
+Thus, we get the name \emph{zero-copy} translation
 because our object is never moved in physical memory; the object simply
 swaps virtual pages for the purposes of the compactor believing all of from-space
 has been compacted.
-
-Ideally, the compaction algorithm will never have to use zero-copy transplantation
-as it does not actually compact the heap. The purpose of this is to ensure
-objects make it to "to-space" should their transplantations need to be aborted. 
-This allow mutators to continue working while also guaranteeing the compaction 
-process can terminate.
 
 
 \subsubsection{Compaction Implementation}
