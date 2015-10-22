@@ -537,29 +537,27 @@ Last, we examine concurrent compaction in GC through the Field Pinning
 Protocol (FPP) designed by \"{O}sterlund and L\"{o}we~\cite{Osterlund:FPP}.
 FPP describes a lock-free process for performing the relocation aspect
 of concurrent compaction. The remapping phase as well as other portions
-of GC are left up to the host garbage collector that this
+of GC are left up to the host garbage collector this
 protocol is implemented within. FPP is compliant with the Java Native Interface
-to allow for integration into a JVM. For purposes of testing, the FPP approach to
-relocation is implemented within the Garbage-First GC algorithm in the HotSpot JVM 
+to allow for integration into a JVM. For purposes of testing, the FPP 
+is implemented within the Garbage-First GC algorithm in the HotSpot JVM 
 of OpenJDK 9~\cite{Detlefs:G1}.
 
 
 \subsection{Hazard Pointers}
 \label{sec:fppHazard}
 
-The key component driving FPP is the \emph{hazard pointer} (HP)~\cite{Osterlund:FPP}. HPs
-are typically used in manual memory management of objects to allow lock-free 
-data structures. All threads contain a list of HPs.
-The HPs point to objects in memory the thread is accessing, or \emph{pin} it.
+The key component driving FPP is the \emph{hazard pointer} (HP)~\cite{Osterlund:FPP}. 
+In FPP, all application threads contain a list of HPs.
+The HPs point to objects in memory a thread is accessing, or \emph{pin} them.
 When a thread finishes accessing an object, it drops the HP.
 The HPs allow for asynchronous relocation of an object. So long as an object
 is pinned by a mutator, it cannot be relocated as it is still in use. Once all threads have
 unpinned the object, it is ready to be relocated collaboratively.
 By collaboratively, we mean the last thread to drop the HP to the object
 will hold the final responsibility for copying the object.
-When discussing the theoretical construction of the algorithm, it is discussed
-at a granularity of pinning individual fields rather than objects, thus \emph{Field} Pinning
-Protocol. 
+When discussing the theoretical construction of the algorithm, a granularity of pinning 
+individual fields is used, thus \emph{Field} Pinning Protocol. 
 
 While it is explained in more detail below, an example of how HPs 
 work on a high-level is useful. Imagine someone brings cake to a party. Anyone 
