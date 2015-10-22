@@ -71,8 +71,8 @@ Use of automatic memory management is beneficial to programmers as it provides
 the robustness of an object-oriented language without worrying about
 details unrelated to what their program is intended to do; specifically, they do
 not have to worry about the details of memory allocation and deallocation. 
-However, programmers also do not have control over how memory management occurs
-, which can have negative impacts on application performance.
+However, programmers also do not have control over how memory management occurs,
+which can have negative impacts on application performance.
 
 Memory for a program is not an unlimited resource. As such, automatic memory management
 must ensure objects that are no longer needed are removed from memory
@@ -82,13 +82,11 @@ save space for new objects that will be created. The algorithm used to perform i
 deallocation of garbage is referred to as a \emph{garbage collector}.
 A garbage collector is a sophisticated algorithm designed to detect
 and remove dead objects. We will focus on specific parts of the 
-garbage collection (GC) process performed by different Java Virtual Machines 
+garbage collection (GC) process performed on Java Virtual Machines 
 (JVMs), software processes that run Java programs on computing systems~\cite{Lindblom:2011}.
 
 \todo[inline]{THIS IS NOT COMPLETE YET. Still need to talk briefly about why parallel GC is becoming necessary.
-Might also want to say what kind of BG will be introduced and what algorithms I will look at? 
-If I do, I will likely leave out implementation details of GC algorithms until their introductory
-parts of their sections.}
+Might also want to say what kind of BG will be introduced and what algorithms I will look at?}
 
 
 \section{Background}
@@ -184,25 +182,21 @@ C4 uses a barrier referred to as the \emph{Loaded Value Barrier} (LVB) to
 maintain concurrency throughout the GC process~\cite{Tene:C4}. The LVB 
 places invariants on each object reference value as it is loaded from memory.
 One of the invariants relates to the tracing portion of the GC algorithm, so
-it is not discussed here. The other invariant states that a loaded
-reference value must point to the location of the object that currently has the
-object's contents that are safely accessible. 
-In other words, if an object is being relocated, references to it must point 
-to the the object wherever it can be safely accessed, be it the from or to-
-space. If the invariant does not hold
+it is not discussed here. The other invariant ensures
+references to an object being relocated must point 
+to wherever the object can be safely accessed, be it the from or to-space.
+If the invariant does not hold
 when a reference is loaded, the barrier will trigger and execute code to correct
-the situation. The code executed depends on what causes the trigger
-and is discussed later.
+the situation. The code executed is discussed later.
 
 In order to prevent repetitive barrier triggers from a single incorrect reference,
 the LVB uses a \emph{self-healing} technique. Whenever a reference triggers LVB
-due to the reference not meeting an invariant, it will perform the rectifying code
+due to not meeting an invariant, it will perform the rectifying code
 necessary to fix the reference. Additionally, the barrier will go to the memory
-location the reference was loaded from and fix the the source of the reference. This
+location the reference was loaded from and fix the source of the reference. This
 ensures not only the loaded reference being used is fixed, but the stored reference
-that might be loaded again later is also fixed. This is possible because the LVB 
-is checked directly following reference load but before the reference is used.
-Self-healing helps reduce the occurrence of the read barrier triggers.
+that might be loaded again later is also fixed.
+Thus, self-healing helps reduce the occurrence of the read barrier triggers.
 
 
 \subsection{Concurrent Relocation}
@@ -285,8 +279,6 @@ the same object and reference graphs to find all reachable references. To
 visualize how this works, examine Figure~\ref{fig:c4Cycle}. After this
 is done, all references to from-pages are now gone. Thus, the virtual resource
 can be freed and reclamation of memory is now entirely complete. 
-
-\todo[inline]{Make the figure greyscale/black-and-white accessible.}
 
 \begin{figure}
 \centering
