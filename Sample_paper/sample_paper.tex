@@ -292,27 +292,27 @@ can be freed and reclamation of memory is now entirely complete.
 \subsection{C4 Results Summary}
 \label{sec:c4Results}
 
-Experiments done with the implemented C4 algorithm were meant to show the
-benefits of using an algorithm that is simultaneously generational and concurrent~\cite{Tene:C4}.
-C4 is tested against a modified C4 algorithm that is not generational. Additionally,
+Experiments done with the implemented C4 algorithm were meant to show improvements
+from using an algorithm that is simultaneously generational and concurrent~\cite{Tene:C4}.
+C4 is tested against a modified, non-generational C4 algorithm. Additionally,
 it is tested against two algorithms that do not perform concurrent compaction. 
-All GC algorithms were tested on the same hardware; for specifications, see~\cite{Tene:C4}. The test exhibited
-a workload with
+All GC algorithms were tested on the same hardware; for specifications, see~\cite{Tene:C4}. 
+The test exhibited a workload with
 an allocation rate of about 1.2GB/sec and live sets of objects on 
 the heap consistently at a size of around 2.5GB; the actual heap size was allowed 
 to grow though, indicating greater amounts of garbage on the heap. The applications were run long
-enough to ensure multiple full heap GC cycles were performed and at least one
+enough to ensure multiple full-heap GC cycles were performed and at least one
 significant compaction event occurred.
 
 The primary performance metric monitored was the worst-case response times
-of the servers responding to requests while experiencing the workloads
-described above. This gives a sense of how much garbage collection slows
+of servers responding to requests while experiencing the workloads
+described. This gives a sense of how much garbage collection slows
 an application's responses to clients. C4 maintained the smallest 
-range of worst-case response times and it did so across the largest range of heap sizes.
+worst-case response times across the largest range of heap sizes.
 The worst-case response times were usually in the range of 0.01-0.1secs. 
 These response times are fast enough to be considered \emph{pauseless}. 
 The non-generational version of C4 could also reach pauseless thresholds,
-but the range of heap sizes it could do so for was far more limited. Where standard
+but the range of heap sizes it could do so for was more limited. Where standard
 C4 sustained pauseless operation for heap sizes of 5-35GB, the modified C4 could
 only do so for heaps sizes of 15-35GB. The non-concurrently compacting
 collectors had multi-second worst-case response times for all heap sizes experienced.
@@ -327,13 +327,13 @@ since my section draft to be worth reading again (or at least skimming for the m
 We now look at the concurrent compaction technique used within the 
 Collie garbage collector described by Iynegar et al.~\cite{Iyengar:Collie};
 with the exception of Gehringer, they were the researchers who worked on the C4 algorithm.
-As such, Collie utilizes modified versions of several techniques within C4, such as:
+As such, Collie utilizes modified versions of several techniques from C4, such as:
 the tracing algorithm, the LVB, page-granularity compaction, self-healing, and quick-release behavior.
-Only the LVB is modified in significant ways for the purposes of compaction in Collie,
-so the rest of the techniques are not re-discussed here; however, the other 
-techniques are still playing parts in the compaction process. Additionally, the Collie
+Only the LVB is modified in significant ways for the purposes of compaction in Collie.
+The rest of the techniques are not re-discussed here due to performing 
+similarly to their C4 counterparts. Like C4, the Collie
 collector is also designed with server environments in mind. Collie is implemented and tested in 
-the same production quality Azul JVM that the Pauseless garbage collector is implemented in
+the same production-quality Azul JVM the Pauseless garbage collector is implemented in
 ~\cite{Click:Pauseless}. However, it has not been made commercially available.
 
 
@@ -353,8 +353,8 @@ the price, quantity, and distributor for various items.
 If a person updates information regarding an item, they would 
 want all or none of the item's attributes to be updated. Having
 only a subset of the attributes updated could cause confusion. A transaction
-would ensure an item goes unchanged if the process of updating the item's info 
-is started and then aborted before completion
+would ensure an item is unchanged if the process of updating the item's info 
+is started and then aborted before completion.
 
 TM systems allow a series
 of operations modifying memory to be placed in
@@ -362,8 +362,8 @@ a \emph{transactional procedure}, much like a database transaction.
 The TM system then monitors the access of concurrent threads to \emph{transactional variables},
 memory modified by a transactional procedure.
 Concurrent threads will operate in parallel until they try to modify
-the same transactional variable. At this time, behavior can be specified as to how 
-the conflict should resolve, but the general pattern would be for one transaction
+the same transactional variable. At this time, how 
+the conflict should resolve can be specified, but the general behavior would be for one transaction
 to be aborted and the other allowed to continue.
 When a transaction is completed, its changes are \emph{committed}; any changes 
 made to memory by the transaction are finalized~\cite{wiki:transactional-memory}.
@@ -374,15 +374,15 @@ made to memory by the transaction are finalized~\cite{wiki:transactional-memory}
 
 With the use of a TM system for synchronizing concurrent compaction,
 new terminology is introduced for understanding the Collie 
-compactor~\cite{Iyengar:Collie}. As discussed, compaction of
-memory requires relocation of objects and remapping of references to
-the objects.
+compactor~\cite{Iyengar:Collie}. 
 An object \emph{transplantation} consists of both the relocation and 
 remapping of an object. A transplantation is not complete until
 the object's contents have been moved and all required references have been
 updated. All relocating collectors, and by extension all
 compacting collectors, transplant objects. The Collie's compactor 
 performs individual object transplantations within transactional procedures. 
+Building on this, an object has a transplantation state consisting of the object's contents 
+and the object's referrer set.
 
 Each object in an application's memory has a \emph{referrer set}. This is the precise set 
 of all references pointing to the object. It is crucial that an object's referrer set not
@@ -403,16 +403,6 @@ set if the object's referrer set meets the following criteria:
 This ensures the compactor is aware of all references to the object
 and references to the object go unchanged.
 
-An object has a transplantation state consisting of the object's contents 
-and the object's referrer set. This definition builds on the general requirements
-for completing an object transplantation. These
-requirements include: all copies of an object's contents should remain consistent
-until transplantation is completed and after transplantation, there cannot be any
-references pointing to the object's from-space location in its referrer set.
-
-%Note to self: consider removing chunk where I mention the general requirements for completing an individual
-%object transplantation.
-
 
 \subsection{The Collie Protocol}
 \label{sec:collieAlgorithm}
@@ -428,9 +418,10 @@ However, objects that have their transplantation aborted would then be stuck
 in from-space, which would mean compaction is never performed. This is why
 the additions of a \emph{mirrored-to-space} and \emph{zero-copy transplantation} are necessary.
 
+% THere's definitely some repition here. Worry about later.
 Mirrored-to-space is a virtual address space that corresponds to and is the same
 size as from-space. Mirrored-to-space memory pages are mapped to the same physical
-memory as their corresponding from-space pages are. For barrier test and compaction 
+memory as their corresponding from-space pages. For barrier test and compaction 
 termination purposes, mirrored-to-space is logically considered part of to-space.
 
 Mirrored-to-space is necessary to facilitate zero-copy transplantation that is 
