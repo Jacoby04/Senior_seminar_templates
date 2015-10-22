@@ -571,17 +571,17 @@ The last person to discard their plate will be responsible for relocating the ca
 \subsection{Tricoloring}
 \label{sec:fppColoring}
 
-A non-garbage object will go through different states with regard to where it is 
-in the copying process during the relocation phase~\cite{Osterlund:FPP}. An object is said to be
+A non-garbage object enters different states of the copying process 
+during the relocation phase~\cite{Osterlund:FPP}. An object is
 \emph{copy-white} before and after relocation. Regardless of whether the object is
-currently in to or from-space, it is copy-white if it is in a single location with all
-references to it pointing to that location. An object is \emph{copy-gray} if it is currently
-being relocated or is awaiting relocation. Copy-gray object's have their from-space location
+currently in to or from-space, it is copy-white when in a single location with all its
+references pointing to that location. An object is \emph{copy-gray} when
+being relocated or awaiting relocation. Copy-gray object's have their from-space location
 point to their to-space destination and their to-space destination point to a location in
-memory holding the status of the object. Last, a \emph{copy-black} object is one that has
+memory holding the status of the object. Last, a \emph{copy-black} object has
 been relocated but still requires remapping. Copy-black objects no longer require the extra
 status information. FPP moves objects marked for relocation from a copy-white state to
-a copy-black state without any types of checkpoints.
+a copy-black state without any type of checkpoint.
 
 
 \subsection{Collaborative Copying and Blame}
