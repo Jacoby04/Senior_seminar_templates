@@ -216,7 +216,6 @@ first. The from-space in this relocation is actually from-pages, and the to-spac
 is to-pages. From-pages are pages with garbage
 and are marked as such during the tracing phase.
 
-% Maybe could get rid of this later if space is needed and just stick to the pseudocode.
 To support concurrent relocation, pages being relocated are protected. 
 The LVB will trigger for mutator threads encountering a reference pointing to an object
 on a protected page. If the object has been relocated already, LVB will
@@ -228,11 +227,30 @@ escalate its movement status by moving the object itself. After any of
 these situations, the LVB will also cause the mutator thread to update 
 the reference to the new location and heal the source location of the reference.
 Without any mutator accesses, the GC threads will relocate the objects but
-will not remap references at this time. If an object
-spans multiple pages, \emph{page shattering} is used to relocate chunks of
-it at a time sequentially while minimizing interruptions to mutators;
-finer details of this can be read here~\cite{Tene:C4}.
-
+will not remap references at this time. The barrier check and subsequent
+handling a mutator thread experiences when attempting to access an object on a
+protected page can be seen from the pseudocode below adapted from~\cite{Tene:C4}.
+\begin{verbatim}
+LVBCheck(referenceAddress, reference)
+  trigger = 0;
+  // Check for tracing invariant here.
+  if (pageIsProtected)
+    set trigger = Reloc_Trigger;
+  if (trigger != 0)
+    reference = LVBHandler(referenceAddress, 
+                  reference, trigger);
+    
+LVBHandler(address, reference, trigger)
+  oldReference = reference;
+  // Handle tracing trigger if that was the cause.
+  if (trigger = Reloc_Trigger) 
+    if (objectNotYetRelocated(reference))
+      relocateObjectAt(reference);
+    reference = lookupNewObjectLocation(reference);
+  // Self-Healing
+  compareAndSwap(address, oldReference, reference);
+  return reference;
+\end{verbatim}
 When all living objects are relocated from a page marked for relocation,
 the C4 compactor will utilize a \emph{Quick Release} method. In order to quickly recycle
 physical memory sources, the physical memory backing the page will be marked as freed
@@ -244,22 +262,6 @@ allows for efficient recycling of physical memory. This is made possible as the 
 stores object forwarding information outside of a from-page. Thus, when a reference to
 a from-page is loaded, LVB has the mutator check the forwarding table rather than the
 from-page to see where an object has moved to.
-
-The key point here is GC threads do the most work. They simply
-move objects from the from-pages. Meanwhile, the LVB protects pages being 
-relocated with the previously mentioned invariant. The LVB is checked for every reference load
-done by a mutator thread, so every time a thread adds a reference to its 
-stack or register. In the case of compaction, we care if the mutator is trying 
-to access an object on a protected page. If it is, the barrier will trigger 
-handling code. This can be seen in the pseudocode. Assuming the issue with the
-reference came from compaction, as opposed to tracing, the object the reference
-points to will be checked for its relocation state; if it has not been relocated, the
-thread will relocate it. Once the thread knows it has been relocated, by itself
-or a GC thread, it will update get the object's relocated position. Using this,
-a method is performed to change the original location
-the invalid reference was loaded from (this is also performed for tracing triggers).
-
-\todo[inline]{Get some nice way of showing pseudocode...}
 
 
 \subsection{Concurrent Remapping}
