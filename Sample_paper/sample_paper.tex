@@ -601,48 +601,48 @@ from another thread.
 At the start of FPP relocation, GC threads will attempt to copy
 objects immediately after shading all objects marked for relocation
 copy-gray. At this time, blaming is disabled. That is, mutator threads
-impeding these copy attempts will not have to attempt to move the objects
-after using them. 
+impeding initial copy attempts will not have to attempt to move the objects
+themselves. 
 
 After the first round of attempting to copy objects, the GC threads
-will once again try to copy the remaining copy-gray objects. If a mutator 
-thread impedes the copy attempt by accessing the object and pinning it with
-a HP, the mutator will be blamed. Once the mutator is done accessing the
-object and unpins it, it will attempt to perform the copy itself. If there
-are any other mutators with HPs to the object at that time, the mutator 
-trying to copy the object will be impeded. Blame will once again be passed
-along to any other mutators with HPs to the object. This sequence will
-continue to occur until a mutator tries to copy the object while no other
+will again try to copy the remaining copy-gray objects. If a mutator 
+thread impedes the copy attempt this time, it will be blamed. 
+Once the mutator is done accessing the
+object and unpins it, it will attempt to perform the copy itself. If 
+any other mutators have HPs to the object at that time, the copying mutator 
+will be impeded. Blame will once again be passed
+along to the other mutators with HPs to the object. This sequence will
+occur repeatedly until a mutator tries to copy the object while no other
 mutators contain HPs to the object. 
 
 When an object is copy-gray, it has an additional copy state associated
-with it. The object is in an \emph{async} state if it is in from-space
-and needs to be copied. It is in a \emph{sync} state if there is
+with it. The object has an \emph{async} state if it is in from-space
+and needs to be copied. It has a \emph{sync} state if there is
 ongoing relocation between from and to-space and the object needs to
-be protected. The protection at this time ensures that the copy is impeded 
-should another mutator pin the object while the object is in a sync state. 
+be protected. The protection ensures that the copy will be impeded 
+should another mutator pin the object. 
 Finally, an object is \emph{copied} if it was moved
-successfully during the sync state. At this time, the object can be marked
+successfully during the sync state. The object can be marked
 copy-black once the additional status memory is removed.
 
 The process followed by mutator threads during the relocation phase when 
 accessing an object is as follows:
 \begin{enumerate}
 \item Pin the object by adding a HP
-\item Read the state of the object. This tells the thread whether the object
+\item Read the color state of the object. This tells the thread whether the object
 has already been copied
 \item Mutate/use the object. Since the object is pinned, the thread can 
 do so without worry
-\item Unpin the object when it is no longer needed
-\item If the object was blamed due to impeding another thread's copy attempt, 
+\item Unpin the object when no longer needed
+\item If the thread was blamed due to impeding another thread's copy attempt, 
 attempt to copy the object:
 \begin{enumerate}
 \item Scan other threads for HPs to begin transition into sync state. If HPs found,
 blame all relevant threads and move along
 \item Tentatively enter sync state
 \item Scan once more for HPs passing blame if found and moving along
-\item Now in sync state, proceed to copy the object keeping in mind further
-pins will still impede the copy
+\item Now in sync state, proceed to copy the object with further
+pins still impeding the copy
 \end{enumerate}
 \end{enumerate}
 
@@ -653,7 +653,7 @@ this process continues until all objects are moved or another GC cycle starts.
 If objects are still copy-gray when another cycle begins, they are automatically
 marked for relocation again. Allowing mutators to continue passing blame works
 in G1 because, like C4 and Collie, the algorithm will roll up remapping into the next
-GC cycle's tracing phase. Example alternatives include setting a max number of impediments
+GC cycle's tracing phase. Possible alternatives include setting a max number of impediments
 or setting a timer.
 
 % So I debated whether I should've went into as much detail as I did (sync, async, copied 
