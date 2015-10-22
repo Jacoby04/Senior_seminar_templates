@@ -202,7 +202,7 @@ Thus, self-healing helps reduce the occurrence of the read barrier triggers.
 \subsection{Concurrent Relocation}
 \label{sec:c4Relocation}
 
-The relocation aspect of compaction in the Collie occurs on a per-\emph{page}
+The relocation aspect of compaction in C4 occurs on a per-\emph{page}
 basis, where a page is a fixed-length, contiguous block of virtual memory
 that is backed by a contiguous block of physical storage~\cite{wiki:page}\cite{Tene:C4}.
 To quickly empty virtual pages, the most sparsely populated pages are relocated
@@ -211,7 +211,7 @@ is to-pages. From-pages are pages with garbage
 and are marked as such during the tracing phase.
 
 To support concurrent relocation, pages being relocated are protected. 
-The LVB will trigger for mutator threads encountering a reference pointing to an object
+The LVB will trigger for mutator threads encountering a reference to an object
 on a protected page. If the object has been relocated already, LVB will
 obtain the new location for the mutator. If the object is being relocated, 
 LVB will cause the mutator to wait
@@ -220,7 +220,7 @@ If the object has not started relocation, LVB has the mutator thread
 escalate its movement status by moving the object itself. After any of 
 these situations, the LVB will also cause the mutator thread to update 
 the reference to the new location and heal the source location of the reference.
-Without any mutator accesses, the GC threads will relocate the objects but
+Without any mutator interference, GC threads will relocate the objects but
 will not remap references at this time. The barrier check and subsequent
 handling a mutator thread experiences when attempting to access an object on a
 protected page can be seen from the pseudocode below adapted from~\cite{Tene:C4}.
@@ -247,10 +247,10 @@ LVBHandler(address, reference, trigger)
 \end{verbatim}
 When all living objects are relocated from a page marked for relocation,
 the C4 compactor will utilize a \emph{Quick Release} method. In order to quickly recycle
-physical memory sources, the physical memory backing the page will be marked as freed
-as soon as the last object has been moved to a to page. Because the objects have already 
-been transferred to new page, the contents of the from-pages are no longer needed. Thus,
-the physical memory backing it can be put to use immediately. The from-page's virtual 
+physical memory sources, the physical memory backing the page will be freed
+as soon as the last live object has been moved to a to page. The objects have already 
+been transferred to new pages, so the contents of the from-pages are no longer needed. Thus,
+physical memory backing from-pages can be used immediately. The from-page's virtual 
 addresses will be in use until all references have been remapped, but this 
 allows for efficient recycling of physical memory. This is made possible as the C4 compactor
 stores object forwarding information outside of a from-page. Thus, when a reference to
@@ -263,21 +263,21 @@ from-page to see where an object has moved to.
 
 To maintain concurrency while updating all references to the now relocated
 objects, the C4 compaction algorithm uses two techniques~\cite{Tene:C4}. The first is
-referred to as \emph{lazy remapping}. This essentially allows the mutator
-threads to continue updating references as they trigger the LVB. In order for
-the remapping phase of compacting GC to end, all live references must be updated.
-This could go on indefinitely if lazy remapping alone is relied upon.
+referred to as \emph{lazy remapping}. With this, mutator
+threads continue updating references as they trigger the LVB. In order for
+the remapping phase to end, all live references must be updated.
+This could go on indefinitely if lazy remapping alone is performed.
 
 To finish remapping, a traversal of live references must be performed to
-ensure they are all updated, like the traversal performed to trace which
-objects are now garbage. Since no physical resources are being held due
+ensure all are updated; this is like the traversal performed to trace which
+objects are garbage. Since no physical resources are being held due
 to Quick Release and lazy remapping does not disrupt mutator operations,
 the remapping traversal is pushed off until another GC cycle starts. That
 is, C4 will have the remapping of one GC cycle be performed while the tracing
-of another cycle is beginning. This works since both processes need to traverse
-the same object and reference graphs to find all reachable references. To
-visualize how this works, examine Figure~\ref{fig:c4Cycle}. After this
-is done, all references to from-pages are now gone. Thus, the virtual resource
+of another cycle is beginning. This works as both processes need to traverse
+the same references in memory to find all that are reachable. To
+visualize how this works, examine Figure~\ref{fig:c4Cycle}. Upon remapping completion, 
+all references to from-pages are now gone. Thus, the virtual resource
 can be freed and reclamation of memory is now entirely complete. 
 
 \begin{figure}
