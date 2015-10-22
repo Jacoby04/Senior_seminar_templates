@@ -452,21 +452,23 @@ has been compacted.
 \subsubsection{Compaction Implementation}
 \label{sec:collieAlgorithmImplementation}
 
-After a tracing phase at the start of the overall GC algorithm, the compaction of
-the heap happens during the \emph{transplantation phase}~\cite{Iyengar:Collie}.
-At this time, it is known which objects are relocatable; that is, the compactor knows which 
-objects are not trash. The compaction algorithm uses TM semantics to complete an object's
+After a tracing phase at the start of the overall GC algorithm for set condemnation, heap compaction
+happens during a \emph{transplantation phase}~\cite{Iyengar:Collie}.
+Live, relocatable objects are known at this time. The compaction 
+algorithm uses TM semantics to complete an object's
 transplantation. The operations for transplantation are stored as a
-transactional procedure. Individual object transplantation will be done on relocatable objects 
-that successfully maintain stable referrer sets throughout the process.
+transactional procedure. Individual object transplantations will be done on relocatable objects 
+maintaining stable referrer sets throughout the process.
 
 An object is deemed \emph{non-individually transplantable} (NIT) if its transplantation
 has to be aborted or if it fails to maintain a stable referrer set. 
-Any object that is deemed as such will be moved to mirrored-to-space by zero-copy 
+Any object deemed as such will be moved to mirrored-to-space by zero-copy 
 transplantation. An object may be declared NIT during the tracing phase before transplantation
 if it violates requirement 1 for having a stable referrer set; discussion
-of how this occurs is beyond the scope of this paper of this paper, see~\cite{Iyengar:Collie}.
+of how this occurs is beyond the scope of this paper, see~\cite{Iyengar:Collie}.
 
+% Talk about this barrier because it is during GC - betweentracing and transplantation.
+% If others experience something similar, they should be talked about too.
 At the start of the transplantation phase, a pre-compaction checkpoint occurs.
 For all relocatable objects, referrer sets have been established during the tracing phase.
 These referrer sets need to be stable referrer sets. As such, the objects are checked for 
@@ -482,9 +484,9 @@ requirement 3 of having a stable referrer set.
 
 With the set of objects to be transplanted, the compactor uses transactional
 procedures to complete the individual object transplantations to to-space.
-The copying of an object can actually occur outside the transaction since any
-mutator access of the object will lead to triggering the LVB-style read barrier,
-which will render the object NIT. Thus, only the work of updating the referrer set
+The copying of an object occurs outside the transaction since any
+mutator access of the object will trigger the LVB-style read barrier,
+rendering the object NIT. Thus, only the referrer set updating
 is done in the transactional procedure. The transaction looks like:
 \begin{enumerate}
 \item Transaction is started
@@ -497,7 +499,7 @@ If a transaction fails or is interrupted, as detected by the TM system, then the
 After the transactional procedure either succeeds or fails for the 
 relocatable objects with stable referrer sets, all that remains is to perform zero-copy transplantation
 on all NIT objects. Just like the C4 compactor, Collie will do this lazily. This is the second purpose
-of the LVB-like barrier; as mutators try to access NIT object before their references are updated to
+of the LVB-like barrier; as mutators try to access NIT objects before their references are updated to
 point to mirrored-to-space, the barrier will force them to correct the references. Also like C4, Collie
 rolls the full traversal of memory to finish zero-copy transplantation of all NIT objects into the next
 tracing phase.
