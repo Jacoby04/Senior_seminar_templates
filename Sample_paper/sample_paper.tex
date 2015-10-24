@@ -97,10 +97,10 @@ Might also want to say what kind of BG will be introduced and what algorithms I 
 \label{sec:garbageCollection}
 
 Newly allocated objects in JVM languages are stored in a memory location referred
-to as the \emph{heap}. The heap represents the memory available to a program.
+to as the \emph{heap}~\cite{oracle:heap}. The heap represents the memory available to a program.
 Thus, when GC removes garbage, it is cleaning up the heap.
 An application accesses objects stored on the heap through \emph{references},
-fixed-size values that refer to object locations in the heap. 
+fixed-size values that refer to object locations in the heap~\cite{reilly:reference}. 
 As such, an application process never stores
 an actual object. It stores references to objects in a memory structure known
 as the \emph{stack}, which is separate from the heap.
