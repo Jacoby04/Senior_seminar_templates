@@ -174,6 +174,21 @@ cores of a CPU to run threads concurrently. If processes are set up
 to run with multiple threads, the extra processing power can be used to make 
 the process more efficient.
 
+If parallel processing makes running processes more efficient, why is it not
+always used? The reason is creating parallel processes subjects
+developers to new challenges. Many new issues can result from use of
+multi-threading. One example relevant to GC is modifications to an 
+object being lost. For example, say we have an application keeping 
+track of people's moods and locations. People are stored as objects. 
+Thread 'a' moves people, and it does so by relocating them in location data structures (DSs) 
+with a deep copy and delete operation. Thread 'b' updates people's moods. Suppose a person
+is about to go home from work, so their mood changes to happy.
+The person's change in mood could be lost if thread a copies the person
+to the home DS, thread b updates the person's mood while still expecting
+them to be in the work DS, and thread a deletes the person from the work DS. 
+While the example is fairly simple, it can be seen how this type of problem
+could apply to GC.
+
 
 \subsection{GC with Parallel Processing}
 \label{sec:parallelProcessingGarbageCollection}
