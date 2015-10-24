@@ -293,7 +293,7 @@ can be freed and reclamation of memory is now entirely complete.
 \label{sec:c4Results}
 
 Experiments done with the implemented C4 algorithm were meant to show improvements
-from using an algorithm that is simultaneously generational and concurrent~\cite{Tene:C4}.
+of using an algorithm that is simultaneously generational and concurrent~\cite{Tene:C4}.
 C4 is tested against a modified, non-generational C4 algorithm. Additionally,
 it is tested against two algorithms that do not perform concurrent compaction. 
 All GC algorithms were tested on the same hardware; for specifications, see~\cite{Tene:C4}. 
@@ -301,14 +301,15 @@ The test exhibited a workload with
 an allocation rate of about 1.2GB/sec and live sets of objects on 
 the heap consistently at a size of around 2.5GB; the actual heap size was allowed 
 to grow though, indicating greater amounts of garbage on the heap. The applications were run long
-enough to ensure multiple full-heap GC cycles were performed and at least one
+enough to ensure multiple full-heap GC cycles ran and at least one
 significant compaction event occurred.
 
 The primary performance metric monitored was the worst-case response times
 of servers responding to requests while experiencing the workloads
-described. This gives a sense of how much garbage collection slows
-an application's responses to clients. C4 maintained the smallest 
-worst-case response times across the largest range of heap sizes.
+described. This gives a sense of how much latency a garbage collector causes. 
+C4 maintained the smallest 
+worst-case response times across the largest range of heap sizes, so
+it had the lowest latency.
 The worst-case response times were usually in the range of 0.01-0.1secs. 
 These response times are fast enough to be considered \emph{pauseless}. 
 The non-generational version of C4 could also reach pauseless thresholds,
