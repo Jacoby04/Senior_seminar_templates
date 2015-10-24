@@ -109,6 +109,16 @@ References pointing to object locations actually point to their
 virtual locations rather than their physical locations. Objects may also 
 consist of references to other objects, so references may appear on the heap.
 
+In GC, the overarching pattern common to all algorithms is finding which object are garbage
+and reclaiming the memory from those objects~\cite{wiki:gc}. This can be broken down into two major steps.
+First, a GC algorithm performs \emph{set condemnation} when it decides which objects are 
+garbage. The overall GC algorithms we examine perform set condemnation using a method 
+known as \emph{tracing}. During this, objects are determined to be reachable by 
+traversing references from global, root objects. Any objects that can be reached by chaining references
+from these global, root objects could still be used by the application. 
+Any objects that are not reachable are garbage.  Then, the algorithm performs 
+\emph{reclamation} by recovering the memory held by garbage objects.
+
 
 \subsection{Parallel Processing}
 \label{sec:parallelProcessing}
