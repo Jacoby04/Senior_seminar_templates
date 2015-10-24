@@ -158,10 +158,21 @@ updates all references to objects to refer to their new locations. Often, reclam
 in compacting collectors is performed by marking from-spaces as freed.
 
 
-\subsection{Parallel Processing}
+\subsection{Parallel Processing Basics}
 \label{sec:parallelProcessing}
 
-Things
+To develop an understanding of parallel processing, we need to know 
+what \emph{processes} and \emph{threads} are~\cite{oracle:threads}.
+A process is an instance of a computer program being run. What we
+see as an application being run may actually incorporate multiple processes.
+For example, a Java application being run and GC being performed on the application are two processes.
+A thread, at a basic level, is a component of a process. A thread performs a sequence
+of instructions that are part of a process the thread belongs to. A process
+can involve a single thread, or a process can involve multiple threads.
+Parallel processing is the utilization of multiple
+cores of a CPU to run threads concurrently. If processes are set up
+to run with multiple threads, the extra processing power can be used to make 
+the process more efficient.
 
 
 \subsection{GC with Parallel Processing}
