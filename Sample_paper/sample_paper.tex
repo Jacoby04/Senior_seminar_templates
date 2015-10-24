@@ -96,7 +96,18 @@ Might also want to say what kind of BG will be introduced and what algorithms I 
 \subsection{Garbage Collection (GC)}
 \label{sec:garbageCollection}
 
-Stuff
+Newly allocated objects in JVM languages are stored in a memory location referred
+to as the \emph{heap}. The heap represents the memory available to a program.
+Thus, when GC removes garbage, it is cleaning up the heap.
+An application accesses objects stored on the heap through \emph{references},
+fixed-size values that refer to object locations in the heap. 
+As such, an application process never stores
+an actual object. It stores references to objects in a memory structure known
+as the \emph{stack}, which is separate from the heap.
+The heap is a virtual layer of memory that corresponds to physical memory.
+References pointing to object locations actually point to their
+virtual locations rather than their physical locations. Objects may also 
+consist of references to other objects, so references may appear on the heap.
 
 
 \subsection{Parallel Processing}
@@ -156,7 +167,7 @@ Thus, self-healing helps reduce the occurrence of the read barrier triggers.
 \label{sec:c4Relocation}
 
 The relocation aspect of compaction in C4 occurs on a per-\emph{page}
-basis, where a page is a fixed-length, contiguous block of virtual memory
+basis, where a page is a fixed-length, contiguous block of virtual memory in the heap
 that is backed by a contiguous block of physical storage~\cite{wiki:page}\cite{Tene:C4}.
 To quickly empty virtual pages, the most sparsely populated pages are relocated
 first. The from-space in this relocation is actually from-pages, and the to-space
@@ -351,7 +362,7 @@ There is also a notion of a \emph{stable} referrer set. An object has a stable r
 set if the object's referrer set meets the following criteria:
 \begin{enumerate}
 \item Once the overall GC process begins, no references to the object may be written to the heap
-\item At the start of the object's transplantation, no threads contain references to the object in their stacks/registers
+\item At the start of the object's transplantation, no threads contain references to the object in their stacks
 \item Once transplantation is underway, no new references may be added to the object's \emph{transplantation state} until it is complete
 \end{enumerate}
 This ensures the compactor is aware of all references to the object
@@ -426,7 +437,7 @@ of how this occurs is beyond the scope of this paper, see~\cite{Iyengar:Collie}.
 At the start of the transplantation phase, a pre-compaction checkpoint occurs.
 For all relocatable objects, referrer sets have been established during the tracing phase.
 These referrer sets need to be stable referrer sets. As such, the objects are checked for 
-references to them in threads' stacks and registers. Any objects with these will be 
+references to them in threads' stacks. Any objects with these will be 
 marked NIT as their referrer sets fail to meet requirement 2 for being stable referrer sets.
 After the checkpoint, the compactor has a set of relocatable objects with currently stable referrer sets.
 
