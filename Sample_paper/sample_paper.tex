@@ -92,70 +92,23 @@ Might also want to say what kind of BG will be introduced and what algorithms I 
 \section{Background}
 \label{sec:background}
 
-\todo[inline]{Just threw stuff from outline in this section for now.
-Made a list of most bg each specific section needs so I ensure I cover
-what is needed and nothing more for space. Still haven't
-changed this portion since the outline}
 
-This is where I explain terminology and aspects of GC and parallel 
-computing that are necessary to understand my paper (If there is 
-enough information in each subsection, I should maybe forego the 
-background and just make them all sections)
-
-
-\subsection{Garbage Collection}
+\subsection{Garbage Collection (GC)}
 \label{sec:garbageCollection}
 
-References and the heap (if not done in the introduction)
-
-General process flow GC algorithms tend to follow
-
-Specific GC algorithms/techniques my researched papers will 
-refer to and common techniques needed to understand my paper 
-(Pauseless, tracing/marking, more)
-
-Start introducing some terminology relevant to single processor 
-garbage collectors such as: stop-the-world, fragmentation, compaction, 
-tracing, reference remapping, reclamation etc.
-
-Explain the two typical aspects of compaction 
-(relocation/copying and remapping: 
-reclamation in compacting garbage collectors is often done through these
-by just labeling memory as free.)
+Stuff
 
 
 \subsection{Parallel Processing}
 \label{sec:parallelProcessing}
 
-Threads: the virtual form of a processor (might need to 
-explain virtualization or abstraction)
-
-Issues experienced in parallel computing and reasons why it 
-is difficult to perform effectively like: deadlock, race conditions, 
-etc. (Real brief, but I feel the audience needs to have some idea of 
-why progress in this area doesn't happen overnight. It also seems 
-necessary for explaining barriers)
-
-Typical ways of mitigating challenges experienced in parallel 
-computing (synchronization, barriers/locks)
-
-Also, talk about checkpoints here.
+Things
 
 
-\subsection{Parallel Processing as it Applies to Garbage Collection}
+\subsection{GC with Parallel Processing}
 \label{sec:parallelProcessingGarbageCollection}
 
-Bring audience's attention back to the original focus introduced 
-of wanting to use parallel computing to improve GC
-
-Introduce new terminology for GC that depends on parallel processing 
-in order to show some more specific ways in which parallel processing 
-can be used to improve GC (mutator threads, parallelism, concurrency, etc.)
-
-Explain Latency vs throughput
-
-Describe the focus: Concurrent Compaction (If this has enough information, 
-it could be moved out of being a component in a subsection)
+More stuff
 
 
 \section{The C4 Collector}
