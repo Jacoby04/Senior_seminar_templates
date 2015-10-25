@@ -85,9 +85,36 @@ and remove dead objects. We will focus on specific parts of the
 garbage collection (GC) process performed on Java Virtual Machines 
 (JVMs), software processes that run Java programs on computing systems~\cite{Lindblom:2011}.
 
-Final things...
+GC is not a free procedure.
+Just like the application, GC requires processing resources to run. After all,
+a GC algorithm is another piece of software. When using a single processor, 
+we get a \emph{serial} garbage collector operating in a 
+\emph{stop-the-world} fashion~\cite{Lindblom:2011}; GC requires
+pausing the application in order to clean up. With storage media growing, 
+applications are experiencing a growth in memory
+available to them. Likewise, garbage collectors are performing more
+work as there is more garbage to remove. Thus, the stop-the-world
+pauses applications experience are growing larger.
 
-GC is not free. Time spent running it, when using a single processor, is time the application must be paused.
+% If this isn't good, maybe refer back to Jeff's paper to show how 
+% Many serial garbage collectors are hitting walls.
+Clearly, stop-the-world behaviors are not desirable. In some environments,
+application pauses are unacceptable. In order to decrease or remove these 
+pauses, we want to use parallel processing. With the growing
+need for faster responding applications coupled with greater amounts of memory needing managing,
+it is paramount that GC be optimized using parallel processing. Languages with
+automatic memory management need this in order to remain useful today,
+and it would be a waste not to make use of the additional processing power
+many machines have available today.
+
+In Section 2, we cover more of what GC entails. Then, we go over the
+basic concepts of parallel processing of programs. We combine this 
+to discuss how parallel processing is used for GC.
+From there, we focus our examination of parallel processing in GC in Sections 3, 4, and 5;
+we examine how a specific component of GC can be made to run parallel to
+and independent of the application running. To this end, we cover three
+different techniques which are all implemented and tested within different
+garbage collectors.
 
 
 \section{Background}
@@ -119,7 +146,8 @@ traversing references from global, root objects. Any objects reachable by chaini
 from these global, root objects could still be used by the application. 
 Any objects that are not reachable are garbage.  Then, the algorithm performs 
 \emph{reclamation} by recovering the memory held by garbage objects. A single
-process of a GC pattern being performed is known as a \emph{cycle}.
+process of a GC pattern being performed is known as a \emph{cycle}. A GC cycle
+is usually started when the heap is full.
 
 To optimize GC, a variant can be performed known as \emph{generational} GC.
 Generational collectors are based on a key idea of the \emph{weak generational hypothesis}~\cite{Tene:C4}.
@@ -407,9 +435,6 @@ collectors had multi-second worst-case response times for all heap sizes experie
 
 \section{The Collie Collector}
 \label{sec:collie}
-
-\todo[inline, color=green]{For professors, this should be modified enough
-since my section draft to be worth reading again (or at least skimming for the main differences).}
 
 We now look at the concurrent compaction technique used within the 
 Collie garbage collector described by Iynegar et al.~\cite{Iyengar:Collie};
