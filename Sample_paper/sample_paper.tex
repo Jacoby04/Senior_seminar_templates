@@ -132,7 +132,7 @@ enough GC cycles, it will graduate into the old generation. By not considering t
 heap with each GC cycle, the application experiences less disruptions.
 
 As memory is reclaimed by a garbage collector, the heap is subject to 
-\emph{fragmentation}~\cite{Osterlund:FPP}~\cite{Iyengar:Collie}~\cite{Tene:C4}. Fragmentation is the forming
+\emph{fragmentation}~\cite{Tene:C4}~\cite{Iyengar:Collie}~\cite{Osterlund:FPP}. Fragmentation is the forming
 of interspersed locations of used space in contiguous memory. This
 is an issue as space for new objects being allocated
 on the heap becomes difficult to find and manage. 
@@ -214,7 +214,12 @@ could prevent thread b from updating a person's mood while they are being reloca
 \subsection{GC with Parallel Processing}
 \label{sec:parallelProcessingGarbageCollection}
 
-More stuff
+We can now return to our original goal of applying parallel processing to GC.
+Threads that part of the application process are referred to as \emph{mutator}
+threads (or just mutators) because they mutate the data~\cite{Tene:C4}~\cite{Iyengar:Collie}
+\cite{Osterlund:FPP}. Threads used by the garbage collector are simply GC threads.
+
+
 
 
 \section{The C4 Collector}
