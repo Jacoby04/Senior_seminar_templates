@@ -167,13 +167,17 @@ A process is an instance of a computer program being run. What we
 see as an application being run may actually incorporate multiple processes.
 For example, a Java application being run and GC being performed on the application are two processes.
 A thread, at a basic level, is a component of a process. A thread performs a sequence
-of instructions that are part of a process the thread belongs to. A process
-can involve a single thread, or a process can involve multiple threads.
+of instructions that are part of a process the thread belongs to. In JVM languages,
+each thread has its own unique stack to keep track of variables
+and references used within its specific set of tasks. A process
+can involve a single thread or multiple threads.
 Parallel processing is the utilization of multiple
 cores of a CPU to run threads concurrently. If processes are set up
 to run with multiple threads, the extra processing power can be used to make 
 the process more efficient.
 
+% Could make an image for this example if needed and space allows.
+% HOnestly, this whole paragraph could possibly be removed too...
 If parallel processing makes running processes more efficient, why is it not
 always used? The reason is creating parallel processes subjects
 developers to new challenges. Many new issues can result from use of
@@ -188,6 +192,23 @@ to the home DS, thread b updates the person's mood while still expecting
 them to be in the work DS, and thread a deletes the person from the work DS. 
 While the example is fairly simple, it can be seen how this type of problem
 could apply to GC.
+
+To deal with multiple threads relying on use of the same data, \emph{synchronization}
+techniques have been developed. These are meant to ensure threads do not interfere
+with one another in a process-breaking manner. A \emph{memory barrier} (referred to 
+as a read barrier or simply barrier) is an instruction set enforced upon the 
+CPU to be performed before accessing memory~\cite{wiki:barrier}. This can be used to ensure threads
+meet certain requirements before accessing memory or to disallow a thread to
+access memory while another thread is using it.
+ 
+A \emph{checkpoint} is a technique
+where all threads are required to pass through a barrier-like function at some point
+during an overall process~\cite{Tene:C4}. Going back to our moods and locations example, say we
+now have multiple threads in charge of relocating people. These threads
+could be required to store a flag on their stacks when relocating a person.
+When thread b tries updating someone's mood, all threads go through
+a barrier function checking if there is a flag for relocating that person. This
+could prevent thread b from updating a person's mood while they are being relocated.
 
 
 \subsection{GC with Parallel Processing}
