@@ -215,11 +215,34 @@ could prevent thread b from updating a person's mood while they are being reloca
 \label{sec:parallelProcessingGarbageCollection}
 
 We can now return to our original goal of applying parallel processing to GC.
-Threads that part of the application process are referred to as \emph{mutator}
+Threads that are part of the application process are referred to as \emph{mutator}
 threads (or just mutators) because they mutate the data~\cite{Tene:C4}~\cite{Iyengar:Collie}
 \cite{Osterlund:FPP}. Threads used by the garbage collector are simply GC threads.
 
+A \emph{parallel} garbage collector is one using
+multiple threads simultaneously to complete its GC process.~\cite{Puffitsch:background}
+All the garbage collectors that we examine are parallel. A \emph{concurrent} garbage
+collector is one executing in parallel to the application running. In other 
+words, the garbage collector does not entirely stop-the-world. A GC algorithm
+could be only partially concurrent or parallel. For example, one collector may
+only have the tracing phase be parallel while reclamation is concurrent.
 
+With this in mind, we focus on three different techniques for performing
+concurrent compaction within GC. We do so due to the importance 
+of having non-stop-the-world garbage collectors. Additionally, compacting
+collectors are vital when trying to optimize application performance. Thus,
+the intersection of these two optimizations to languages with automatic memory management leads
+to researching ways to perform concurrent compaction within GC.
+
+All compaction techniques we examine are part of or implemented into garbage
+collectors for testing purposes. One important metric used to consider
+how a collector is affecting an application is \emph{latency}~\cite{Lindblom:2011}.
+Within GC, latency is a measure how much a collector negatively impacts
+application processing performance. A higher latency implies the collector
+is taking up more processing resources that the application could be using.
+Latency in the GC sense only applies to concurrent collectors. It 
+can be measured in various ways and is usually collected in the same manner
+among multiple collectors for comparative purposes.
 
 
 \section{The C4 Collector}
