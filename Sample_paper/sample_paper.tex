@@ -97,10 +97,10 @@ work as there is more garbage to remove. Thus, the stop-the-world
 pauses applications experience are growing larger.
 
 % If this isn't good, maybe refer back to Jeff's paper to show how 
-% Many serial garbage collectors are hitting walls.
+% many serial garbage collectors are hitting walls.
 Clearly, stop-the-world behaviors are not desirable. In some environments,
 application pauses are unacceptable. In order to decrease or remove these 
-pauses, we want to use parallel processing. With the growing
+pauses, we want to use \emph{parallel processing}. With the growing
 need for faster responding applications coupled with greater amounts of memory needing managing,
 it is paramount that GC be optimized using parallel processing. Languages with
 automatic memory management need this in order to remain useful today,
@@ -191,11 +191,11 @@ in compacting collectors is performed by marking from-spaces as freed.
 To develop an understanding of parallel processing, we need to know 
 what \emph{processes} and \emph{threads} are~\cite{oracle:threads}.
 A process is an instance of a computer program being run. What we
-see as an application being run may actually incorporate multiple processes.
+see as an application being run can actually incorporate multiple processes.
 For example, a Java application being run and GC being performed on the application are two processes.
 A thread, at a basic level, is a component of a process. A thread performs a sequence
 of instructions that are part of a process the thread belongs to. In JVM languages,
-each thread has its own unique stack to keep track of variables
+each thread has a personal stack to keep track of variables
 and references used within its specific set of tasks. A process
 can involve a single thread or multiple threads.
 Parallel processing is the utilization of multiple
@@ -205,37 +205,38 @@ the process more efficient.
 
 % Could make an image for this example if needed and space allows.
 % HOnestly, this whole paragraph could possibly be removed too...
+%If I do, remove the last sentence of the preceding paragraph too.
 If parallel processing makes running processes more efficient, why is it not
 always used? The reason is creating parallel processes subjects
 developers to new challenges. Many new issues can result from use of
-multi-threading. One example relevant to GC is modifications to an 
-object being lost. For example, say we have an application keeping 
+multi-threading. One example, relevant to GC, is modifications to an 
+object can be lost. For example, say there is an application keeping 
 track of people's moods and locations. People are stored as objects. 
-Thread 'a' moves people, and it does so by relocating them in location data structures (DSs) 
+Thread 'a' moves people, and it does so by relocating them in data structures (DSs) 
 with a deep copy and delete operation. Thread 'b' updates people's moods. Suppose a person
 is about to go home from work, so their mood changes to happy.
-The person's change in mood could be lost if thread a copies the person
-to the home DS, thread b updates the person's mood while still expecting
-them to be in the work DS, and thread a deletes the person from the work DS. 
+The person's change in mood could be lost if thread 'a' copies the person
+to the home DS, thread 'b' updates the person's mood while still expecting
+them to be in the work DS, and thread 'a' deletes the person from the work DS. 
 While the example is fairly simple, it can be seen how this type of problem
-could apply to GC.
+applies to GC.
 
 To deal with multiple threads relying on use of the same data, \emph{synchronization}
-techniques have been developed. These are meant to ensure threads do not interfere
+techniques are used. These ensure threads do not interfere
 with one another in a process-breaking manner. A \emph{memory barrier} (referred to 
 as a read barrier or simply barrier) is an instruction set enforced upon the 
-CPU to be performed before accessing memory~\cite{wiki:barrier}. This can be used to ensure threads
-meet certain requirements before accessing memory or to disallow a thread to
-access memory while another thread is using it.
+CPU to be performed before accessing memory~\cite{wiki:barrier}. Uses of this include ensuring threads
+meet certain requirements before accessing memory or disallowing a thread to
+access memory while another thread is using the memory.
  
 A \emph{checkpoint} is a technique
 where all threads are required to pass through a barrier-like function at some point
 during an overall process~\cite{Tene:C4}. Going back to our moods and locations example, say we
 now have multiple threads in charge of relocating people. These threads
 could be required to store a flag on their stacks when relocating a person.
-When thread b tries updating someone's mood, all threads go through
+When thread 'b' tries updating someone's mood, all threads go through
 a barrier function checking if there is a flag for relocating that person. This
-could prevent thread b from updating a person's mood while they are being relocated.
+could prevent thread 'b' from updating a person's mood while they are being relocated.
 
 
 \subsection{GC with Parallel Processing}
@@ -243,7 +244,7 @@ could prevent thread b from updating a person's mood while they are being reloca
 
 We can now return to our original goal of applying parallel processing to GC.
 Threads that are part of the application process are referred to as \emph{mutator}
-threads (or just mutators) because they mutate the data~\cite{Tene:C4}~\cite{Iyengar:Collie}
+threads (or mutators) because they mutate the data~\cite{Tene:C4}~\cite{Iyengar:Collie}
 \cite{Osterlund:FPP}. Threads used by the garbage collector are simply GC threads.
 
 A \emph{parallel} garbage collector is one using
@@ -254,14 +255,14 @@ words, the garbage collector does not entirely stop-the-world. A GC algorithm
 could be only partially concurrent or parallel. For example, one collector may
 only have the tracing phase be parallel while reclamation is concurrent.
 
-With this in mind, we focus on three different techniques for performing
+We focus on three techniques for performing
 concurrent compaction within GC. We do so due to the importance 
 of having non-stop-the-world garbage collectors. Additionally, compacting
 collectors are vital when trying to optimize application performance. Thus,
 the intersection of these two optimizations to languages with automatic memory management leads
 to researching ways to perform concurrent compaction within GC.
 
-All compaction techniques we examine are part of or implemented into garbage
+All compaction techniques we examine are used in garbage
 collectors for testing purposes. One important metric used to consider
 how a collector is affecting an application is \emph{latency}~\cite{Lindblom:2011}.
 Within GC, latency is a measure how much a collector negatively impacts
