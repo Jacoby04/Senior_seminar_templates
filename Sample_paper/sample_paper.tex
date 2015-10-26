@@ -135,28 +135,28 @@ as the \emph{stack}, which is separate from the heap.
 The heap is a virtual layer of memory that corresponds to physical memory.
 References pointing to object locations actually point to their
 virtual locations rather than their physical locations. Objects may also 
-consist of references to other objects, so references may appear on the heap.
+contain references to other objects, so references may appear on the heap.
 
 In GC, the overarching pattern common to all algorithms is determining garbage
-and reclaiming the memory from those dead objects~\cite{wiki:gc}. This can be broken down into two major steps.
-First, a GC algorithm performs \emph{set condemnation} when it decides which objects are 
-garbage. The overall GC algorithms we examine perform set condemnation using a method 
+and reclaiming memory from dead objects~\cite{wiki:gc}. This can be broken down into two major steps.
+First, a GC algorithm performs \emph{set condemnation} when deciding which objects are 
+garbage. The garbage collectors we examine perform set condemnation using a method 
 known as \emph{tracing}. During this, objects are determined to be reachable by 
 traversing references from global, root objects. Any objects reachable by chaining references
 from these global, root objects could still be used by the application. 
-Any objects that are not reachable are garbage.  Then, the algorithm performs 
-\emph{reclamation} by recovering the memory held by garbage objects. A single
-process of a GC pattern being performed is known as a \emph{cycle}. A GC cycle
+Any objects not reachable are garbage. Then, the algorithm performs 
+\emph{reclamation} by recovering the memory held by garbage objects. A full
+performance of the overall GC pattern is known as a \emph{cycle}, and it
 is usually started when the heap is full.
 
 To optimize GC, a variant can be performed known as \emph{generational} GC.
-Generational collectors are based on a key idea of the \emph{weak generational hypothesis}~\cite{Tene:C4}.
-This idea is most objects do not live on the 
+Generational collectors are based on the \emph{weak generational hypothesis}~\cite{Tene:C4}.
+This says most objects do not live on the 
 heap long. Thus, GC efforts are focused on these objects. Typically, this is achieved
 by dividing the heap into two generations. One generation focuses on the younger objects and
 is collected more frequently. If objects in the young generation of the heap survive
-enough GC cycles, it will graduate into the old generation. By not considering the entire
-heap with each GC cycle, the application experiences less disruptions.
+enough GC cycles, it will move into the old generation. By not considering the entire
+heap with each GC cycle, an application experiences less disruptions.
 
 As memory is reclaimed by a garbage collector, the heap is subject to 
 \emph{fragmentation}~\cite{Tene:C4}~\cite{Iyengar:Collie}~\cite{Osterlund:FPP}. Fragmentation is the forming
@@ -172,7 +172,7 @@ as it has to store parts of it across non-contiguous locations. Additionally,
 more overhead will be experienced as accessing the object will require locating
 all of its parts.
 
-This is where \emph{compaction} becomes relevant. Compaction works to avoid
+This is where \emph{compaction} becomes relevant. Compaction fights
 fragmentation of the heap by moving lives objects into contiguous memory locations.
 Compaction is performed by a garbage collector and is part of GC. Two steps
 are typically involved in compaction. \emph{Relocation} occurs by moving live objects
@@ -180,8 +180,8 @@ to a contiguous memory location after set condemnation.
 The contiguous memory location being moved to is often referred to as \emph{to-space}.
 The location an object is moved from is referred to as \emph{from-space}. While it is called 
 relocation, objects are typically copied rather than moved. \emph{Remapping}
-occurs after objects have been relocated. After objects have moved, a remapping phase 
-updates all references to objects to refer to their new locations. Often, reclamation
+occurs after objects have been relocated; the remapping phase 
+updates all references to moved objects to refer to their new locations. Often, reclamation
 in compacting collectors is performed by marking from-spaces as freed.
 
 
