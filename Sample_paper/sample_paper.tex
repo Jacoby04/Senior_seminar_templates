@@ -69,7 +69,7 @@ a language is said to have \emph{automatic memory management}. Some languages
 with automatic memory management are C\#, Java, and Python.
 Use of automatic memory management is beneficial to programmers as it provides
 the robustness of an object-oriented language without worrying about
-details unrelated to what their program is intended to do; specifically, they do
+details unrelated to what the program is intended to do; specifically, users do
 not have to worry about the details of memory allocation and deallocation. 
 However, programmers also do not have control over how memory management occurs,
 which can have negative impacts on application performance.
@@ -85,12 +85,12 @@ and remove dead objects. We will focus on specific parts of the
 garbage collection (GC) process performed on Java Virtual Machines 
 (JVMs), software processes that run Java programs on computing systems~\cite{Lindblom:2011}.
 
-GC is not a free procedure.
+GC is not without cost.
 Just like the application, GC requires processing resources to run. After all,
 a GC algorithm is another piece of software. When using a single processor, 
 we get a \emph{serial} garbage collector operating in a 
 \emph{stop-the-world} fashion~\cite{Lindblom:2011}; GC requires
-pausing the application in order to clean up. With storage media growing, 
+pausing the application in order to clean. With storage media growing, 
 applications are experiencing a growth in memory
 available to them. Likewise, garbage collectors are performing more
 work as there is more garbage to remove. Thus, the stop-the-world
@@ -113,7 +113,7 @@ to discuss how parallel processing is used for GC.
 From there, we focus our examination of parallel processing in GC in Sections 3, 4, and 5;
 we examine how a specific component of GC can be made to run parallel to
 and independent of the application running. To this end, we cover three
-different techniques which are all implemented and tested within different
+different techniques that are all implemented and tested within different
 garbage collectors.
 
 
