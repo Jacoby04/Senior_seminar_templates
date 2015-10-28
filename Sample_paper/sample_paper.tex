@@ -249,7 +249,7 @@ threads (or mutators) because they mutate the data~\cite{Tene:C4}~\cite{Iyengar:
 
 A \emph{parallel} garbage collector is one using
 multiple threads simultaneously to complete its GC process.~\cite{Puffitsch:background}
-All the garbage collectors that we examine are parallel. A \emph{concurrent} garbage
+All but one of the garbage collectors we examine are parallel. A \emph{concurrent} garbage
 collector is one executing in parallel to the application running. In other 
 words, the garbage collector does not entirely stop-the-world. A GC algorithm
 could be only partially concurrent or parallel. For example, one collector may
@@ -267,14 +267,15 @@ collectors for testing purposes. One important metric used to consider
 how a collector is affecting an application is \emph{latency}~\cite{Lindblom:2011}.
 Within GC, latency is a measure how much a collector negatively impacts
 application processing performance. A higher latency implies the collector
-is taking up more processing resources that the application could be using.
-Latency in the GC sense only applies to concurrent collectors. It 
+is taking up more processing resources that the application could be using. It 
 can be measured in various ways and is usually collected in the same manner
 among multiple collectors for comparative purposes.
 
 
 \section{The C4 Collector}
 \label{sec:c4}
+
+\todo[inline]{Things that have changed since 4 page draft: results}
 
 %I think I got enough introductory info describing the context of C4
 %here. Might want to check with Elena.
@@ -407,6 +408,8 @@ can be freed and reclamation of memory is now entirely complete.
 \subsection{C4 Results Summary}
 \label{sec:c4Results}
 
+% Tested primarily against also concurrent, but non-generational.
+
 Experiments done with the implemented C4 algorithm were meant to show improvements
 of using an algorithm that is simultaneously generational and concurrent~\cite{Tene:C4}.
 C4 is tested against a modified, non-generational C4 algorithm. Additionally,
@@ -421,10 +424,10 @@ significant compaction event occurred.
 
 The primary performance metric monitored was the worst-case response times
 of servers responding to requests while experiencing the workloads
-described. This gives a sense of how much latency a garbage collector causes. 
+described. While not directly measuring latency, this gives a sense of how 
+much latency a garbage collector causes. 
 C4 maintained the smallest 
-worst-case response times across the largest range of heap sizes, so
-it had the lowest latency.
+worst-case response times across the largest range of heap sizes.
 The worst-case response times were usually in the range of 0.01-0.1secs. 
 These response times are fast enough to be considered \emph{pauseless}. 
 The non-generational version of C4 could also reach pauseless thresholds,
@@ -437,7 +440,7 @@ collectors had multi-second worst-case response times for all heap sizes experie
 \section{The Collie Collector}
 \label{sec:collie}
 
-We now look at the concurrent compaction technique used within the 
+We now look at the concurrent compaction technique used within the single-threaded
 Collie garbage collector described by Iynegar et al.~\cite{Iyengar:Collie};
 with the exception of Gehringer, they were the researchers who worked on the C4 algorithm.
 As such, Collie utilizes modified versions of several techniques from C4, such as:
@@ -445,7 +448,8 @@ the tracing algorithm, the LVB, page-granularity compaction, self-healing, and q
 Only the LVB is modified in significant ways for the purposes of compaction in Collie.
 The rest of the techniques are not re-discussed here due to performing 
 similarly to their C4 counterparts. Like C4, the Collie
-collector is also designed with server environments in mind. Collie is implemented and tested in 
+collector is also designed with server environments in mind. 
+Collie is implemented and tested in 
 the same production-quality Azul JVM the Pauseless garbage collector is implemented in
 ~\cite{Click:Pauseless}. However, it has not been made commercially available.
 
@@ -548,7 +552,7 @@ an object makes it to "to-space" should its transplantation need
 to be aborted because mutators need to access it.
 
 % Could make a cake example instead if this isn't really helpful.
-As an example, say we have an object stored in memory. As discussed before, all references
+As an example, consider an object stored in memory. As discussed before, all references
 to this object are actually references to its virtual page location. This virtual page
 is backed up by some contiguous, physical memory equivalent in size to the page. 
 Mirrored-to-space is simply another page that is assigned to the same section of physical memory. 
@@ -567,7 +571,7 @@ has been compacted.
 
 After a tracing phase at the start of the overall GC algorithm for set condemnation, heap compaction
 happens during a \emph{transplantation phase}~\cite{Iyengar:Collie}.
-Live, relocatable objects are known at this time. The compaction 
+Live, relocatable objects and their referrer sets are known at this time. The compaction 
 algorithm uses TM semantics to complete an object's
 transplantation. The operations for transplantation are stored as a
 transactional procedure. Individual object transplantations will be done on relocatable objects 
@@ -584,8 +588,8 @@ of how this occurs is beyond the scope of this paper, see~\cite{Iyengar:Collie}.
 % If others experience something similar, they should be talked about too.
 At the start of the transplantation phase, a pre-compaction checkpoint occurs.
 For all relocatable objects, referrer sets have been established during the tracing phase.
-These referrer sets need to be stable referrer sets. As such, the objects are checked for 
-references to them in threads' stacks. Any objects with these will be 
+These referrer sets need to be stable referrer sets. As such, threads' stacks are checked 
+for references to the objects. Any objects with these will be 
 marked NIT as their referrer sets fail to meet requirement 2 for being stable referrer sets.
 After the checkpoint, the compactor has a set of relocatable objects with currently stable referrer sets.
 
@@ -620,6 +624,8 @@ tracing phase.
 
 \subsection{Collie Results Summary}
 \label{sec:collieResults}
+
+% Tested primarily against Another concurrent that is also modified to run on a single thread.
 
 The main goal of the Collie collector is to decrease latency
 during compaction~\cite{Iyengar:Collie}. The Collie was tested 
@@ -778,6 +784,8 @@ or setting a timer.
 \subsection{FPP Results Summary}
 \label{sec:fppResults}
 
+% Tested against a concurrent collector that does NOT have concurrent compaction.
+
 As mentioned, FPP was implemented in the G1 garbage collector for testing purposes~\cite{Osterlund:FPP}. 
 Appropriately, the modified G1 collector utilizing FPP for relocation is tested against the
 unmodified G1 collector. This was tested in a MacBook Pro; for the 
@@ -797,59 +805,45 @@ host garbage collector activities such as tracing and remapping.
 \section{Conclusions}
 \label{sec:conclusions}
 
-To be done at a later date...
+The concurrent compaction techniques examined are effective in reducing latency of garbage collectors.
+The collectors the concurrent compaction algorithms were in were tested for latency in
+different manners, so it is difficult to compare them to one another. Additionally, the
+algorithms were not all designed with the same environment in mind.
 
-Just throwing some general final statements about each algorithm in here as I write about
-them. At this point, this is not meant to be cohesive in any way. Feel free
-to look at it though; let me now what you think should stick around and what is definitely
-not needed.
+As C4 and Collie were developed to be used in large server environments, we can
+examine them together.
+The Collie compactor needs the most additional work. As is mentioned
+by the authors, it could be made generational similarly to C4~\cite{Iyengar:Collie}. 
+Also, work towards a no-barrier version, discussed in theory, could be performed.
+The only relevant improvement to C4 discussed by the researchers is the
+final implementation tested, the version in production at the time of writing,
+is not fully concurrent~\cite{Tene:C4}. It uses additional synchronization techniques between
+GC phases in the sub-millisecond range. While minor, these could potentially be removed.
 
-\emph{C4}
+Both C4 and Collie require server modifications in order
+to work~\cite{Tene:C4}~\cite{Iyengar:Collie}. The transactional memory 
+used in Collie requires specialized hardware for implementation.
+C4 needs faster allocation rates than typical Linux virtual memory provides,
+which is the intended operating system. Both modifications are explained not to be difficult to do.
 
-%Not sure what else to say for this. It's a pretty solid algorithm.
-As was shown in its experimentation, C4 is fully capable of sustaining pauseless application
-behavior for its intended environment. C4 demonstrated two-orders of magnitude improvement
-over the two non-concurrently compacting GC algorithms it was compared against. C4 is
-fully concurrent, all of its main phases execute without hindering application behavior,
-but the implementation of C4 tested does actually use some very brief stop-the-world synchronization
-techniques between these phases. These synchronizations cause pauses in the sub-millisecond range, so
-they are not significant enough for to make C4 not be considered pauseless. To be 
-implemented for use on a Linux platform, C4 requires improvements to the default 
-virtual mapping rates that Linux provides. In other words, default Linux platforms 
-do not support high enough allocation rates to run C4 effectively. Future work 
-on the C4 could include scaling it up to larger heaps and 
-finding a way to remove the between phases synchronizations.
+FPP is a more general algorithm; it is also one part of a GC algorithm
+meant to be implemented into a host garbage collector. It was designed
+to be easily implemented into hosts, so it does not have any special hardware or operating
+system requirements. FPP is implementable in the Pauseless collector, which heavily influenced
+both C4 and Collie~\cite{Osterlund:FPP}. By extension, it could likely use C4 and Collie as
+its host GC algorithms. FPP works without barriers, whereas C4 and Collie use barriers, so
+this might be worth looking into.
 
-\emph{Collie}
+To conclude, compaction is a necessity for efficient GC with growing heaps and
+increasing environmental demands. Additionally, concurrent compaction reduces the impact of compaction
+on an application. For server environments, C4 is available through Azul Systems, and requires
+less additional work than Collie. For barrier-free compaction in any JVM, FPP 
+is easily implementable into a host garbage collector of choice. Ultimately,
+the approach for compaction one wishes to use will depend on its intended environment.
 
-Since the Collie uses a compactor that aborts on mutator interference to allow
-concurrency, there are no copy-progress guarantees for the algorithm~\cite{Osterlund:FPP}.
-While extremely unlikely, this means a GC cycle could be performed without compacting
-any portion of the heap. Since the Collie reclaims memory by labeling the from-space as freed,
-this would mean no garbage is actually collected should this occur.
-
-The referrer sets built during the GC process are done per object. Keeping track of them
-will require extra space overhead. The amount of overhead this would cause is discussed in
-general terms, but no numbers are provided. It is noted that the overall space needed will 
-depend upon the specific storage mechanisms used, but these mechanisms are not 
-investigated~\cite{Iyengar:Collie}. However, allowing referrer sets to take
-more space is shown to result in more memory being reclaimed for each GC cycle.
-
-Collie is not made generational at this time, but it could be done similarly
-to how C4 does so, which would improve performance. (I believe the paper
-mentions some other ways Collie could be improved by borrowing from other
-GC algorithms.)
-
-\emph{FPP}
-
-As FPP seeks to be easily implemented into a range of host garbage collectors, 
-it does not require special hardware or operating system requirements. FPP
-is primarily designed for tracing garbage collectors that divide the heap
-into more than one region. 
-FPP is mentioned to be implementable within the Pauseless garbage collector,
-which we have discussed heavily influenced both the C4 and Collie garbage collectors.
-It seems likely that it could also be implemented into either of them as a result.
-FPP has copy-progress guarantees as well.
+%If I add in intro a note mentioning how without paralle, GC algorithms
+%are hitting a wall and becoming about trade-offs. Could mention here
+%that these also have some trade-offs.
 
 
 \section*{Acknowledgments}
