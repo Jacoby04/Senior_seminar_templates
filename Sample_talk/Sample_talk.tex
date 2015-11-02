@@ -108,19 +108,58 @@
 
 \section[C4]{Continuously Concurrent Compacting Collector (C4)}
 
-\subsection[Explanation and Results]{Explanation and Test Results}
+\subsection[Explanation]{Explanation}
+
+
+
+\subsection[Results]{Test Results}
 
 
 
 \section[Collie]{Collie Collector}
 
-\subsection[Explanation and Results]{Explanation and Test Results}
+\subsection[Explanation]{Explanation}
+
+
+
+\subsection[Results]{Test Results}
 
 
 
 \section[FPP]{Field Pinning Protocol}
 
-\subsection[Explanation and Results]{Explanation and Test Results}
+\subsection[Explanation]{Explanation}
+
+\begin{frame}
+
+\frametitle{The Blame Game}
+
+\begin{itemize}
+\item \emph{blamed} thread: responsible for relocating an object
+
+\begin{itemize}
+\item Comes from HPs interrupting copying
+\end{itemize}
+\end{itemize}
+
+\linespace
+\linespace
+
+\begin{enumerate}
+\item GC threads attempt to relocate objects
+\begin{itemize}
+\item No blame passed!
+\end{itemize}
+
+\item GC threads try again... blame if interrupted
+\item Blame continues to be passed to interrupting threads
+\end{enumerate}
+
+
+\end{frame}
+
+
+\subsection[Results]{Test Results}
 
 
 
