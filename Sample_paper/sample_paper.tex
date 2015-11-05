@@ -700,26 +700,12 @@ interruption~\cite{Osterlund:FPP}; it becomes responsible for ensuring
 the object is relocated. GC threads cannot receive blame as they will not impede
 copy attempts.
 
-To illustrate how blame works, reconsider the coffee example. Suppose
-someone is in charge of moving the coffee to another break room. They
-can try to do so, but if others still have cups, they may want more coffee.
-The interrupted person has other tasks they could be doing, so they tell
-everyone with a cup to move the coffee when they are finished with it.
-
 At the start of FPP relocation, GC threads will attempt to copy
 objects marked for relocation. At this time, blaming is 
 disabled. 
 After the first round of attempting to copy objects, the GC threads
 will again try to copy the remaining objects. If a mutator 
 thread impedes the copy attempt this time, it will be blamed. 
-
-% This is redundant with the process below.
-Once a mutator is done accessing an
-object, the mutator unpins it. If blamed, the mutator will attempt to perform the copy itself. If 
-any other mutators have HPs to the object at that time, the copying mutator 
-will be impeded. Blame will once again be passed
-along to the impeding mutators. This sequence
-occurs repeatedly until a thread tries to copy the object when it is not pinned. 
 
 The process followed by mutator threads during the relocation phase when 
 accessing an object is as follows:
@@ -740,6 +726,12 @@ blame the threads and move along
 From this, we see how mutators will continually bounce blame around until
 no threads have the object pinned any longer. At this time, the last thread
 to attempt to copy the object will succeed.
+
+To illustrate how blame works, reconsider the coffee example. Suppose
+someone is in charge of moving the coffee to another break room. They
+can try to do so, but if others still have cups, they may want more coffee.
+The interrupted person has other tasks they could be doing, so they tell
+everyone with a cup to move the coffee when they are finished with it.
 
 It is possible for an
 object not to move because it is continually pinned. How this terminates 
