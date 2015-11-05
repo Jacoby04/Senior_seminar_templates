@@ -138,7 +138,7 @@ virtual locations rather than their physical locations. Objects may also
 contain references to other objects, so references may appear on the heap.
 
 In GC, the overarching pattern common to all algorithms is determining garbage
-and reclaiming memory from dead objects~\cite{wiki:gc}. This can be broken down into two major steps.
+and reclaiming memory from dead objects. This can be broken down into two major steps.
 First, a GC algorithm performs \emph{set condemnation} when deciding which objects are 
 garbage. The garbage collectors we examine perform set condemnation using a method 
 known as \emph{tracing}. During this, objects are determined to be reachable by 
@@ -275,8 +275,6 @@ among multiple collectors for comparative purposes.
 \section{The C4 Collector}
 \label{sec:c4}
 
-\todo[inline]{Things that have changed since 4 page draft: results}
-
 %I think I got enough introductory info describing the context of C4
 %here. Might want to check with Elena.
 The first concurrent compaction algorithm we examine is implemented in the 
@@ -320,7 +318,7 @@ Thus, self-healing helps reduce the occurrence of the read barrier triggers.
 
 The relocation aspect of compaction in C4 occurs on a per-\emph{page}
 basis, where a page is a fixed-length, contiguous block of virtual memory in the heap
-that is backed by a contiguous block of physical storage~\cite{wiki:page}\cite{Tene:C4}.
+that is backed by a contiguous block of physical storage~\cite{Tene:C4}.
 To quickly empty virtual pages, the most sparsely populated pages are relocated
 first. The from-space in this relocation is actually from-pages, and the to-space
 is to-pages. From-pages are pages with garbage
@@ -463,7 +461,7 @@ alternative to barriers~\cite{Iyengar:Collie}. TM systems allow
 sections of code to function 
 analogously to \emph{transactions} from database systems, 
 which are a series of operations performed as one unit where 
-they occur in an all-or-none manner~\cite{wiki:atomicity}.
+they occur in an all-or-none manner.
 
 For example, consider updating the inventory of a store; this may involve updating
 the price, quantity, and distributor for various items. 
