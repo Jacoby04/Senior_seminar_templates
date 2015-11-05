@@ -691,11 +691,11 @@ be done safely when no one has cups any longer, so the coffee is not pinned.
 \label{sec:fppCopy}
 
 HPs prevent relocation of objects by serving as a distributed
-counter. A thread cannot relocate an object should the number of
-HPs pinning the object be greater than zero.
+counter. Threads cannot relocate objects should the number of
+HPs pinning the objects be greater than zero.
 A mutator thread \emph{impedes} a copying thread if
 its HP prevents the copying.
-An impeding thread is \emph{blamed} for the 
+The impeding thread is \emph{blamed} for the 
 interruption~\cite{Osterlund:FPP}; it becomes responsible for ensuring 
 the object is relocated. GC threads cannot receive blame as they will not impede
 copy attempts.
@@ -707,21 +707,19 @@ The interrupted person has other tasks they could be doing, so they tell
 everyone with a cup to move the coffee when they are finished with it.
 
 At the start of FPP relocation, GC threads will attempt to copy
-objects that are marked for relocation. At this time, blaming is 
-disabled. That is, mutator threads
-impeding initial copy attempts will not have to attempt to move the objects
-themselves. 
-
+objects marked for relocation. At this time, blaming is 
+disabled. 
 After the first round of attempting to copy objects, the GC threads
 will again try to copy the remaining objects. If a mutator 
 thread impedes the copy attempt this time, it will be blamed. 
-Once the mutator is done accessing the
-object and unpins it, it will attempt to perform the copy itself. If 
+
+% This is redundant with the process below.
+Once a mutator is done accessing an
+object, the mutator unpins it. If blamed, the mutator will attempt to perform the copy itself. If 
 any other mutators have HPs to the object at that time, the copying mutator 
 will be impeded. Blame will once again be passed
-along to the other mutators with HPs to the object. This sequence will
-occur repeatedly until a thread tries to copy the object while it is no
-longer pinned. 
+along to the impeding mutators. This sequence
+occurs repeatedly until a thread tries to copy the object when it is not pinned. 
 
 The process followed by mutator threads during the relocation phase when 
 accessing an object is as follows:
@@ -739,6 +737,9 @@ blame the threads and move along
 \item Proceed to copy the object with further pins still impeding the copy
 \end{enumerate}
 \end{enumerate}
+From this, we see how mutators will continually bounce blame around until
+no threads have the object pinned any longer. At this time, the last thread
+to attempt to copy the object will succeed.
 
 It is possible for an
 object not to move because it is continually pinned. How this terminates 
