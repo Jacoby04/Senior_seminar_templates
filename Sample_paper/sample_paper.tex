@@ -687,22 +687,6 @@ be done safely when no one has cups any longer, so the coffee is not pinned.
 % Did so to be able to build on the example.
 
 
-\subsection{Tricoloring}
-\label{sec:fppColoring}
-
-A non-garbage object enters different states of the copying process 
-during the relocation phase~\cite{Osterlund:FPP}. An object is
-\emph{copy-white} before and after relocation. Regardless of whether the object is
-currently in to or from-space, it is copy-white when in a single location with all its
-references pointing to that location. An object is \emph{copy-gray} when
-being relocated or awaiting relocation. Copy-gray object's have their from-space location
-point to their to-space destination and their to-space destination point to a location in
-memory holding the status of the object. Last, a \emph{copy-black} object has
-been relocated but still requires remapping. Copy-black objects no longer require the extra
-status information. FPP moves objects marked for relocation from a copy-white state to
-a copy-black state without any type of checkpoint.
-
-
 \subsection{Collaborative Copying and Blame}
 \label{sec:fppCopy}
 
@@ -723,50 +707,36 @@ The interrupted person has other tasks they could be doing, so they tell
 everyone with a cup to move the coffee when they are finished with it.
 
 At the start of FPP relocation, GC threads will attempt to copy
-objects immediately after shading all objects marked for relocation
-copy-gray. At this time, blaming is disabled. That is, mutator threads
+objects that are marked for relocation. At this time, blaming is 
+disabled. That is, mutator threads
 impeding initial copy attempts will not have to attempt to move the objects
 themselves. 
 
 After the first round of attempting to copy objects, the GC threads
-will again try to copy the remaining copy-gray objects. If a mutator 
+will again try to copy the remaining objects. If a mutator 
 thread impedes the copy attempt this time, it will be blamed. 
 Once the mutator is done accessing the
 object and unpins it, it will attempt to perform the copy itself. If 
 any other mutators have HPs to the object at that time, the copying mutator 
 will be impeded. Blame will once again be passed
 along to the other mutators with HPs to the object. This sequence will
-occur repeatedly until a mutator tries to copy the object while no other
-mutators contain HPs to the object. 
-
-When an object is copy-gray, it has an additional copy state associated
-with it. The object has an \emph{async} state if it is in from-space
-and needs to be copied. It has a \emph{sync} state if there is
-ongoing relocation between from and to-space and the object needs to
-be protected. The protection ensures that the copy will be impeded 
-should another mutator pin the object. 
-Finally, an object is \emph{copied} if it was moved
-successfully during the sync state. The object can be marked
-copy-black once the additional status memory is removed.
+occur repeatedly until a thread tries to copy the object while it is no
+longer pinned. 
 
 The process followed by mutator threads during the relocation phase when 
 accessing an object is as follows:
 \begin{enumerate}
 \item Pin the object by adding a HP
-\item Read the color state of the object. This tells the thread whether the object
-has already been copied
+\item Determine whether the object has already been copied
 \item Mutate/use the object. Since the object is pinned, the thread can 
 do so without worry
 \item Unpin the object when no longer needed
 \item If the thread was blamed due to impeding another thread's copy attempt, 
 attempt to copy the object:
 \begin{enumerate}
-\item Scan other threads for HPs to begin transition into sync state. If HPs found,
-blame all relevant threads and move along
-\item Tentatively enter sync state
-\item Scan once more for HPs passing blame if found and moving along
-\item Now in sync state, proceed to copy the object with further
-pins still impeding the copy
+\item Check other threads for HPs before copying. If HPs found,
+blame the threads and move along
+\item Proceed to copy the object with further pins still impeding the copy
 \end{enumerate}
 \end{enumerate}
 
@@ -774,16 +744,11 @@ It is possible for an
 object not to move because it is continually pinned. How this terminates 
 depends on the host GC algorithm used. When using the Garbage-First (G1) algorithm,
 this process continues until all objects are moved or another GC cycle starts.
-If objects are still copy-gray when another cycle begins, they are automatically
+If objects have not relocated when another cycle begins, they are automatically
 marked for relocation again. Allowing mutators to continue passing blame works
 in G1 because, like C4 and Collie, the algorithm will roll up remapping into the next
 GC cycle's tracing phase. Possible alternatives include setting a max number of impediments
 or setting a timer.
-
-% So I debated whether I should've went into as much detail as I did (sync, async, copied 
-% particularly). Depending on how adviser feedback goes, I may tri too scale back the 
-% technical aspects here. If I do so, I will extend the cake example to elaborate
-% on how new mutators impeding move/"clean-up" works.
 
 
 \subsection{FPP Results Summary}
