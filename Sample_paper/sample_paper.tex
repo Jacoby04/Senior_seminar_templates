@@ -670,19 +670,21 @@ The HPs point to objects in memory a thread is accessing, or \emph{pin} them.
 When a thread finishes accessing an object, it drops the HP.
 The HPs allow for asynchronous relocation of an object. So long as an object
 is pinned by a mutator, it cannot be relocated as it is still in use. Once all threads have
-unpinned the object, it is ready to be relocated collaboratively.
-By collaboratively, we mean the last thread to drop the HP to the object
-will hold the final responsibility for copying the object.
+unpinned the object, it is free to be relocated safely.
 When discussing the theoretical construction of the algorithm, a granularity of pinning 
-individual fields is used, thus \emph{Field} Pinning Protocol. 
+individual fields is used, thus the name \emph{field} pinning protocol. 
 
+% Changed from original example using cake. May want to change back depending
+% on reader feedback. Cake at a party.
 While it is explained in more detail below, an example of how HPs 
-work on a high-level is useful. Imagine someone brings cake to a party. Anyone 
-wanting cake must make it known to others by having a plate, otherwise the 
-cake is liable to be moved to the fridge. The people are effectively pinning the cake.
-Once everyone has had their share of cake, it should be moved. This can
-be done safely when no one has plates any longer, so no one has the cake pinned.
-The last person to discard their plate will be responsible for relocating the cake.
+work on a high-level is useful. Imagine a pot of coffee at work. Anyone 
+wanting coffee must make it known to others by having a cup, otherwise the 
+coffee is liable to be moved to the fridge. The people are effectively pinning the coffee.
+Once everyone has had their share of caffeine, it should be moved. This can
+be done safely when no one has cups any longer, so no one has the coffee pinned.
+
+% Took out from this example that last person to discard the cup will be responsible.
+% Did so to be able to build on the example.
 
 
 \subsection{Tricoloring}
