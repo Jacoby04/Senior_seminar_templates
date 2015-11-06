@@ -276,86 +276,66 @@ The first concurrent compaction algorithm we examine is implemented in the
 Continuously Concurrent Compacting Collector (C4), which is a garbage collector 
 included in JVMs commercially shipped by Azul Systems~\cite{Tene:C4}. The 
 researchers, Iyengar et al., describe how C4 is an enhanced, generational variant
-of the Pauseless garbage collector~\cite{Click:Pauseless}. C4 is generational in 
-that the entire GC algorithm is independently utilized in both the young and old generations 
-concurrently; in addition, both generations have garbage collected concurrently 
-to the application running. For set condemnation, C4 uses a tracing-style algorithm.
-C4 is intended to be used in server environments with multiple GB heaps and 
-multiple GB/sec allocation rates.
+of the Pauseless Garbage Collector~\cite{Click:Pauseless}. C4 is generational in 
+that the entire GC algorithm is independently utilized in both the young and old generations;
+in addition, both generations are concurrent with the application. 
+For set condemnation, C4 uses a tracing-style algorithm.
+C4's intended environment is large server environments with multiple gigabyte heaps.
 
 
 \subsection{Loaded Value Barrier}
 \label{sec:c4LVB}
 
+\begin{figure}
+\centering
+\psfig{file=c4_page_rough_2.pdf,width =3in}
+\caption{Simplified representation of memory management with C4. Memory is relocated
+page-by-page. Dead objects are represented with $X$ and will not be relocated.
+From-pages are protected from mutators by the LVB. Contiguous virtual memory
+may not correspond to contiguous physical memory, which is out of our scope of discussion.}
+\label{fig:c4Memory}
+\end{figure}
+
 C4 uses a barrier referred to as the \emph{Loaded Value Barrier} (LVB) to 
 maintain concurrency throughout the GC process~\cite{Tene:C4}. The LVB 
-places invariants on each object reference value as it is loaded from memory.
+places invariants on each reference as it is loaded from memory.
 One of the invariants relates to the tracing portion of the GC algorithm, so
 it is not discussed here. The other invariant ensures
-references to an object being relocated must point 
-to wherever the object can be safely accessed, be it the from or to-space.
+references loaded by a mutator during relocation must point to safely
+accessible objects, objects that have already been moved.
 If the invariant does not hold
 when a reference is loaded, the barrier will trigger and execute code to correct
-the situation. The code executed is discussed later.
-
-In order to prevent repetitive barrier triggers from a single incorrect reference,
-the LVB uses a \emph{self-healing} technique. Whenever a reference triggers LVB
-due to not meeting an invariant, it will perform the rectifying code
-necessary to fix the reference. Additionally, the barrier will go to the memory
-location the reference was loaded from and fix the source of the reference. This
-ensures not only the loaded reference being used is fixed, but the stored reference
-that might be loaded again later is also fixed.
-Thus, self-healing helps reduce the occurrence of the read barrier triggers.
+the situation.
 
 
 \subsection{Concurrent Relocation}
 \label{sec:c4Relocation}
 
-The relocation aspect of compaction in C4 occurs on a per-\emph{page}
+The relocation phase of compaction in C4 occurs on a per-\emph{page}
 basis, where a page is a fixed-length, contiguous block of virtual memory in the heap
 that is backed by a contiguous block of physical storage~\cite{Tene:C4}.
 To quickly empty virtual pages, the most sparsely populated pages are relocated
 first. The from-space in this relocation is actually from-pages, and the to-space
-is to-pages. From-pages are pages with garbage
+is to-pages. From-pages contain garbage
 and are marked as such during the tracing phase.
 
-To support concurrent relocation, pages being relocated are protected. 
-The LVB will trigger for mutator threads encountering a reference to an object
-on a protected page. If the object has been relocated already, LVB will
-obtain the new location for the mutator. If the object is being relocated, 
-LVB will cause the mutator to wait
-for the GC thread to finish before continuing to work.
-If the object has not started relocation, LVB has the mutator thread 
-escalate its movement status by moving the object itself. After any of 
-these situations, the LVB will also cause the mutator thread to update 
-the reference to the new location and heal the source location of the reference.
-Without any mutator interference, GC threads will relocate the objects but
-will not remap references at this time. The barrier check and subsequent
-handling a mutator thread experiences when attempting to access an object on a
-protected page can be seen from the pseudocode below adapted from~\cite{Tene:C4}.
-\begin{verbatim}
-LVBCheck(referenceAddress, reference)
-  trigger = 0;
-  // Check for tracing invariant here.
-  if (pageIsProtected)
-    set trigger = Reloc_Trigger;
-  if (trigger != 0)
-    reference = LVBHandler(referenceAddress, 
-                  reference, trigger);
-    
-LVBHandler(address, reference, trigger)
-  oldReference = reference;
-  // Handle tracing trigger if that was the cause.
-  if (trigger = Reloc_Trigger) 
-    if (objectNotYetRelocated(reference))
-      relocateObjectAt(reference);
-    reference = lookupNewObjectLocation(reference);
-  // Self-Healing
-  compareAndSwap(address, oldReference, reference);
-  return reference;
-\end{verbatim}
+To support concurrent relocation, pages being relocated are protected by the LVB. 
+LVB will trigger for mutator threads encountering a reference to an object
+on a protected page. The mutator's subsequent behavior is:
+\begin{itemize}
+\item If the object is relocated already, find its new location
+\item If the object is being relocated currently, wait until the GC thread is finished
+\item If the object has not been relocated, move the object 
+\end{itemize}
+In all cases, the object is not used by a mutator until it is on a to-page.
+Additionally, LVB corrects the
+old reference loaded by the mutator to prevent further barrier triggers on the same
+reference.
+Without mutator interference, GC threads will simply relocate the objects but
+not remap references at this time. 
+
 When all living objects are relocated from a page marked for relocation,
-the C4 compactor will utilize a \emph{Quick Release} method. In order to quickly recycle
+the C4 compactor will utilize a \emph{quick release} method. In order to quickly recycle
 physical memory sources, the physical memory backing the page will be freed
 as soon as the last live object has been moved to a to page. The objects have already 
 been transferred to new pages, so the contents of the from-pages are no longer needed. Thus,
@@ -437,7 +417,7 @@ We now look at the concurrent compaction technique used within the single-thread
 Collie garbage collector described by Iynegar et al.~\cite{Iyengar:Collie};
 with the exception of Gehringer, they were the researchers who worked on the C4 algorithm.
 As such, Collie utilizes modified versions of several techniques from C4, such as:
-the tracing algorithm, the LVB, page-granularity compaction, self-healing, and quick-release behavior.
+the tracing algorithm, the LVB, page-granularity compaction, and quick-release behavior.
 Only the LVB is modified in significant ways for the purposes of compaction in Collie.
 The rest of the techniques are not re-discussed here due to performing 
 similarly to their C4 counterparts. Like C4, the Collie
