@@ -509,33 +509,37 @@ Compaction cannot terminate with objects in from-space.
 The additions of a \emph{mirrored-to-space} and \emph{zero-copy transplantation} are necessary
 to terminate compaction without disrupting mutators.
 
-% THere's definitely some repition here. Worry about later.
 Mirrored-to-space is a virtual memory space corresponding to and the same
 size as from-space. It is mapped to the same physical
-memory as the corresponding from-space. As mentioned, 
+memory as the corresponding from-space as can be seen in Figure~\ref{fig:collieMirrored}. As mentioned, 
 Collie uses page-granularity compaction like C4. From-space is used here 
 to refer to the set of from-pages with NIT objects. For compaction 
 termination purposes, mirrored-to-space is logically considered part of to-space.
 
-Mirrored-to-space is used to get the compactor to believe its work is done.
-It already holds the same objects in physical memory as from-space.
-Also, the compactor considers this space to be to-space. Thus, if references
-to objects are changed to point to mirrored-to-space rather than from-space,
+Zero-copy transplantation gets the compactor to believe it has finished for a cycle.
+Mirrored-to-space contains the same objects in physical memory as from-space.
+Thus, if references
+are remapped to mirrored-to-space from from-space,
 the objects appear to be relocated without physically moving. This technique
-used to terminate compaction is known as zero-copy transplantation.
+is known as zero-copy transplantation. In Figure~\ref{fig:collieMirrored},
+we see all references are to from space for NIT objects. After zero-copy transplantation, they
+point to mirrored-to-space.
 
-%Refer to figure here once it is added in a new paragraph or the paragraph right above.
-
-To have NIT objects be moved from the perspective of the compactor, zero-copy transplantation
-is performed on all of them. The LVB-style barrier gets a second purpose here. As mutators
-try to access references to NIT objects before they are updated to mirrored-to-space, 
-the barrier will cause them to correct the references before using the object. Also like
+Zero-copy transplantation
+is performed on all NIT objects. The LVB-style barrier receives a second purpose here. As mutators
+access references to NIT objects before they are updated to mirrored-to-space, 
+the barrier will cause the mutators to correct the references before using the object. Also like
 C4, entirely finishing zero-copy transplantation, which is just remapping, is rolled
 up into the next GC cycle's tracing phase. In the end, NIT objects are not actually compacted;
 for this reason, Collie is said to have an \emph{aborting} compactor. It will
 cease moving objects to allow mutator threads to continue working uninterrupted.
 
-\todo[inline]{Add figure to clarify here!!}
+\begin{figure}
+\centering
+\psfig{file=collie_mirrored_rough.pdf,width =3in}
+\caption{Mirrored-to-space and zero-copy transplantation in Collie}
+\label{fig:collieMirrored}
+\end{figure}
 
 
 \subsection{Collie Results Summary}
