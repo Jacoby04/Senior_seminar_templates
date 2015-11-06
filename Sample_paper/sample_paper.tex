@@ -95,8 +95,6 @@ availability for programs, which means garbage collectors
 have more garbage to remove. Thus, stop-the-world pauses
 experienced by applications are increasing.
 
-% If this isn't good, maybe refer back to Jeff's paper to show how 
-% many serial garbage collectors are hitting walls.
 In some environments,
 application pauses are unacceptable; for example, see the section on 
 real-time GC in~\cite{Lindblom:2011}. In order to decrease or remove 
@@ -395,7 +393,7 @@ can be freed and reclamation of memory is now entirely complete.
 
 \begin{figure}
 \centering
-\psfig{file=c4Mapping_rough_figure.pdf,width =3in}
+\psfig{file=c4Mapping_rough_figure_3.pdf,width =3in}
 \caption{C4 GC cycle. Remapping and Tracing are rolled into one traversal.
 (taken from \cite{Tene:C4})}
 \label{fig:c4Cycle}
