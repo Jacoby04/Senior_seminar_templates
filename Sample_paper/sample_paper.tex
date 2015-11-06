@@ -64,27 +64,27 @@ pauses of an application.
 \section{Introduction}
 \label{sec:introduction}
 
-In object-oriented programming languages, the allocation and deallocation
+In programming languages, the allocation and deallocation
 of memory for objects can be explicit or implicit. If done implicitly,
 a language is said to have \emph{automatic memory management}. Some languages 
 with automatic memory management are C\#, Java, and Python.
-Use of automatic memory management is beneficial to programmers as it provides
-the robustness of an object-oriented language without worrying about
-details unrelated to what the program is intended to do; specifically, users do
-not have to worry about the details of memory allocation and deallocation. 
+Use of automatic memory management is beneficial to programmers as it 
+prevents them from worrying about the details of memory allocation and deallocation. 
 However, programmers also do not have control over how memory management occurs,
 which can have negative impacts on application performance.
 
-Memory for a program is not an unlimited resource. As such, automatic memory management
-must ensure objects that are no longer needed are removed from memory
-when appropriate. Dead objects, or \emph{garbage}, are objects that can be shown
-to be unreachable by the program~\cite{glossary:g}. Thus, garbage should be deallocated to 
+
+Since memory for a program is not an unlimited resource, automatic memory management
+must remove unused objects from memory when appropriate.
+Dead objects, or \emph{garbage}, are objects that can be shown
+to be unreachable by the program~\cite{glossary:g}. Garbage should be deallocated to 
 save space for new objects that will be created. The algorithm used to perform implicit
 deallocation of garbage is referred to as a \emph{garbage collector}.
-A garbage collector is a sophisticated algorithm designed to detect
-and remove dead objects. We will focus on specific parts of the 
-garbage collection (GC) process performed on Java Virtual Machines 
-(JVMs), software processes that run Java programs on computing systems~\cite{Lindblom:2011}.
+A garbage collector is an algorithm designed to detect
+and remove dead objects. We will focus on
+garbage collection (GC) performed on Java Virtual Machines 
+(JVMs), software processes that run programs written in Java and other languages 
+on computing systems~\cite{Lindblom:2011}.
 
 GC is not without cost.
 Just like the application, GC requires processing resources to run. After all,
