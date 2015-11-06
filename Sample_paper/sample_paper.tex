@@ -280,7 +280,7 @@ of the Pauseless Garbage Collector~\cite{Click:Pauseless}. C4 is generational in
 that the entire GC algorithm is independently utilized in both the young and old generations;
 in addition, both generations are concurrent with the application. 
 For set condemnation, C4 uses a tracing-style algorithm.
-C4's intended environment is large server environments with multiple gigabyte heaps.
+C4's intended environment is large servers with multiple gigabyte heaps.
 
 
 \subsection{Loaded Value Barrier}
@@ -328,8 +328,8 @@ on a protected page. The mutator's subsequent behavior is:
 \item If the object has not been relocated, move the object 
 \end{itemize}
 In all cases, the mutator cannot use the object until it is on a to-page.
-Additionally, LVB corrects the source of the
-reference to prevent further barrier triggers on the same
+Additionally, LVB has mutators correct the
+references to avoid further barrier triggers on the same
 reference.
 Without mutator interference, GC threads will simply relocate the objects but
 not remap references at this time. 
@@ -350,7 +350,7 @@ can be paired with a different virtual page and used immediately.
 
 To maintain concurrency while updating all references to the now relocated
 objects, the C4 compaction algorithm uses two techniques~\cite{Tene:C4}. The first is
-referred to as \emph{lazy remapping}. With this, mutator
+\emph{lazy remapping}. With this, mutator
 threads continue updating references as they trigger the LVB. In order for
 the remapping phase to end, all live references must be updated.
 This could go on indefinitely if lazy remapping alone is performed.
@@ -358,14 +358,14 @@ This could go on indefinitely if lazy remapping alone is performed.
 To finish remapping, a traversal of live references must be performed to
 ensure all are updated; this is like the traversal performed to trace which
 objects are garbage. Since no physical resources are being held due
-to Quick Release and lazy remapping does not disrupt mutator operations,
-the remapping traversal is pushed off until another GC cycle starts. That
-is, C4 will have the remapping of one GC cycle be performed while the tracing
+to quick release and lazy remapping does not severely impact mutator operations,
+the remapping traversal is delayed until another GC cycle starts.
+C4 will perform the remapping of one GC cycle while the tracing
 of another cycle is beginning. This works as both processes need to traverse
-the same references in memory to find all that are reachable. To
+the same references in memory. To
 visualize how this works, examine Figure~\ref{fig:c4Cycle}. Upon remapping completion, 
-all references to from-pages are now gone. Thus, the virtual resource
-can be freed and reclamation of memory is now entirely complete. 
+all references to from-pages are now gone. Thus, the virtual addresses
+are freed and reclamation of memory is now complete. 
 
 \begin{figure}
 \centering
@@ -381,31 +381,29 @@ can be freed and reclamation of memory is now entirely complete.
 
 % Tested primarily against also concurrent, but non-generational.
 
-Experiments done with the implemented C4 algorithm were meant to show improvements
+Experiments done with the C4 collector were meant to show improvements
 of using an algorithm that is simultaneously generational and concurrent~\cite{Tene:C4}.
-C4 is tested against a modified, non-generational C4 algorithm. Additionally,
-it is tested against two algorithms that do not perform concurrent compaction. 
+C4 is tested against a modified, non-generational C4 algorithm as well as
+two algorithms that do not perform concurrent compaction. 
 All GC algorithms were tested on the same hardware; for specifications, see~\cite{Tene:C4}. 
-The test exhibited a workload with
-an allocation rate of about 1.2GB/sec and live sets of objects on 
-the heap consistently at a size of around 2.5GB; the actual heap size was allowed 
-to grow though, indicating greater amounts of garbage on the heap. The applications were run long
+The test exhibited live sets of objects on 
+the heap consistently at a size of around 2.5 gigabytes (Gbs); the actual heap size was allowed 
+to grow, indicating greater amounts of garbage on the heap. The applications were run long
 enough to ensure multiple full-heap GC cycles ran and at least one
 significant compaction event occurred.
 
-The primary performance metric monitored was the worst-case response times
-of servers responding to requests while experiencing the workloads
+The primary performance metric monitored was worst-case response times
+of servers while experiencing the heap sizes
 described. While not directly measuring latency, this gives a sense of how 
 much latency a garbage collector causes. 
 C4 maintained the smallest 
 worst-case response times across the largest range of heap sizes.
-The worst-case response times were usually in the range of 0.01-0.1secs. 
-These response times are fast enough to be considered \emph{pauseless}. 
-The non-generational version of C4 could also reach pauseless thresholds,
-but the range of heap sizes it could do so for was more limited. Where standard
-C4 sustained pauseless operation for heap sizes of 5-35GB, the modified C4 could
-only do so for heaps sizes of 15-35GB. The non-concurrently compacting
-collectors had multi-second worst-case response times for all heap sizes experienced.
+The worst-case response times were usually in the range of 0.01-0.1 secs. 
+The non-generational version of C4 could also reach low worst-case response times,
+but for a more limited range of heaps sizes. Standard
+C4 sustained the times for heap sizes of 5-35 Gb; the modified C4 could
+only do so for heaps sizes of 15-35 Gb. The non-concurrently compacting
+collectors had multi-second worst-case response times for all heap sizes.
 
 
 \section{The Collie Collector}
