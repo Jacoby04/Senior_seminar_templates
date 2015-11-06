@@ -43,13 +43,14 @@ Jacob P. Opdahl\\
 
 \maketitle
 \begin{abstract}
-This paper provides an overview of garbage collection (GC) of memory 
-in programming languages and parallel processing as well as how 
-parallel processing applies to GC; particularly, these
+This paper provides a basic overview of both garbage collection (GC) 
+of memory and parallel processing. We then cover how 
+parallel processing applies to GC. Particularly, these
 concepts are focused within the context of the Java Virtual Machine (JVM).
-We examine in detail various algorithms that perform compaction of fragmented 
-memory during garbage collection concurrently to the application running.
-The desire for such GC behavior stems from a desire to reduce stop-the-world
+With that foundation, we look at various algorithms that perform compaction of fragmented 
+memory during the GC process. These algorithms are designed 
+to run concurrently to the application running.
+Such concurrently compacting GC behavior stems from a desire to reduce stop-the-world
 pauses of an application.
 % The current paper format *only* allows inline comments using the todo
 % macro. That's kind of a bummer, and it would be neat if someone figured
