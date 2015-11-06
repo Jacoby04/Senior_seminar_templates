@@ -58,7 +58,7 @@ pauses of an application.
 % but there are quite a few details that have to be sorted out in synchrony.
 \end{abstract}
 
-\keywords{garbage collection (GC), concurrency, compaction, continuously concurrent compacting collector (C4), collie, field pinning protocol (FPP)}
+\keywords{garbage collection (GC), concurrency, compaction, Continuously Concurrent Compacting Collector (C4), Collie, Field Pinning Protocol (FPP)}
 
 
 \section{Introduction}
@@ -108,8 +108,8 @@ it is paramount that GC be optimized using parallel processing.
 In Section 2, we go over background information for GC, parallel processing,
 and a combination of the two.
 From there, we focus our examination of parallel processing in GC.
-Section 3 covers the continuously concurrent compacting collector (C4), Section
-4 considers the Collie collector, and Section 5 looks at the field pinning protocol (FPP).
+Section 3 covers the Continuously Concurrent Compacting Collector (C4), Section
+4 considers the Collie collector, and Section 5 looks at the Field Pinning Protocol (FPP).
 Discussion of each is focused on how one component of GC can run parallel to
 and independent of the application running. 
 
@@ -272,8 +272,6 @@ among multiple collectors for comparative purposes.
 \section{The C4 Collector}
 \label{sec:c4}
 
-%I think I got enough introductory info describing the context of C4
-%here. Might want to check with Elena.
 The first concurrent compaction algorithm we examine is implemented in the 
 Continuously Concurrent Compacting Collector (C4), which is a garbage collector 
 included in JVMs commercially shipped by Azul Systems~\cite{Tene:C4}. The 
@@ -647,8 +645,8 @@ despite potentially limiting the amount of memory compacted.
 \section{Field Pinning Protocol}
 \label{sec:fpp}
 
-Last, we examine concurrent compaction in GC through the field pinning
-protocol, (FPP) designed by \"{O}sterlund and L\"{o}we~\cite{Osterlund:FPP}.
+Last, we examine concurrent compaction in GC through the Field Pinning
+Protocol, (FPP) designed by \"{O}sterlund and L\"{o}we~\cite{Osterlund:FPP}.
 FPP describes a lock-free process for performing the relocation aspect
 of concurrent compaction. The remapping phase as well as other portions
 of GC are left up to the host garbage collector this
@@ -669,7 +667,7 @@ So long as an object
 is pinned by a mutator, it cannot be relocated as it is still in use. Once all threads have
 unpinned the object, it can safely be relocated.
 When discussing the theoretical construction of the algorithm, a granularity of pinning 
-individual fields is used, thus the name \emph{field} pinning protocol. 
+individual fields is used, thus the name \emph{Field} Pinning Protocol. 
 
 % Changed from original example using cake. May want to change back depending
 % on reader feedback. Cake at a party.
