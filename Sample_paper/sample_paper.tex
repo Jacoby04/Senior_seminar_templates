@@ -409,18 +409,17 @@ collectors had multi-second worst-case response times for all heap sizes.
 \section{The Collie Collector}
 \label{sec:collie}
 
-We now look at the concurrent compaction technique used within the single-threaded
+We now look at the concurrent compaction technique used by the single-threaded
 Collie garbage collector described by Iynegar et al.~\cite{Iyengar:Collie};
-with the exception of Gehringer, they were the researchers who worked on the C4 algorithm.
+with the exception of Gehringer, they were the researchers who worked on C4.
 As such, Collie utilizes modified versions of several techniques from C4, such as:
 the tracing algorithm, the LVB, page-granularity compaction, and quick-release behavior.
-Only the LVB is modified in significant ways for the purposes of compaction in Collie.
-The rest of the techniques are not re-discussed here due to performing 
-similarly to their C4 counterparts. Like C4, the Collie
+Only the LVB is modified in significant ways as discussed below.
+Like C4, the Collie
 collector is also designed with server environments in mind. 
 Collie is implemented and tested in 
 the same production-quality Azul JVM the Pauseless garbage collector is implemented in
-~\cite{Click:Pauseless}. However, it has not been made commercially available.
+~\cite{Click:Pauseless}. However, it is not commercially available.
 
 
 \subsection{Transactional Memory}
