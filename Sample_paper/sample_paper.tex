@@ -775,41 +775,22 @@ host garbage collector activities such as tracing and remapping.
 \section{Conclusions}
 \label{sec:conclusions}
 
-The concurrent compaction techniques examined are effective in reducing latency of garbage collectors.
-The collectors the concurrent compaction algorithms were in were tested for latency in
-different manners, so it is difficult to compare them to one another. Additionally, the
-algorithms were not all designed with the same environment in mind.
+We have examined three concurrent compaction techniques that are 
+effective in reducing latency of garbage collectors.
+The garbage collectors implemented in were tested for latency in
+different manners and against various algorithms, so it is difficult to 
+compare them to one another. Direct comparisons are made even more difficult since the
+algorithms were not all designed for the same environment.
 
-As C4 and Collie were developed to be used in large server environments, we can
-examine them together.
-The Collie compactor needs the most additional work. As is mentioned
-by the authors, it could be made generational similarly to C4~\cite{Iyengar:Collie}. 
-Also, work towards a no-barrier version, discussed in theory, could be performed.
-The only relevant improvement to C4 discussed by the researchers is the
-final implementation tested, the version in production at the time of writing,
-is not fully concurrent~\cite{Tene:C4}. It uses additional synchronization techniques between
-GC phases in the sub-millisecond range. While minor, these could potentially be removed.
-
-Both C4 and Collie require server modifications in order
-to work~\cite{Tene:C4}~\cite{Iyengar:Collie}. The transactional memory 
-used in Collie requires specialized hardware for implementation.
-C4 needs faster allocation rates than typical Linux virtual memory provides,
-which is the intended operating system. Both modifications are explained not to be difficult to do.
-
-FPP is a more general algorithm; it is also one part of a GC algorithm
-meant to be implemented into a host garbage collector. It was designed
-to be easily implemented into hosts, so it does not have any special hardware or operating
-system requirements. FPP is implementable in the Pauseless collector, which heavily influenced
-both C4 and Collie~\cite{Osterlund:FPP}. By extension, it could likely use C4 and Collie as
-its host GC algorithms. FPP works without barriers, whereas C4 and Collie use barriers, so
-this might be worth looking into.
-
-To conclude, compaction is a necessity for efficient GC with growing heaps and
-increasing environmental demands. Additionally, concurrent compaction reduces the impact of compaction
-on an application. For server environments, C4 is available through Azul Systems, and requires
-less additional work than Collie. For barrier-free compaction in any JVM, FPP 
-is easily implementable into a host garbage collector of choice. Ultimately,
-the approach for compaction one wishes to use will depend on its intended environment.
+The algorithms we have looked at achieved concurrency while maintaining low latency in various
+ways. C4 and Collie both use read barriers differently. C4 
+uses a barrier to control mutator behavior, and Collie uses one to allow mutators to
+work without interruption. FPP takes a wholly different approach by focusing on 
+performing relocation alone without any barriers; it avoids standard synchronization methods by using HPs
+and thread collaboration instead.
+Regardless of approach, compaction is necessary for efficient GC with growing heaps and
+increasing environmental demands. Ultimately,
+the approach for compaction used will depend on its intended environment.
 
 %If I add in intro a note mentioning how without paralle, GC algorithms
 %are hitting a wall and becoming about trade-offs. Could mention here
@@ -822,7 +803,7 @@ the approach for compaction one wishes to use will depend on its intended enviro
 % To be updated as time goes on.
 
 Thank you Elena Machkasova for the great advice and feedback.
-Thank you Jeremy Eberhardt for briefing me on the senior seminar process early on.
+Thank you Jeremy Eberhardt for infinite words of wisdom throughout.
 
 
 % The following two commands are all you need in the
