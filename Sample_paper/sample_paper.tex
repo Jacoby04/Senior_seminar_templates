@@ -225,15 +225,6 @@ as a read barrier or simply barrier) is an instruction set enforced upon the
 CPU to be performed before accessing memory~\cite{wiki:barrier}. Uses of this include ensuring threads
 meet certain requirements before accessing memory or disallowing a thread to
 access memory while another thread is using the memory.
- 
-A \emph{checkpoint} is a technique
-where all threads are required to pass through a barrier-like function at some point
-during an overall process~\cite{Tene:C4}. Going back to our moods and locations example, say we
-now have multiple threads in charge of relocating people. These threads
-could be required to store a flag on their stacks when relocating a person.
-When thread 'b' tries updating someone's mood, all threads go through
-a barrier function checking if there is a flag for relocating that person. This
-could prevent thread 'b' from updating a person's mood while they are being relocated.
 
 
 \subsection{GC with Parallel Processing}
@@ -460,8 +451,9 @@ made to memory by the transaction are finalized~\cite{wiki:transactional-memory}
 \label{sec:collieReferrerSets}
 
 Each object on the heap has a \emph{referrer set}. This is the precise set 
-of all references pointing to the object. Collie stores object's referrer sets
-so that it can perform a single object's relocation and remapping as a transaction.
+of all references pointing to the object. Collie stores object's referrer sets as transactional variables
+so it can perform a single object's relocation and remapping as a transactional procedure 
+(simply referred to as a transaction).
 To ensure an object's referrer set is not modified during the transaction,
 we define a \emph{stable} referrer set. An object has a stable referrer 
 set if the object's referrer set meets the following criteria:
@@ -474,88 +466,76 @@ This ensures the compactor is aware of all references to the object
 and references to the object go unchanged.
 
 
-\subsection{Aborting Compactor}
-\label{sec:collieAbortion}
-
-Mutator threads interrupting the transaction for relocating and remapping
-an object or triggering the modified LVB will cause the object to go unmoved.~\cite{Iyengar:Collie}.
-However, unmoved objects due to these abortions would then be stuck
-in from-space. This is why
-the additions of a \emph{mirrored-to-space} and \emph{zero-copy transplantation} are necessary.
-
-% THere's definitely some repition here. Worry about later.
-Mirrored-to-space is a virtual address space that corresponds to and is the same
-size as from-space. Mirrored-to-space memory pages are mapped to the same physical
-memory as their corresponding from-space pages. For barrier test and compaction 
-termination purposes, mirrored-to-space is logically considered part of to-space.
-
-Mirrored-to-space is necessary to facilitate non-compacting, zero-copy transplantation 
-between from-space and to-space. An object's contents are 
-consistent between from-space and mirrored-to-space and mirrored-to-space
-is logically considered to be to-space. Thus, transplantation to "to-space"
-can be done without copying the object's contents. That is, zero-copy transplantation
-allows transplantation of an object from from-space to mirrored-to-space, which only
-requires correcting references. The purpose of this is to ensure
-an object makes it to "to-space" should its transplantation need 
-to be aborted because mutators need to access it.
-
-\todo[inline]{Add figure to clarify here!!}
-
-
 \subsection{The Collie Protocol}
 \label{sec:collieProtocol}
 
-After a tracing phase at the start of the overall GC algorithm for set condemnation, heap compaction
-happens during a \emph{transplantation phase}~\cite{Iyengar:Collie}.
-Live, relocatable objects and their referrer sets are known at this time. The compaction 
-algorithm uses TM semantics to complete an object's
-transplantation. The operations for transplantation are stored as a
-transactional procedure. Individual object transplantations will be done on relocatable objects 
-maintaining stable referrer sets throughout the process.
+After a tracing phase at the start of GC, heap compaction
+happens during a \emph{transplantation phase}~\cite{Iyengar:Collie};
+transplantation is a term meaning the combination of relocation and remapping.
+Live objects and their referrer sets are known at this time. As mentioned, 
+the operations for object transplantation are stored as a
+transaction. Individual object transplantations are done only on objects 
+that maintain stable referrer sets throughout the process.
+An object is deemed \emph{non-individually transplantable} (NIT) if its transaction
+is aborted or if it fails to maintain a stable referrer set. 
 
-An object is deemed \emph{non-individually transplantable} (NIT) if its transplantation
-has to be aborted or if it fails to maintain a stable referrer set. 
-Any object deemed as such will be moved to mirrored-to-space by zero-copy 
-transplantation. An object may be declared NIT during the tracing phase before transplantation
-if it violates requirement 1 for having a stable referrer set; discussion
-of how this occurs is beyond the scope of this paper, see~\cite{Iyengar:Collie}.
+Before beginning to perform the transactions to move individual objects, they
+need to be checked for having stable referrer sets. To do this, threads' stacks
+are checked for references to objects. Objects with references from stacks
+will be marked NIT since their referrer sets do not meet requirement 2 for being stable.
+This means mutators are using the objects and the GC process does not want to interfere.
+The LVB-style read barrier receives its first new purpose here. When a thread attempts to load a reference,
+and add it to its stack, the object the reference points to will be marked NIT as a mutator is using it.
 
-% Talk about this barrier because it is during GC - betweentracing and transplantation.
-% If others experience something similar, they should be talked about too.
-At the start of the transplantation phase, a pre-compaction checkpoint occurs.
-For all relocatable objects, referrer sets have been established during the tracing phase.
-These referrer sets need to be stable referrer sets. As such, threads' stacks are checked 
-for references to the objects. Any objects with these will be 
-marked NIT as their referrer sets fail to meet requirement 2 for being stable referrer sets.
-After the checkpoint, the compactor has a set of relocatable objects with currently stable referrer sets.
-
-The pre-compaction checkpoint also kicks off the LVB-style read barrier's first purpose. 
-The barrier will trigger on the load of a reference to an object that was 
-relocatable. Upon being triggered, the object will be marked NIT. This is done because
-the load operation adds another reference to the object's referrer set, which violates
-requirement 3 of having a stable referrer set.
-
-With the set of objects to be transplanted, the compactor uses transactional
-procedures to complete the individual object transplantations to to-space.
-The copying of an object occurs outside the transaction since any
-mutator access of the object will trigger the LVB-style read barrier,
-rendering the object NIT. Thus, only the referrer set updating
-is done in the transactional procedure. The transaction looks like:
+The copying of an object actually occurs outside the transaction since any
+mutator access of the object will trigger the LVB-style barrier,
+rendering the object NIT. Thus, only remapping by updating the referrer set
+is done in the transaction, which looks like:
 \begin{enumerate}
 \item Transaction is started
-\item References are checked to make sure none point to the mirrored-to-space location as this means the object had been changed to NIT by some previous, interrupting operation
-\item All references are changed to point from an object's from-space location to its new to-space location
+\item Object is checked to not have been marked NIT at some point
+\item All references are changed to point to the objects to-space location
 \item Memory transaction is committed
 \end{enumerate}
-If a transaction fails or is interrupted, as detected by the TM system, then the object is rendered NIT.
+If a transaction fails or is interrupted, as detected by the TM system, the object is rendered NIT.
 
-After the transactional procedure either succeeds or fails for the 
-relocatable objects with stable referrer sets, all that remains is to perform zero-copy transplantation
-on all NIT objects. Just like the C4 compactor, Collie will do this lazily. This is the second purpose
-of the LVB-like barrier; as mutators try to access NIT objects before their references are updated to
-point to mirrored-to-space, the barrier will force them to correct the references. Also like C4, Collie
-rolls the full traversal of memory to finish zero-copy transplantation of all NIT objects into the next
-tracing phase.
+
+\subsection{Aborting Compactor}
+\label{sec:collieAbortion}
+
+After all objects that could be transplanted are, we
+are left with unmoved NIT objects.~\cite{Iyengar:Collie}.
+Compaction cannot terminate with objects in from-space.
+The additions of a \emph{mirrored-to-space} and \emph{zero-copy transplantation} are necessary
+to terminate compaction without disrupting mutators.
+
+% THere's definitely some repition here. Worry about later.
+Mirrored-to-space is a virtual memory space corresponding to and the same
+size as from-space. It is mapped to the same physical
+memory as the corresponding from-space. As mentioned, 
+Collie uses page-granularity compaction like C4. From-space is used here 
+to refer to the set of from-pages with NIT objects. For compaction 
+termination purposes, mirrored-to-space is logically considered part of to-space.
+
+Mirrored-to-space is used to get the compactor to believe its work is done.
+It already holds the same objects in physical memory as from-space.
+Also, the compactor considers this space to be to-space. Thus, if references
+to objects are changed to point to mirrored-to-space rather than from-space,
+the objects appear to be relocated without physically moving. This technique
+used to terminate compaction is known as zero-copy transplantation.
+
+%Refer to figure here once it is added in a new paragraph or the paragraph right above.
+
+To have NIT objects be moved from the perspective of the compactor, zero-copy transplantation
+is performed on all of them. The LVB-style barrier gets a second purpose here. As mutators
+try to access references to NIT objects before they are updated to mirrored-to-space, 
+the barrier will cause them to correct the references before using the object. Also like
+C4, entirely finishing zero-copy transplantation, which is just remapping, is rolled
+up into the next GC cycle's tracing phase. In the end, NIT objects are not actually compacted;
+for this reason, Collie is referred to as an \emph{aborting} compactor. It will
+cease moving objects to allow mutator threads to continue working uninterrupted.
+
+\todo[inline]{Add figure to clarify here!!}
 
 
 \subsection{Collie Results Summary}
