@@ -651,12 +651,12 @@ despite potentially limiting the amount of memory compacted.
 \label{sec:fpp}
 
 Last, we examine concurrent compaction in GC through the field pinning
-protocol (FPP) designed by \"{O}sterlund and L\"{o}we~\cite{Osterlund:FPP}.
+protocol, (FPP) designed by \"{O}sterlund and L\"{o}we~\cite{Osterlund:FPP}.
 FPP describes a lock-free process for performing the relocation aspect
 of concurrent compaction. The remapping phase as well as other portions
 of GC are left up to the host garbage collector this
 protocol is implemented within. FPP is compliant with the Java Native Interface
-to allow for integration into a JVM. For purposes of testing, the FPP 
+to allow for integration into a JVM. For purposes of testing, FPP 
 is implemented within the Garbage-First GC algorithm in the HotSpot JVM 
 of OpenJDK 9~\cite{Detlefs:G1}.
 
@@ -667,7 +667,7 @@ of OpenJDK 9~\cite{Detlefs:G1}.
 The key component driving FPP is the \emph{hazard pointer} (HP)~\cite{Osterlund:FPP}. 
 In FPP, all mutator threads contain a list of HPs.
 The HPs point to objects in memory a thread is accessing, or \emph{pin} them.
-When a thread finishes accessing an object, it drops the HP.
+When a thread finishes using an object, it drops the HP.
 So long as an object
 is pinned by a mutator, it cannot be relocated as it is still in use. Once all threads have
 unpinned the object, it can safely be relocated.
@@ -690,22 +690,15 @@ be done safely when no one has cups any longer, so the coffee is not pinned.
 \subsection{Collaborative Copying and Blame}
 \label{sec:fppCopy}
 
-HPs prevent relocation of objects by serving as a distributed
-counter. Threads cannot relocate objects should the number of
-HPs pinning the objects be greater than zero.
+HPs prevent premature relocation of objects by serving as a distributed
+counter. Threads cannot relocate objects if the number of
+HPs pinning the objects is greater than zero.
 A mutator thread \emph{impedes} a copying thread if
 its HP prevents the copying.
 The impeding thread is \emph{blamed} for the 
 interruption~\cite{Osterlund:FPP}; it becomes responsible for ensuring 
 the object is relocated. GC threads cannot receive blame as they will not impede
 copy attempts.
-
-At the start of FPP relocation, GC threads will attempt to copy
-objects marked for relocation. At this time, blaming is 
-disabled. 
-After the first round of attempting to copy objects, the GC threads
-will again try to copy the remaining objects. If a mutator 
-thread impedes the copy attempt this time, it will be blamed. 
 
 The process followed by mutator threads during the relocation phase when 
 accessing an object is as follows:
@@ -723,20 +716,34 @@ blame the threads and move along
 \item Proceed to copy the object with further pins still impeding the copy
 \end{enumerate}
 \end{enumerate}
-From this, we see how mutators will continually bounce blame around until
-no threads have the object pinned any longer. At this time, the last thread
+Mutators will continually bounce blame around until
+no threads have the object pinned. At this time, the last thread
 to attempt to copy the object will succeed.
 
-To illustrate how blame works, reconsider the coffee example. Suppose
-someone is in charge of moving the coffee to another break room. They
-can try to do so, but if others still have cups, they may want more coffee.
+Reconsider the coffee example. Suppose
+someone is in charge of moving the coffee to the other room.
+Much like how a GC thread must relocate objects. They
+can try to, but others could still have cups and want more coffee.
 The interrupted person has other tasks they could be doing, so they tell
-everyone with a cup to move the coffee when they are finished with it.
+everyone with a cup to move the coffee when finished drinking it;
+they blame the others for not finishing the task and make them responsible
+for it. When those blamed finish their coffee, they will try to
+move it as well. If interrupted by others with coffee cups, HPs, they
+pass the blame along. This continues until a last person finishes 
+their coffee.
+
+At the start of FPP relocation, GC threads will attempt to copy
+objects marked for relocation. At this time, blaming is 
+disabled. 
+After the first round of attempting to copy objects, the GC threads
+will again try to copy the remaining objects. If a mutator 
+thread impedes the copy attempt this time, it will be blamed.
+Blame continues to be passed until the objects are relocated. 
 
 It is possible for an
 object not to move because it is continually pinned. How this terminates 
 depends on the host GC algorithm used. When using the Garbage-First (G1) algorithm,
-this process continues until all objects are moved or another GC cycle starts.
+this process goes until all objects are moved or another GC cycle starts.
 If objects have not relocated when another cycle begins, they are automatically
 marked for relocation again. Allowing mutators to continue passing blame works
 in G1 because, like C4 and Collie, the algorithm will roll up remapping into the next
@@ -755,12 +762,12 @@ unmodified G1 collector. This was tested in a MacBook Pro; for the
 hardware details, see~\cite{Osterlund:FPP}. We focus on the tests comparing
 latency of the two garbage collectors. For other tests performed and their results, see~\cite{Osterlund:FPP}.
 
-For latency, the h2 benchmark from DaCapo is used; for details, see~\cite{Blackburn:DaCapo}.
-The benchmark was chosen due to being memory intensive and using an 8GB heap;
-the memory intensiveness makes latency issues apparent.
-Additionally, latency is measured using the jHiccup tool developed by Azul Systems.
+For latency, the h2 benchmark from DaCapo is used~\cite{Blackburn:DaCapo}.
+The benchmark was chosen due to being memory intensive,
+which makes latency issues apparent.
+Latency is measured using the jHiccup tool developed by Azul Systems.
 Compared to its host garbage collector, G1 with FPP improved latency at all time
-intervals examined. On average, latency was improved by around 50\%. That means application
+intervals examined. On average, latency was improved by around 50\%; application
 pause times were about half as long. Latency was also shown to mostly be caused by 
 host garbage collector activities such as tracing and remapping.
 
