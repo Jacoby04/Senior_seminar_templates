@@ -450,20 +450,13 @@ made to memory by the transaction are finalized~\cite{wiki:transactional-memory}
 \subsection{Referrer Sets}
 \label{sec:collieReferrerSets}
 
-Each object on the heap has a \emph{referrer set}. This is the precise set 
+Each object on the heap has a \emph{referrer set}~\cite{Iyengar:Collie}. This is the precise set 
 of all references pointing to the object. Collie stores object's referrer sets as transactional variables
 so it can perform a single object's relocation and remapping as a transactional procedure 
 (simply referred to as a transaction).
-To ensure an object's referrer set is not modified during the transaction,
-we define a \emph{stable} referrer set. An object has a stable referrer 
-set if the object's referrer set meets the following criteria:
-\begin{enumerate}
-\item Once the overall GC process begins, no references to the object may be written to the heap
-\item At the start of the object's transplantation, no threads contain references to the object in their stacks
-\item Once transplantation is underway, no new references may be added to the object's \emph{transplantation state} until it is complete
-\end{enumerate}
-This ensures the compactor is aware of all references to the object
-and references to the object go unchanged.
+An object must maintain a \emph{stable referrer set} throughout the GC process. That is,
+its referrer set cannot be modified or expanded. This is necessary to ensure all of an object's references
+are correctly remapped.
 
 
 \subsection{The Collie Protocol}
@@ -482,8 +475,8 @@ is aborted or if it fails to maintain a stable referrer set.
 Before beginning to perform the transactions to move individual objects, they
 need to be checked for having stable referrer sets. To do this, threads' stacks
 are checked for references to objects. Objects with references from stacks
-will be marked NIT since their referrer sets do not meet requirement 2 for being stable.
-This means mutators are using the objects and the GC process does not want to interfere.
+will be marked NIT since mutators are using the objects, which could cause referrer set modifications.
+This behavior is chosen so the GC process does not interfere with mutator work.
 The LVB-style read barrier receives its first new purpose here. When a thread attempts to load a reference,
 and add it to its stack, the object the reference points to will be marked NIT as a mutator is using it.
 
