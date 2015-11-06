@@ -425,7 +425,7 @@ the same production-quality Azul JVM the Pauseless garbage collector is implemen
 \subsection{Transactional Memory}
 \label{sec:collieTM}
 
-The Collie's compaction algorithm sets itself apart due to its use 
+The Collie's compaction algorithm sets itself apart due to use 
 of a \emph{transactional memory} (TM) system as a concurrency control 
 alternative to barriers~\cite{Iyengar:Collie}. TM systems allow
 sections of code to function 
@@ -433,12 +433,13 @@ analogously to \emph{transactions} from database systems,
 which are a series of operations performed as one unit where 
 they occur in an all-or-none manner.
 
-For example, consider updating the inventory of a store; this may involve updating
-the price, quantity, and distributor for various items. 
-If a person updates information regarding an item, they would 
-want all or none of the item's attributes to be updated. Having
-only a subset of the attributes updated could cause confusion. A transaction
-would ensure an item is unchanged if the process of updating the item's info 
+For example, consider updating sale prices of items in a store; this requires
+ensuring the store price matches the sale price advertised. 
+If a person updates the prices for an item, they want both the
+advertised price and the store price to be updated. Only updating the
+advertised price could lead to irate customers, and only updating the
+store price could lead to customers not knowing about the sale. A transaction
+ensures an item's prices are unchanged if the update process 
 is started and then aborted before completion.
 
 TM systems allow a series
