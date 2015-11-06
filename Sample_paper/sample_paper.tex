@@ -87,35 +87,34 @@ garbage collection (GC) performed on Java Virtual Machines
 on computing systems~\cite{Lindblom:2011}.
 
 GC is not without cost.
-Just like the application, GC requires processing resources to run. After all,
-a GC algorithm is another piece of software. When using a single processor, 
+Just like the application, GC requires processing resources to run. When using a single processor, 
 we get a \emph{serial} garbage collector operating in a 
 \emph{stop-the-world} fashion~\cite{Lindblom:2011}; GC requires
-pausing the application in order to clean. With storage media growing, 
-applications are experiencing a growth in memory
-available to them. Likewise, garbage collectors are performing more
-work as there is more garbage to remove. Thus, the stop-the-world
-pauses applications experience are growing larger.
+pausing the application in order to clean. 
+Growing storage media is leading to more memory
+availability for programs, which means garbage collectors
+have more garbage to remove. Thus, stop-the-world pauses
+experienced by applications are increasing.
 
 % If this isn't good, maybe refer back to Jeff's paper to show how 
 % many serial garbage collectors are hitting walls.
-Clearly, stop-the-world behaviors are not desirable. In some environments,
-application pauses are unacceptable. In order to decrease or remove these 
-pauses, we want to use \emph{parallel processing}. With the growing
-need for faster responding applications coupled with greater amounts of memory needing managing,
-it is paramount that GC be optimized using parallel processing. Languages with
-automatic memory management need this in order to remain useful today,
-and it would be a waste not to make use of the additional processing power
-many machines have available today.
+In some environments,
+application pauses are unacceptable; for example, see the section on 
+real-time GC in~\cite{Lindblom:2011}. In order to decrease or remove 
+pauses, we want to use multiple
+processors to share the workload of both running an application and its GC.
+This is known as \emph{parallel processing}, and it can be used
+to enhance performance of both. With
+demand for faster responding applications coupled with more memory needing managing,
+it is paramount that GC be optimized using parallel processing. 
 
-In Section 2, we cover more of what GC entails. Then, we go over the
-basic concepts of parallel processing of programs. We combine this 
-to discuss how parallel processing is used for GC.
-From there, we focus our examination of parallel processing in GC in Sections 3, 4, and 5;
-we examine how a specific component of GC can be made to run parallel to
-and independent of the application running. To this end, we cover three
-different techniques that are all implemented and tested within different
-garbage collectors.
+In Section 2, we go over background information for GC, parallel processing,
+and a combination of the two.
+From there, we focus our examination of parallel processing in GC.
+Section 3 covers the continuously concurrent compacting collector (C4), Section
+4 considers the Collie collector, and Section 5 looks at the field pinning protocol (FPP).
+Discussion of each is focused on how one component of GC can run parallel to
+and independent of the application running. 
 
 
 \section{Background}
