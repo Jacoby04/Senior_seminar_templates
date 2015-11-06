@@ -296,8 +296,8 @@ may not correspond to contiguous physical memory, which is out of our scope of d
 \label{fig:c4Memory}
 \end{figure}
 
-C4 uses a barrier referred to as the \emph{Loaded Value Barrier} (LVB) to 
-maintain concurrency throughout the GC process~\cite{Tene:C4}. The LVB 
+C4 uses a read barrier referred to as the \emph{Loaded Value Barrier} (LVB) to 
+maintain synchronization of concurrent threads throughout the GC process~\cite{Tene:C4}. The LVB 
 places invariants on each reference as it is loaded from memory.
 One of the invariants relates to the tracing portion of the GC algorithm, so
 it is not discussed here. The other invariant ensures
@@ -313,13 +313,13 @@ the situation.
 
 The relocation phase of compaction in C4 occurs on a per-\emph{page}
 basis, where a page is a fixed-length, contiguous block of virtual memory in the heap
-that is backed by a contiguous block of physical storage~\cite{Tene:C4}.
-To quickly empty virtual pages, the most sparsely populated pages are relocated
-first. The from-space in this relocation is actually from-pages, and the to-space
-is to-pages. From-pages contain garbage
-and are marked as such during the tracing phase.
+backed by a contiguous block of physical storage~\cite{Tene:C4}.
+To quickly empty pages, the most sparsely populated ones are relocated
+first. In the case of Figure~\ref{fig:c4Memory}, the left-most 
+\emph{from-page}, analogous to from-space, is relocated first as it has only one small object alive.
+The object is copied to a \emph{to-page}, which is analogous to to-space.
 
-To support concurrent relocation, pages being relocated are protected by the LVB. 
+From-pages are protected by the LVB as can be seen in Figure~\ref{fig:c4Memory}. 
 LVB will trigger for mutator threads encountering a reference to an object
 on a protected page. The mutator's subsequent behavior is:
 \begin{itemize}
@@ -327,24 +327,22 @@ on a protected page. The mutator's subsequent behavior is:
 \item If the object is being relocated currently, wait until the GC thread is finished
 \item If the object has not been relocated, move the object 
 \end{itemize}
-In all cases, the object is not used by a mutator until it is on a to-page.
-Additionally, LVB corrects the
-old reference loaded by the mutator to prevent further barrier triggers on the same
+In all cases, the mutator cannot use the object until it is on a to-page.
+Additionally, LVB corrects the source of the
+reference to prevent further barrier triggers on the same
 reference.
 Without mutator interference, GC threads will simply relocate the objects but
 not remap references at this time. 
 
-When all living objects are relocated from a page marked for relocation,
-the C4 compactor will utilize a \emph{quick release} method. In order to quickly recycle
-physical memory sources, the physical memory backing the page will be freed
-as soon as the last live object has been moved to a to page. The objects have already 
-been transferred to new pages, so the contents of the from-pages are no longer needed. Thus,
-physical memory backing from-pages can be used immediately. The from-page's virtual 
-addresses will be in use until all references have been remapped, but this 
-allows for efficient recycling of physical memory. This is made possible as the C4 compactor
-stores object forwarding information outside of a from-page. Thus, when a reference to
-a from-page is loaded, LVB has the mutator check the forwarding table rather than the
-from-page to see where an object has moved to.
+When all live objects are relocated from a from-page,
+the C4 compactor will perform \emph{quick release}. 
+The physical memory backing the page will be freed
+once the last live object has been moved to a to-page. The objects have already 
+been transferred to new pages, so the contents of the from-pages are no longer needed. The from-page 
+will be in use as it still has references to it, but the physical memory can be recycled efficiently. 
+In terms of Figure~\ref{fig:c4Memory}, the heap
+memory seen on top is in use until after the remapping phase, but the physical memory below 
+can be paired with a different virtual page and used immediately.
 
 
 \subsection{Concurrent Remapping}
