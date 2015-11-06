@@ -442,6 +442,7 @@ store price could lead to customers not knowing about the sale. A transaction
 ensures an item's prices are unchanged if the update process 
 is started and then aborted before completion.
 
+% Might be too much detail. Consider cutting later.
 TM systems allow a series
 of operations modifying memory to be placed in
 a \emph{transactional procedure}, much like a database transaction.
@@ -455,31 +456,14 @@ When a transaction is completed, its changes are \emph{committed}; any changes
 made to memory by the transaction are finalized~\cite{wiki:transactional-memory}.
 
 
-\subsection{Object Transplantation}
-\label{sec:collieTransplantation}
+\subsection{Referrer Sets}
+\label{sec:collieReferrerSets}
 
-With the use of a TM system for synchronizing concurrent compaction,
-new terminology is introduced for understanding the Collie 
-compactor~\cite{Iyengar:Collie}. 
-An object \emph{transplantation} consists of both the relocation and 
-remapping of an object. A transplantation is not complete until
-the object's contents have been moved and all required references have been
-updated. All relocating collectors, and by extension all
-compacting collectors, transplant objects. The Collie's compactor 
-performs individual object transplantations within transactional procedures. 
-Building on this, an object has a transplantation state consisting of the object's contents 
-and the object's referrer set.
-
-Each object in an application's memory has a \emph{referrer set}. This is the precise set 
-of all references pointing to the object. It is crucial that an object's referrer set not
-be modified or expanded during the object's transplantation. Doing so could result
-in references to the object being created that the transactional procedure
-was not aware of when starting, so they are not updated to point to 
-the new object location when it is finishing. To avoid this, a referrer set can be
-\emph{protected} by writing to each reference within it and preventing it from
-being loaded temporarily.
-
-There is also a notion of a \emph{stable} referrer set. An object has a stable referrer 
+Each object on the heap has a \emph{referrer set}. This is the precise set 
+of all references pointing to the object. Collie stores object's referrer sets
+so that it can perform a single object's relocation and remapping as a transaction.
+To ensure an object's referrer set is not modified during the transaction,
+we define a \emph{stable} referrer set. An object has a stable referrer 
 set if the object's referrer set meets the following criteria:
 \begin{enumerate}
 \item Once the overall GC process begins, no references to the object may be written to the heap
@@ -490,18 +474,13 @@ This ensures the compactor is aware of all references to the object
 and references to the object go unchanged.
 
 
-\subsection{The Collie Protocol}
-\label{sec:collieAlgorithm}
-
-
-\subsubsection{Aborting Compactor}
+\subsection{Aborting Compactor}
 \label{sec:collieAbortion}
 
-The compactor implemented in the Collie GC algorithm uses barriers 
-and transactions that will abort the transplantation process of an object if the
-GC threads and mutator threads conflict to maintain concurrency~\cite{Iyengar:Collie}.
-However, objects that have their transplantation aborted would then be stuck
-in from-space, which would mean compaction is never performed. This is why
+Mutator threads interrupting the transaction for relocating and remapping
+an object or triggering the modified LVB will cause the object to go unmoved.~\cite{Iyengar:Collie}.
+However, unmoved objects due to these abortions would then be stuck
+in from-space. This is why
 the additions of a \emph{mirrored-to-space} and \emph{zero-copy transplantation} are necessary.
 
 % THere's definitely some repition here. Worry about later.
@@ -520,23 +499,11 @@ requires correcting references. The purpose of this is to ensure
 an object makes it to "to-space" should its transplantation need 
 to be aborted because mutators need to access it.
 
-% Could make a cake example instead if this isn't really helpful.
-As an example, consider an object stored in memory. As discussed before, all references
-to this object are actually references to its virtual page location. This virtual page
-is backed up by some contiguous, physical memory equivalent in size to the page. 
-Mirrored-to-space is simply another page that is assigned to the same section of physical memory. 
-The only difference between mirrored-to-space and the page our object is stored on
-is references to the object used by mutators point to its virtual page.
-Zero-copy transplantation swaps this. All references to the object are
-updated to point from the virtual page to mirrored-to-space. 
-Thus, we get the name \emph{zero-copy} translation
-because our object is never moved in physical memory; the object simply
-swaps virtual pages for the purposes of the compactor believing all of from-space
-has been compacted.
+\todo[inline]{Add figure to clarify here!!}
 
 
-\subsubsection{Compaction Implementation}
-\label{sec:collieAlgorithmImplementation}
+\subsection{The Collie Protocol}
+\label{sec:collieProtocol}
 
 After a tracing phase at the start of the overall GC algorithm for set condemnation, heap compaction
 happens during a \emph{transplantation phase}~\cite{Iyengar:Collie}.
