@@ -532,7 +532,7 @@ try to access references to NIT objects before they are updated to mirrored-to-s
 the barrier will cause them to correct the references before using the object. Also like
 C4, entirely finishing zero-copy transplantation, which is just remapping, is rolled
 up into the next GC cycle's tracing phase. In the end, NIT objects are not actually compacted;
-for this reason, Collie is referred to as an \emph{aborting} compactor. It will
+for this reason, Collie is said to have an \emph{aborting} compactor. It will
 cease moving objects to allow mutator threads to continue working uninterrupted.
 
 \todo[inline]{Add figure to clarify here!!}
@@ -549,15 +549,15 @@ against a modified variant of the Pauseless collector~\cite{Click:Pauseless}.
 Accordingly, both collectors were implemented on the same JVM. For hardware
 specifications used for testing, refer to~\cite{Iyengar:Collie}. The Collie
 utilizes several aspects of the C4 collector, which in turn builds upon the Pauseless
-collector. This provides an effective comparison to see how the main differences, 
-use of transactional memory and an aborting compactor, affect application performance. 
+collector. This provides an effective comparison to see how 
+use of transactional memory and an aborting compactor affect application performance. 
 
 To examine latency, \emph{minimum mutator utilization} (MMU) is measured.
 MMU is the minimum percentage of mutators being utilized over a period of time~\cite{Bacon:MMU}. Ideally,
 MMU would always be at 100\% so all mutators are being used. 
 MMUs were taken from various time periods during which
 compaction was running and was compared between the two algorithms. Comparisons were done
-with a 128MB heap and a 512MB heap. For all time windows, the Collie compactor
+with a 128 megabyte (Mb) heap and a 512 Mb heap. For all time windows, the Collie compactor
 had higher MMUs than Pauseless. Collie did not go below a 70\% mutator utilization 
 level whereas Pauseless ranged over the whole spectrum of values. 
 This shows the aborting nature of Collie
