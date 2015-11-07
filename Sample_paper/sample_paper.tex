@@ -185,13 +185,15 @@ reclamation is often performed by marking from-spaces as freed.
 To develop an understanding of parallel processing, we need to know 
 what \emph{processes} and \emph{threads} are~\cite{oracle:threads}.
 A process is an instance of a computer program being run. What we
-see as an application being run can actually incorporate multiple processes.
+see as an application can actually incorporate multiple processes.
 For example, a Java application being run and GC being performed on the application are two processes.
-A thread, at a basic level, is a component of a process. A thread performs a sequence
-of instructions that are part of a process the thread belongs to. In JVM languages,
+A thread, at a basic level, is a component of a process; it performs a sequence
+of instructions from the process it belongs to. 
+A process can involve a single thread or multiple threads. The order 
+of instructions are preserved within a single thread, but 
+not necessarily among multiple threads. In JVM languages,
 each thread has a personal stack to keep track of variables
-and references used within its specific set of tasks. A process
-can involve a single thread or multiple threads.
+and references used within its specific set of tasks. 
 Parallel processing is the utilization of multiple
 cores of a CPU to run threads concurrently. If processes are set up
 to run with multiple threads, the extra processing power can be used to make 
@@ -203,8 +205,8 @@ the process more efficient.
 If parallel processing makes running processes more efficient, why is it not
 always used? The reason is creating parallel processes subjects
 developers to new challenges. Many new issues can result from use of
-multi-threading. One example, relevant to GC, is modifications to an 
-object can be lost. For example, say there is an application keeping 
+multi-threading. One example, relevant to GC, is that modifications to an 
+object can be lost. For example, consider an application keeping 
 track of people's moods and locations. People are stored as objects. 
 Thread $A$ moves people, and it does so by relocating them in data structures (DSs) 
 with a deep copy and delete operation. Thread $B$ updates people's moods. Suppose a person
@@ -212,7 +214,7 @@ is about to go home from work, so their mood changes to happy.
 The person's change in mood could be lost if thread $A$ copies the person
 to the home DS, thread $B$ updates the person's mood while still expecting
 them to be in the work DS, and thread $A$ deletes the person from the work DS. 
-While the example is fairly simple, it can be seen how this type of problem
+While the example is fairly simple, it can be seen how such a problem
 applies to GC.
 
 To deal with multiple threads relying on use of the same data, \emph{synchronization}
@@ -234,27 +236,28 @@ threads (or mutators) because they mutate the data~\cite{Tene:C4}~\cite{Iyengar:
 
 A \emph{parallel} garbage collector is one using
 multiple threads simultaneously to complete its GC process.~\cite{Puffitsch:background}
-All but one of the garbage collectors we examine are parallel. A \emph{concurrent} garbage
-collector is one executing in parallel to the application running. In other 
-words, the garbage collector does not entirely stop-the-world. A GC algorithm
+All but one of the algorithms we examine are parallel. A \emph{concurrent} garbage
+collector executes instructions in parallel to the application running. In other 
+words, the garbage collector does not entirely stop the world. A GC algorithm
 could be only partially concurrent or parallel. For example, one collector may
 only have the tracing phase be parallel while reclamation is concurrent.
 
-We focus on three techniques for performing
+This paper focuses on
 concurrent compaction within GC. We do so due to the importance 
 of having non-stop-the-world garbage collectors. Additionally, compacting
-collectors are vital when trying to optimize application performance. Thus,
+collectors are vital to improving application performance. Thus,
 the intersection of these two optimizations to languages with automatic memory management leads
 to researching ways to perform concurrent compaction within GC.
 
-All compaction techniques we examine are used in garbage
-collectors for testing purposes. One important metric used to consider
+One important metric for considering
 how a collector is affecting an application is \emph{latency}~\cite{Lindblom:2011}.
 Within GC, latency is a measure how much a collector negatively impacts
 application processing performance. A higher latency implies the collector
 is taking up more processing resources that the application could be using. It 
 can be measured in various ways and is usually collected in the same manner
-among multiple collectors for comparative purposes.
+among multiple collectors for comparative purposes. As an example, one way to
+examine latency is viewing how a server responding to requests is slowed
+during GC.
 
 
 \section{The C4 Collector}
@@ -277,12 +280,14 @@ C4's intended environment is large servers with multiple gigabyte heaps.
 \begin{figure}
 \centering
 \psfig{file=c4_page_rough_2.pdf,width =3in}
-\caption{Simplified representation of memory management with C4. Memory is relocated
-page-by-page. Dead objects are represented with $X$ and will not be relocated.
-From-pages are protected from mutators by the LVB. Contiguous virtual memory
-may not correspond to contiguous physical memory, which is out of our scope of discussion.}
+\caption{In C4, memory is relocated
+page-by-page. Dead objects are represented with X.
+From-pages are protected from mutators by the LVB.}
 \label{fig:c4Memory}
 \end{figure}
+
+%Contiguous virtual memory
+%might not correspond to contiguous physical memory, which is out of scope for our discussion
 
 C4 uses a read barrier referred to as the \emph{Loaded Value Barrier} (LVB) to 
 maintain synchronization of concurrent threads throughout the GC process~\cite{Tene:C4}. The LVB 
