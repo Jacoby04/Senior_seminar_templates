@@ -121,38 +121,34 @@ and independent of the application running.
 \subsection{Garbage Collection (GC)}
 \label{sec:garbageCollection}
 
-Newly allocated objects in JVM languages are stored in a contiguous memory location referred
-to as the \emph{heap}~\cite{oracle:heap}. The heap represents the memory available to a program.
+%Maybe move talk of stack down to parallel processing.
+Newly allocated objects in JVM languages are stored in a contiguous memory location called
+the \emph{heap}~\cite{oracle:heap}. The heap represents the memory available to a program and is a virtual layer of memory that corresponds to physical memory.
 Thus, when GC removes garbage, it cleans the heap.
-An application accesses objects stored on the heap through \emph{references},
-fixed-size values that refer to object locations in the heap~\cite{reilly:reference}. 
-As such, an application process never stores
-an actual object. It stores references to objects in a memory structure known
-as the \emph{stack}, which is separate from the heap.
-The heap is a virtual layer of memory that corresponds to physical memory.
-References pointing to object locations actually point to their
-virtual locations rather than their physical locations. Objects may also 
-contain references to other objects, so references may appear on the heap.
+Applications access objects stored on the heap through \emph{references},
+fixed-size values that refer to virtual object locations in the heap~\cite{reilly:reference}. 
+An application process has a memory structure known
+as the \emph{stack}, which is separate from the heap. Objects are never actually
+stored on a stack, only references to objects.
+Objects can also contain references to other objects, so references can also appear on the heap.
 
-In GC, the overarching pattern common to all algorithms is determining garbage
-and reclaiming memory from dead objects. This can be broken down into two major steps.
+A full
+performance of the overall GC algorithm is known as a \emph{cycle}, and it
+is usually started when the heap is full. GC can be broken down into two major steps.
 First, a GC algorithm performs \emph{set condemnation} when deciding which objects are 
 garbage. The garbage collectors we examine perform set condemnation using a method 
 known as \emph{tracing}. During this, objects are determined to be reachable by 
 traversing references from global, root objects. Any objects reachable by chaining references
 from these global, root objects could still be used by the application. 
-Any objects not reachable are garbage. Then, the algorithm performs 
-\emph{reclamation} by recovering the memory held by garbage objects. A full
-performance of the overall GC pattern is known as a \emph{cycle}, and it
-is usually started when the heap is full.
+Unreachable objects are garbage. Then, the algorithm performs 
+\emph{reclamation} by recovering the memory held by garbage objects.
 
 To optimize GC, a variant can be performed known as \emph{generational} GC.
-Generational collectors are based on the \emph{weak generational hypothesis}~\cite{Tene:C4}.
-This says most objects do not live on the 
-heap long. Thus, GC efforts are focused on these objects. Typically, this is achieved
-by dividing the heap into two generations. One generation focuses on the younger objects and
+Generational collectors rely on most objects not living long on the 
+heap~\cite{Tene:C4}. Thus, GC efforts are focused on these objects. Typically, this is achieved
+by dividing the heap into two generations. One generation contains younger objects and
 is collected more frequently. If objects in the young generation of the heap survive
-enough GC cycles, it will move into the old generation. By not considering the entire
+enough GC cycles, they will move into the old generation. By not considering the entire
 heap with each GC cycle, an application experiences less disruptions.
 
 As memory is reclaimed by a garbage collector, the heap is subject to 
@@ -161,25 +157,26 @@ of interspersed locations of used space in contiguous memory. This
 is an issue as space for new objects being allocated
 on the heap becomes difficult to find and manage. 
 
-For example. Assume
-we have an object that takes 4MB of memory. After several cycles of GC,
-we have gaps of open memory with a size of at most 2MB contiguously. Thus, 
-the JVM experiences additional overhead in allocating space for this object
-as it has to store parts of it across non-contiguous locations. Additionally,
-more overhead will be experienced as accessing the object will require locating
+Consider an example with an object that uses 2 megabytes (Mb) of memory, 
+such as an array. After several cycles of GC,
+we have memory gaps of at most 1 Mb. 
+The JVM experiences additional overhead in allocating space for this object
+as it has to store the object across non-contiguous locations. Additionally,
+more overhead is experienced as accessing the object requires locating
 all of its parts.
 
-This is where \emph{compaction} becomes relevant. Compaction fights
-fragmentation of the heap by moving lives objects into contiguous memory locations.
-Compaction is performed by a garbage collector and is part of GC. Two steps
-are typically involved in compaction. \emph{Relocation} occurs by moving live objects
-to a contiguous memory location after set condemnation.
+\emph{Compaction} fights
+fragmentation of the heap by moving live objects into contiguous memory locations, and
+it is performed as part of GC. Two steps
+are typically involved in compaction. After set condemnation, \emph{relocation} moves live objects
+to a contiguous memory location.
 The contiguous memory location being moved to is often referred to as \emph{to-space}.
-The location an object is moved from is referred to as \emph{from-space}. While it is called 
+Likewise, an object is moved from \emph{from-space}. While it is called 
 relocation, objects are typically copied rather than moved. \emph{Remapping}
 occurs after objects have been relocated; the remapping phase 
-updates all references to moved objects to refer to their new locations. Often, reclamation
-in compacting collectors is performed by marking from-spaces as freed.
+updates all references to moved objects to refer to their new locations. With this, 
+reclamation is often performed by marking from-spaces as freed.
+%The contiguous memory location is virtual, ie, on the heap.
 
 
 \subsection{Parallel Processing Basics}
