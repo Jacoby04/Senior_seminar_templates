@@ -410,8 +410,8 @@ Only the LVB is modified in significant ways as discussed below.
 Like C4, the Collie
 collector is also designed with server environments in mind. 
 Collie is implemented and tested in 
-the same production-quality Azul JVM the Pauseless garbage collector is implemented in
-~\cite{Click:Pauseless}. However, it is not commercially available.
+the same production-quality Azul JVM the Pauseless garbage collector is implemented 
+in~\cite{Click:Pauseless}. However, it is not commercially available.
 
 
 \subsection{Transactional Memory}
@@ -551,7 +551,7 @@ collector. This provides an effective comparison to see how
 use of transactional memory and an aborting compactor affect application performance. 
 
 To examine latency, \emph{minimum mutator utilization} (MMU) is measured.
-MMU is the minimum percentage of mutators being utilized over a period of time~\cite{Bacon:MMU}. Ideally,
+MMU is the minimum percentage of mutators being utilized over a period of time. Ideally,
 MMU would always be at 100\% so all mutators are being used. 
 MMUs were taken from various time periods during which
 compaction was running and was compared between the two algorithms. Comparisons were done
@@ -707,10 +707,6 @@ and thread collaboration instead.
 Regardless of approach, compaction is necessary for efficient GC with growing heaps and
 increasing environmental demands. Ultimately,
 the approach for compaction used will depend on its intended environment.
-
-%If I add in intro a note mentioning how without paralle, GC algorithms
-%are hitting a wall and becoming about trade-offs. Could mention here
-%that these also have some trade-offs.
 
 
 \section*{Acknowledgments}
