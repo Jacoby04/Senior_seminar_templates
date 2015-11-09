@@ -97,7 +97,7 @@
 
 \subsection[GC Basics]{Garbage Collection Basics}
 
-
+%Kristin liked the heap visualization I did when explaining it (did with my hands at the time).
 
 \subsection[PP Basics]{Parallel Processing Basics}
 
@@ -133,9 +133,30 @@
 
 \begin{frame}
 
-\frametitle{The Blame Game}
+\frametitle{Hazard Pointers}
 
-\only<1>{
+
+Content Goes Here
+
+\end{frame}
+
+
+\begin{frame}
+
+\frametitle{Example}
+
+\only<1>{\includegraphics[width=.95\textwidth]{Illustrations/coffeeLine1.png}}
+\only<2>{\includegraphics[width=.95\textwidth]{Illustrations/coffeeLine2.png}}
+\only<3>{\includegraphics[width=.95\textwidth]{Illustrations/coffeeLine3.png}}
+\only<4>{\includegraphics[width=.95\textwidth]{Illustrations/coffeeLine4.png}}
+\only<5>{\includegraphics[width=.95\textwidth]{Illustrations/coffeeLine5.png}}
+
+\end{frame}
+
+
+\begin{frame}
+
+\frametitle{The Blame Game}
 
 \begin{itemize}
 \item \emph{blamed} thread: responsible for relocating an object
@@ -157,14 +178,6 @@
 \item GC threads try again... blame if interrupted
 \item Blame continues to be passed to interrupting threads
 \end{enumerate}
-
-} %End only<1>
-
-\only<2>{\includegraphics[width=.95\textwidth]{Illustrations/coffeeLine1.png}}
-\only<3>{\includegraphics[width=.95\textwidth]{Illustrations/coffeeLine2.png}}
-\only<4>{\includegraphics[width=.95\textwidth]{Illustrations/coffeeLine3.png}}
-\only<5>{\includegraphics[width=.95\textwidth]{Illustrations/coffeeLine4.png}}
-\only<6>{\includegraphics[width=.95\textwidth]{Illustrations/coffeeLine5.png}}
 
 \end{frame}
 
