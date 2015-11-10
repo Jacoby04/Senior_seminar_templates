@@ -129,14 +129,45 @@
 
 \section[FPP]{Field Pinning Protocol}
 
+\begin{frame}
+
+\frametitle{Field Pinning Protocol}
+
+Solely describes concurrent relocation
+
+\linespace
+
+Implements into a host garbage collector
+\begin{itemize}
+\item Designed for flexibility
+\end{itemize}
+
+\linespace
+
+Performs relocation without barriers!
+
+\end{frame}
+
+
+
 \subsection*{Explanation}
 
 \begin{frame}
 
 \frametitle{Hazard Pointers}
 
+Point to objects an application thread is accessing
 
-Content Goes Here
+\linespace
+\linespace
+
+Inform other threads of objects that are in use
+
+\linespace
+\linespace
+
+Are maintained by the thread they belong to
+
 
 \end{frame}
 
