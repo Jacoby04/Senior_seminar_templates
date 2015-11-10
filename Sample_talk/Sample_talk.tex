@@ -171,26 +171,29 @@ Content Goes Here
 
 \frametitle{The Blame Game}
 
-\begin{itemize}
-\item \emph{blamed} thread: responsible for relocating an object
+%If time allows and feedback demands, could break this into multiple slides to not have so much text
+%on one as well as to refer back to the example and characters more.
 
+\emph{blamed} thread: responsible for relocating an object
 \begin{itemize}
-\item Comes from HPs interrupting copying
-\end{itemize}
+\item Comes from hazard pointers (coffee cups) impeding copying
 \end{itemize}
 
 \linespace
 \linespace
 
-\begin{enumerate}
+When relocation begins:
+\begin{itemize}
 \item GC threads attempt to relocate objects
 \begin{itemize}
 \item No blame passed!
 \end{itemize}
-
-\item GC threads try again... blame if interrupted
+\item GC threads try again
+\begin{itemize}
+\item Blame interrupting threads
+\end{itemize}
 \item Blame continues to be passed to interrupting threads
-\end{enumerate}
+\end{itemize}
 
 \end{frame}
 
