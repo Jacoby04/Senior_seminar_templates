@@ -136,12 +136,14 @@
 Solely describes concurrent relocation
 
 \linespace
+\linespace
 
 Implements into a host garbage collector
 \begin{itemize}
 \item Designed for flexibility
 \end{itemize}
 
+\linespace
 \linespace
 
 Performs relocation without barriers!
@@ -167,6 +169,13 @@ Inform other threads of objects that are in use
 \linespace
 
 Are maintained by the thread they belong to
+
+\linespace
+\linespace
+
+Main goal: safely access objects without worrying about relocation
+
+%\includegraphics[width=.95\textwidth]{Illustrations/FPP_HP_Illustration.png}
 
 
 \end{frame}
@@ -224,6 +233,7 @@ When relocation begins:
 \item Blame interrupting threads
 \end{itemize}
 \item Blame continues to be passed to interrupting threads
+\item Termination is dependent on the host garbage collector
 \end{itemize}
 
 \end{frame}
