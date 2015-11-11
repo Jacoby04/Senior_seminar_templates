@@ -159,6 +159,9 @@ Performs relocation without barriers!
 \frametitle{Hazard Pointers}
 
 Point to objects an application thread is accessing
+\begin{itemize}
+\item \emph{Pin} the object
+\end{itemize}
 
 \linespace
 \linespace
@@ -237,6 +240,39 @@ When relocation begins:
 \end{itemize}
 
 \end{frame}
+
+
+\begin{frame}
+
+\frametitle{An Application Thread's Perspective}
+
+Process followed by an application thread:
+\linespace
+
+\begin{columns}
+\begin{column}{0.5\textwidth}
+\begin{enumerate}
+\item Pin object with a hazard pointer
+\item Check if the object has been moved already
+\item Use the object without worry
+\item Unpin the object when done
+\item If blamed, try to relocate the object
+\end{enumerate}
+\end{column}
+
+\begin{column}{0.5\textwidth}
+\begin{enumerate}
+\item Get a coffee cup
+\item Check that the coffee is still in the room
+\item Drink all the coffee you want
+\item Discard you coffee cup
+\item If blamed, try to move the coffee
+\end{enumerate}
+\end{column}
+\end{columns}
+
+\end{frame}
+
 
 
 \subsection*{Test Results}
