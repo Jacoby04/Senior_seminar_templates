@@ -235,8 +235,7 @@ When relocation begins:
 \begin{itemize}
 \item Blame interrupting threads
 \end{itemize}
-\item Blame continues to be passed to interrupting threads
-\item Termination is dependent on the host garbage collector
+\item Blame passed to interrupting threads until relocation succeeds
 \end{itemize}
 
 \end{frame}
@@ -246,7 +245,7 @@ When relocation begins:
 
 \frametitle{An Application Thread's Perspective}
 
-Process followed by an application thread:
+Process followed by an \color{red}{application thread}\color{black}{:}
 \linespace
 
 \begin{columns}
