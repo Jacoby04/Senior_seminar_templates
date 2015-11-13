@@ -306,6 +306,40 @@ Standard JVM benchmarks used to test latency
 \frametitle{Results}
 
 %Show the figures from the paper here and start talking about them
+\only<1>{
+\begin{center}
+Average GC Pauses for Various Benchmarks
+\includegraphics[width=.80\textwidth]{Illustrations/fpp_results.pdf}
+\end{center}
+}
+
+\only<2>{
+\begin{columns}
+\begin{column}{0.5\textwidth}
+
+\color{red}G1 with FPP \color{black}on average 50\% shorter pauses than \color{blue}standard G1\color{black}
+\begin{itemize}
+\item Less impact on application thread performance
+\end{itemize}
+
+\linespace
+
+Most latency from host activities
+
+\linespace
+
+Concurrent relocation without barriers is feasible
+
+\end{column}
+
+\begin{column}{0.5\textwidth}
+\begin{center}
+Average GC Pauses
+\includegraphics[width=.90\textwidth]{Illustrations/fpp_results_2.pdf}
+\end{center}
+\end{column}
+\end{columns}
+}
 
 %In the same slide using 'only', show the images (smaller), with text explaining the results
 
