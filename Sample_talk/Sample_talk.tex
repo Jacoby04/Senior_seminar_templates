@@ -158,7 +158,32 @@ Major focus on improving latency
 
 \frametitle{Transactions}
 
+%Remember to emphasize the key point is interruptions will cause noting to happen, or everything to.
+\only<1>{
+\emph{transaction}: series of operations performed in an all-or-none manner
 
+\linespace
+\linespace
+
+Example: updating prices in a store for sales \\
+\begin{center}
+Figure out how to show it later
+\end{center}
+
+Protects data from interrupts
+}
+
+\only<2>{
+\emph{transactional memory}: allows code sections to run like transactions
+\begin{itemize}
+\item Memory used by the code is protected
+\end{itemize}
+
+\linespace
+\linespace
+
+Relocation + remapping $\rightarrow$ transaction
+}
 
 \end{frame}
 
