@@ -119,6 +119,39 @@
 
 \section[Collie]{Collie Collector}
 
+\begin{frame}
+
+\frametitle{The Collie Garbage Collector}
+
+Collie is a full garbage collector
+\begin{itemize}
+\item Uses most techniques from C4
+\end{itemize}
+
+\linespace
+
+Also intended for server environments
+
+\linespace
+
+Uses transactional memory for synchronization
+
+\linespace
+
+Major focus on improving latency
+
+\linespace
+\linespace
+\linespace
+
+\begin{center}
+\includegraphics[width=.85\textwidth]{Illustrations/gc_cycle_locator_compaction.png}
+\end{center}
+
+\end{frame}
+
+
+
 \subsection*{Explanation}
 
 
@@ -273,7 +306,7 @@ Process followed by an \color{red}{application thread}\color{black}{:}
 \item Get a coffee cup
 \item Check that the coffee is still in the room
 \item Drink all the coffee you want
-\item Discard you coffee cup
+\item Discard your coffee cup
 \item If blamed, try to move the coffee
 \end{enumerate}
 \end{column}
