@@ -158,32 +158,29 @@ Major focus on improving latency
 
 \frametitle{Transactions}
 
-%Remember to emphasize the key point is interruptions will cause noting to happen, or everything to.
-\only<1>{
+%Remember to emphasize the key point is interruptions will cause nothing to happen, or everything to.
 \emph{transaction}: series of operations performed in an all-or-none manner
 
 \linespace
 \linespace
 
 Example: updating prices in a store for sales \\
-\begin{center}
-Figure out how to show it later
-\end{center}
+\begin{itemize}
+\item Update sale price
+\item Update store price
+\end{itemize}
+
+\linespace
 
 Protects data from interrupts
-}
 
-\only<2>{
+\linespace
+\linespace
+
 \emph{transactional memory}: allows code sections to run like transactions
 \begin{itemize}
 \item Memory used by the code is protected
 \end{itemize}
-
-\linespace
-\linespace
-
-Relocation + remapping $\rightarrow$ transaction
-}
 
 \end{frame}
 
@@ -191,7 +188,36 @@ Relocation + remapping $\rightarrow$ transaction
 
 \frametitle{Transplantations}
 
+\emph{transplantation}: Relocating and remapping unmodified objects
 
+\linespace
+\linespace
+
+\begin{columns}
+\begin{column}{0.33\textwidth}
+
+Transaction:
+\begin{itemize}
+\item Start transaction
+\item Check object
+\item Relocate object
+\item Remap references
+\item End Transaction
+\end{itemize}
+
+\end{column}
+\begin{column}{0.32\textwidth}
+
+
+$\xrightarrow{\text{Interrupted by application}}$
+
+\end{column}
+\begin{column}{0.3\textwidth}
+
+Mark object as non-individually transplantable
+
+\end{column}
+\end{columns}
 
 \end{frame}
 
