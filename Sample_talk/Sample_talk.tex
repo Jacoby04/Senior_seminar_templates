@@ -171,6 +171,7 @@ Example: updating prices in a store for sales \\
 \end{itemize}
 
 \linespace
+\linespace
 
 Protects data from interrupts
 
@@ -188,7 +189,7 @@ Protects data from interrupts
 
 \frametitle{Transplantations}
 
-\emph{transplantation}: Relocating and remapping unmodified objects
+\emph{transplantation}: Relocating and remapping objects
 
 \linespace
 \linespace
@@ -207,7 +208,6 @@ Transaction:
 
 \end{column}
 \begin{column}{0.32\textwidth}
-
 
 $\xrightarrow{\text{Interrupted by application}}$
 
@@ -261,7 +261,22 @@ Lie to the compactor:
 
 \frametitle{Testing Environment}
 
+Tested against the Pauseless Garbage Collector:
+\begin{itemize}
+\item Ancestor of Collie
+\item Largely concurrent with some stop-the-world pauses
+\item Also requires supportive hardware
+\end{itemize}
 
+\linespace
+\linespace
+
+Standard JVM benchmarks used to test latency
+
+\linespace
+\linespace
+
+Improvements from aborting nature and transactions to latency
 
 \end{frame}
 
@@ -444,17 +459,18 @@ Implemented in the Garbage-First (G1) Garbage Collector
 \end{itemize}
 
 \linespace
+\linespace
 
 Tested against the default G1 collector
 
 \linespace
+\linespace
 
 Standard JVM benchmarks used to test latency
 \begin{itemize}
-\item Concurrent relocation improvements to latency seen
+\item Improvements from concurrent relocation alone to latency
+\item Feasibility of barrier-free relocation
 \end{itemize}
-
-%\todo[inline]{Add image here just showing where FPP gets inserted into the overall GC cycle.}
 
 \end{frame}
 
@@ -480,9 +496,11 @@ Average GC Pauses for Various Benchmarks
 \end{itemize}
 
 \linespace
+\linespace
 
 Most latency from host activities
 
+\linespace
 \linespace
 
 Concurrent relocation without barriers is feasible
