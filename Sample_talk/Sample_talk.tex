@@ -169,11 +169,67 @@ If a thread breaks this, the barrier will correct the situation:
 
 \frametitle{Concurrent Relocation}
 
+\only<1>{
+
+GC threads simply relocate objects
+
+\linespace
+\linespace
+
+All references point to from-space!
+\begin{itemize}
+\item Application threads bound to trigger LVB
+\end{itemize}
+
+\linespace
+\linespace
+
+INSERT GRAPHIC HERE!!!
+
+}
+
+\only<2>{
+
+How application threads cope:
+\begin{itemize}
+\item If the object was moved, find it
+\item If the object is being moved, wait
+\item If the object is unmoved, move it
+\end{itemize}
+
+\linespace
+\linespace
+
+In all cases, correct the source reference after
+
+}
+
 \end{frame}
 
 \begin{frame}
 
 \frametitle{Concurrent Remapping}
+
+\emph{lazy remapping}: application threads update references as they trigger LVB
+\begin{itemize}
+\item "If the object was moved, find it"
+\item Correct the source reference after
+\end{itemize}
+
+\linespace
+\linespace
+
+To ensure all references are updated, need to traverse all reachable ones
+
+\linespace
+\linespace
+
+Combine remapping with next tracing phase
+
+\linespace
+\linespace
+
+ADD FIGURE HERE
 
 \end{frame}
 
@@ -190,6 +246,9 @@ If a thread breaks this, the barrier will correct the situation:
 \begin{frame}
 
 \frametitle{Results}
+
+
+Priority given to GC process
 
 \end{frame}
 
