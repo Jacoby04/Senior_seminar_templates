@@ -284,7 +284,54 @@ Improvements from aborting nature and transactions to latency
 
 \frametitle{Results}
 
+\only<1>{
+\begin{center}
+Minimum Mutator Utilization (MMU) Percentages \\for Various Time Windows\\
+\includegraphics[width=.65\textwidth]{Illustrations/collie_results.pdf}
+\end{center}
+}
 
+\only<2>{
+\begin{center}
+\includegraphics[width=.80\textwidth]{Illustrations/collie_mmu_explanation_1.png}
+\end{center}
+}
+
+\only<3>{
+\begin{center}
+\includegraphics[width=.80\textwidth]{Illustrations/collie_mmu_explanation_2.png}
+\end{center}
+}
+
+\only<4>{
+\begin{columns}
+\begin{column}{0.5\textwidth}
+
+\color{red}Collie \color{black}has higher MMU than \color{blue}Pauseless \color{black}across the board
+\begin{itemize}
+\item Application threads are used more
+\end{itemize}
+
+\linespace
+\linespace
+
+Application threads have priority over GC threads
+
+\linespace
+\linespace
+
+Lends itself well to latency but no progress guarantees
+
+\end{column}
+
+\begin{column}{0.5\textwidth}
+\begin{center}
+MMU Percentages
+\includegraphics[width=.90\textwidth]{Illustrations/collie_results_2.pdf}
+\end{center}
+\end{column}
+\end{columns}
+}
 
 \end{frame}
 
