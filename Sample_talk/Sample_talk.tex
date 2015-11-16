@@ -111,7 +111,7 @@
 
 \begin{frame}
 
-\frametitle{The Continuously Concurrent Compacting Collector}
+\frametitle{The Continuously Concurrent Compacting Collector (C4)}
 
 C4 is a full garbage collector
 
@@ -144,9 +144,54 @@ Commercially available through Azul Systems
 
 \subsection*{Explanation}
 
+\begin{frame}
+
+\frametitle{The Loaded Value Barrier (LVB)}
+
+Read barrier protecting from-space from application threads
+
+\linespace
+\linespace
+
+Can only use moved objects
+
+\linespace
+\linespace
+
+If a thread breaks this, the barrier will correct the situation:
+\begin{itemize}
+\item This facilitates concurrent relocation and remapping
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+
+\frametitle{Concurrent Relocation}
+
+\end{frame}
+
+\begin{frame}
+
+\frametitle{Concurrent Remapping}
+
+\end{frame}
+
 
 
 \subsection*{Test Results}
+
+\begin{frame}
+
+\frametitle{Testing Environment}
+
+\end{frame}
+
+\begin{frame}
+
+\frametitle{Results}
+
+\end{frame}
 
 
 
@@ -374,7 +419,7 @@ MMU Percentages
 
 \begin{frame}
 
-\frametitle{Field Pinning Protocol}
+\frametitle{Field Pinning Protocol (FPP)}
 
 Solely describes concurrent relocation
 
