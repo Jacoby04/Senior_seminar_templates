@@ -268,8 +268,45 @@ Custom benchmarks used to test latency
 
 \frametitle{Results}
 
+%Show the figures from the paper here and start talking about them
+\only<1>{
+\begin{center}
+Application Worst Case Response Times
+\includegraphics[width=.80\textwidth]{Illustrations/c4_results.pdf}
+\end{center}
+}
+
+\only<2>{
+\begin{columns}
+\begin{column}{0.5\textwidth}
+
+\color[RGB]{176,30,186}C4 \color{black}:
+\begin{itemize}
+\item Has shortest response times
+\item Maintains them for largest range of heap sizes
+\item Least impact on application
+\end{itemize}
+
+\linespace
+\linespace
 
 Priority given to GC process
+
+\linespace
+\linespace
+
+Still has best application responsiveness
+
+\end{column}
+
+\begin{column}{0.5\textwidth}
+\begin{center}
+Worst Case Times
+\includegraphics[width=.90\textwidth]{Illustrations/c4_results.pdf}
+\end{center}
+\end{column}
+\end{columns}
+}
 
 \end{frame}
 
@@ -465,7 +502,7 @@ Minimum Mutator Utilization (MMU) Percentages \\for Various Time Windows\\
 
 \color{red}Collie \color{black}has higher MMU than \color{blue}Pauseless \color{black}across the board
 \begin{itemize}
-\item Application threads are used more
+\item Application threads used more
 \end{itemize}
 
 \linespace
@@ -701,7 +738,10 @@ Average GC Pauses for Various Benchmarks
 \linespace
 \linespace
 
-Most latency from host activities
+Concurrent relocation prioritizes application threads
+\begin{itemize}
+\item Most latency from host activities
+\end{itemize}
 
 \linespace
 \linespace
@@ -718,8 +758,6 @@ Average GC Pauses
 \end{column}
 \end{columns}
 }
-
-%In the same slide using 'only', show the images (smaller), with text explaining the results
 
 \end{frame}
 
