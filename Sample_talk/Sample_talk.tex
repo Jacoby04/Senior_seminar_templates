@@ -148,12 +148,12 @@ Commercially available through Azul Systems
 
 \frametitle{The Loaded Value Barrier (LVB)}
 
-Read barrier protecting from-space from application threads
+Read barrier protects from-space from application threads
 
 \linespace
 \linespace
 
-Can only use moved objects
+Rule: application can only use moved objects
 
 \linespace
 \linespace
@@ -178,13 +178,15 @@ GC threads simply relocate objects
 
 All references point to from-space!
 \begin{itemize}
-\item Application threads bound to trigger LVB
+\item Application threads certain to trigger LVB
 \end{itemize}
 
 \linespace
 \linespace
 
-INSERT GRAPHIC HERE!!!
+\begin{center}
+\includegraphics[width=.9\textwidth]{Illustrations/c4_lvb_relocation.png}
+\end{center}
 
 }
 
@@ -210,7 +212,8 @@ In all cases, correct the source reference after
 
 \frametitle{Concurrent Remapping}
 
-\emph{lazy remapping}: application threads update references as they trigger LVB
+\only<1>{
+\emph{lazy remapping}: application threads update references through LVB
 \begin{itemize}
 \item "If the object was moved, find it"
 \item Correct the source reference after
@@ -219,17 +222,20 @@ In all cases, correct the source reference after
 \linespace
 \linespace
 
-To ensure all references are updated, need to traverse all reachable ones
+To update all references, need to traverse all reachable ones
 
 \linespace
 \linespace
 
 Combine remapping with next tracing phase
+}
 
-\linespace
-\linespace
-
-ADD FIGURE HERE
+\only<2>{
+\begin{center}
+Remapping combined with tracing
+\includegraphics[width=.9\textwidth]{Illustrations/c4Mapping_rough_figure_4.pdf}
+\end{center}
+}
 
 \end{frame}
 
