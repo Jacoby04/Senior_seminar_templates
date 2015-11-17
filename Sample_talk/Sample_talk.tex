@@ -247,6 +247,21 @@ Remapping combined with tracing
 
 \frametitle{Testing Environment}
 
+Tested against three garbage collectors:
+\begin{itemize}
+\item Non-generational version of C4
+\item Two algorithms with non-concurrent compaction
+\end{itemize}
+
+\linespace
+\linespace
+
+Custom benchmarks used to test latency
+\begin{itemize}
+\item Improvement from a generational collector
+\item Improvement from concurrent compaction
+\end{itemize}
+
 \end{frame}
 
 \begin{frame}
@@ -415,11 +430,9 @@ Tested against the Pauseless Garbage Collector:
 \linespace
 
 Standard JVM benchmarks used to test latency
-
-\linespace
-\linespace
-
-Improvements from aborting nature and transactions to latency
+\begin{itemize}
+\item Improvements from aborting nature and transactions
+\end{itemize}
 
 \end{frame}
 
@@ -642,7 +655,7 @@ Process followed by an \color{red}{application thread}\color{black}{:}
 
 \frametitle{Testing Environment}
 
-Implemented in the Garbage-First (G1) Garbage Collector
+Implemented in the Garbage-First (G1) Garbage Collector:
 \begin{itemize}
 \item Concurrent tracing
 \item Compaction requires stop-the-world pauses
@@ -658,7 +671,7 @@ Tested against the default G1 collector
 
 Standard JVM benchmarks used to test latency
 \begin{itemize}
-\item Improvements from concurrent relocation alone to latency
+\item Improvements from concurrent relocation alone
 \item Feasibility of barrier-free relocation
 \end{itemize}
 
