@@ -315,6 +315,7 @@ Need to keep threads synchronized
 }
 
 \only<2>{
+
 \emph{read barrier}: instructions to run before a thread accesses memory
 
 \linespace
@@ -332,6 +333,63 @@ Need to keep threads synchronized
 
 
 \subsection[GC with PP]{Garbage Collection with Parallel Processing}
+
+\begin{frame}
+
+\frametitle{Concurrency}
+
+We distinguish between application threads and GC threads
+
+\linespace
+\linespace
+
+\emph{concurrent} GC: collector runs at the same time as the application
+\begin{itemize}
+\item Does not stop the world
+\end{itemize}
+
+\linespace
+\linespace
+
+Can have only partial concurrency
+\begin{itemize}
+\item Example: concurrent tracing but non-concurrent compaction
+\end{itemize}
+
+\linespace
+\linespace
+
+Concurrent compaction
+\begin{itemize}
+\item Poses the most challenges
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+
+\frametitle{Latency}
+
+\emph{latency}: measure of negative impact from GC on application threads
+\begin{itemize}
+\item Decrease in time spent processing application due to GC
+\end{itemize}
+
+\linespace
+\linespace
+
+Many different ways to measure
+\begin{itemize}
+\item Example: compare application response times during GC %Mention we will cover more.
+\end{itemize}
+
+\linespace
+\linespace
+
+Common assessment of concurrent collector performance
+%Mention there are other measures, but all my collectors test latency.
+
+\end{frame}
 
 
 
