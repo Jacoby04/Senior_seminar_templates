@@ -269,7 +269,6 @@ researchers, Iyengar et al., describe how C4 is an enhanced, generational varian
 of the Pauseless Garbage Collector~\cite{Click:Pauseless}. C4 is generational in 
 that the entire GC algorithm is independently utilized in both the young and old generations;
 in addition, both generations are concurrent with the application. 
-For set condemnation, C4 uses a tracing-style algorithm.
 C4's intended environment is large servers with multiple gigabyte heaps.
 
 
@@ -290,7 +289,7 @@ From-pages are protected from mutators by the LVB.}
 
 C4 uses a read barrier referred to as the \emph{Loaded Value Barrier} (LVB) to 
 maintain synchronization of concurrent threads throughout the GC process~\cite{Tene:C4}. The LVB 
-places invariants on each reference as it is loaded from memory.
+places \emph{invariants}, properties to be maintained, on each reference as it is loaded from memory.
 One of the invariants relates to the tracing portion of the GC algorithm, so
 it is not discussed here. The other invariant ensures
 references loaded by a mutator during relocation must point to safely
@@ -373,7 +372,7 @@ are freed and reclamation of memory is now complete.
 
 % Tested primarily against also concurrent, but non-generational.
 
-Experiments done with the C4 collector were meant to show improvements
+Experiments done with C4 were meant to show improvements
 of using an algorithm that is simultaneously generational and concurrent~\cite{Tene:C4}.
 C4 is tested against a modified, non-generational C4 algorithm as well as
 two algorithms that do not perform concurrent compaction. 
@@ -386,8 +385,7 @@ significant compaction event occurred.
 
 The primary performance metric monitored was worst-case response times
 of servers while experiencing the heap sizes
-described. While not directly measuring latency, this gives a sense of how 
-much latency a garbage collector causes. 
+described. This provides a useful indicator of latency.
 C4 maintained the smallest 
 worst-case response times across the largest range of heap sizes.
 The worst-case response times were usually in the range of 0.01-0.1 secs. 
@@ -410,7 +408,7 @@ Only the LVB is modified in significant ways as discussed below.
 Like C4, the Collie
 collector is also designed with server environments in mind. 
 Collie is implemented and tested in 
-the same production-quality Azul JVM the Pauseless garbage collector is implemented 
+the same production-quality Azul JVM the Pauseless Garbage Collector is implemented 
 in~\cite{Click:Pauseless}. However, it is not commercially available.
 
 
@@ -546,7 +544,7 @@ during compaction~\cite{Iyengar:Collie}. The Collie was tested
 against a modified variant of the Pauseless collector~\cite{Click:Pauseless}.
 Accordingly, both collectors were implemented on the same JVM. For hardware
 specifications used for testing, refer to~\cite{Iyengar:Collie}. The Collie
-utilizes several aspects of the C4 collector, which in turn builds upon the Pauseless
+utilizes several aspects of C4, which in turn builds upon the Pauseless
 collector. This provides an effective comparison to see how 
 use of transactional memory and an aborting compactor affect application performance. 
 
@@ -566,8 +564,8 @@ despite potentially limiting the amount of memory compacted.
 \section{Field Pinning Protocol}
 \label{sec:fpp}
 
-Last, we examine concurrent compaction in GC through the Field Pinning
-Protocol, (FPP) designed by \"{O}sterlund and L\"{o}we~\cite{Osterlund:FPP}.
+Last, we examine concurrent compaction in GC through a Field Pinning
+Protocol (FPP), designed by \"{O}sterlund and L\"{o}we~\cite{Osterlund:FPP}.
 FPP describes a lock-free process for performing the relocation aspect
 of concurrent compaction. The remapping phase as well as other portions
 of GC are left up to the host garbage collector this
@@ -714,7 +712,7 @@ the approach for compaction used will depend on its intended environment.
 
 % To be updated as time goes on.
 
-Thank you Elena Machkasova for the great advice and feedback.
+Thank you Elena Machkasova and Jeff Lindblom for the great advice and feedback.
 Thank you Jeremy Eberhardt for infinite words of wisdom throughout.
 
 
