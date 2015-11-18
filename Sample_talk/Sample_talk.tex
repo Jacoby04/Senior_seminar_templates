@@ -134,6 +134,9 @@ Memory is a finite resource
 
 \begin{frame}
 
+\begin{columns}
+\begin{column}{0.65\textwidth}
+
 \frametitle{Stopping the World}
 
 GC requires processing resources
@@ -141,7 +144,7 @@ GC requires processing resources
 \linespace
 \linespace
 
-When only one processor is used, collectors stop the world
+When only one processor is used, collectors \emph{stop the world}
 
 \linespace
 \linespace
@@ -156,6 +159,15 @@ Problem: applications today are subjected to increasing pauses
 \linespace
 
 Use parallel processing to solve!
+\end{column}
+\begin{column}{0.35\textwidth}
+
+\begin{center}
+\includegraphics[width=.8\textwidth]{Illustrations/meme.jpg}
+\end{center}
+
+\end{column}
+\end{columns}
 
 \end{frame}
 
@@ -175,7 +187,7 @@ Use parallel processing to solve!
 
 \subsection[GC Basics]{Garbage Collection}
 
-%Kristin liked the heap visualization I did when explaining it (did with my hands at the time).
+
 
 \subsection[PP Basics]{Parallel Processing}
 
