@@ -288,16 +288,16 @@ From-pages are protected from mutators by the LVB.}
 %Contiguous virtual memory
 %might not correspond to contiguous physical memory, which is out of scope for our discussion
 
-C4 uses a read barrier referred to as the \emph{Loaded Value Barrier} (LVB) to 
-maintain synchronization of concurrent threads throughout the GC process~\cite{Tene:C4}. The LVB 
+C4 uses a read barrier called the \emph{Loaded Value Barrier} (LVB) to 
+synchronize concurrent threads throughout the GC process~\cite{Tene:C4}. The LVB 
 places \emph{invariants}, properties to be maintained, on each reference as it is loaded from memory.
 One of the invariants relates to the tracing portion of the GC algorithm, so
 it is not discussed here. The other invariant ensures
-references loaded by a mutator during relocation must point to safely
+references loaded by a mutator during compaction must point to safely
 accessible objects, objects that have already been moved.
 If the invariant does not hold
-when a reference is loaded, the barrier will trigger and execute code to correct
-the situation.
+when a reference is loaded, the barrier will trigger and correct
+the situation as we discuss in the next Subsections.
 
 
 \subsection{Concurrent Relocation}
@@ -348,12 +348,12 @@ the remapping phase to end, all live references must be updated.
 This could go on indefinitely if lazy remapping alone is performed.
 
 To finish remapping, a traversal of live references must be performed to
-ensure all are updated; this is like the traversal performed to trace which
-objects are garbage. Since no physical resources are being held due
-to quick release and lazy remapping does not severely impact mutator operations,
-the remapping traversal is delayed until another GC cycle starts.
+ensure all are updated; this is like the tracing traversal used to determine which
+objects are garbage. No physical resources are being held due
+to quick release and lazy remapping does not severely impact mutator operations. 
+As a result, the remapping traversal can be delayed until another GC cycle starts.
 C4 will perform the remapping of one GC cycle while the tracing
-of another cycle is beginning. This works as both processes need to traverse
+of another cycle is beginning since both processes need to traverse
 the same references in memory. To
 visualize how this works, examine Figure~\ref{fig:c4Cycle}. Upon remapping completion, 
 all references to from-pages are now gone. Thus, the virtual addresses
@@ -389,12 +389,14 @@ of servers while experiencing the heap sizes
 described. This provides a useful indicator of latency.
 C4 maintained the smallest 
 worst-case response times across the largest range of heap sizes.
-The worst-case response times were usually in the range of 0.01-0.1 secs. 
+The worst-case response times were usually in the range of 0.01-0.1 secs;
+this is fast enough so an application user would not notice pauses. 
 The non-generational version of C4 could also reach low worst-case response times,
 but for a more limited range of heaps sizes. Standard
-C4 sustained the times for heap sizes of 5-35 Gb; the modified C4 could
-only do so for heaps sizes of 15-35 Gb. The non-concurrently compacting
-collectors had multi-second worst-case response times for all heap sizes.
+C4 sustained the times for heap sizes of 5-35 Gbs; the modified C4 could
+only do so for heaps sizes of 15-35 Gbs. The non-concurrently compacting
+collectors had multi-second worst-case response times for all heap sizes,
+which would cause noticeable pauses for a users.
 
 
 \section{The Collie Collector}
