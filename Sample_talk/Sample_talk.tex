@@ -835,7 +835,7 @@ Implements into a host garbage collector
 \linespace
 \linespace
 
-Performs relocation without barriers!
+Performs concurrent relocation without barriers!
 
 \linespace
 \linespace
@@ -980,8 +980,8 @@ Process followed by an \color{red}{application thread}\color{black}{:}
 
 Implemented in the Garbage-First (G1) Garbage Collector:
 \begin{itemize}
-\item Concurrent tracing
-\item Compaction requires stop-the-world pauses
+\item Concurrent tracing and remapping
+\item Relocation requires stop-the-world pauses
 \end{itemize}
 
 \linespace
