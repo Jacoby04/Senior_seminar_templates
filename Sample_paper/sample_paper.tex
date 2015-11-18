@@ -122,13 +122,13 @@ and independent of the application running.
 \label{sec:garbageCollection}
 
 %Maybe move talk of stack down to parallel processing.
-Newly allocated objects in JVM languages are stored in a contiguous memory location called
-the \emph{heap}~\cite{oracle:heap}. The heap represents the memory available to a program and is a virtual layer of memory that corresponds to physical memory.
+Newly allocated objects in JVM languages are stored in a memory location called
+the \emph{heap}~\cite{oracle:heap}; this memory is contiguous meaning it has no gaps. The heap represents the memory available to a program and is a virtual layer of memory that corresponds to physical memory.
 Thus, when GC removes garbage, it cleans the heap.
 Applications access objects stored on the heap through \emph{references},
 fixed-size values that refer to virtual object locations in the heap~\cite{reilly:reference}. 
 An application process has a memory structure known
-as the \emph{stack}, which is separate from the heap. Objects are never actually
+as a \emph{stack}, which is separate from the heap. Objects are never actually
 stored on a stack, only references to objects.
 Objects can also contain references to other objects, so references can also appear on the heap.
 
@@ -202,24 +202,24 @@ the process more efficient.
 % Could make an image for this example if needed and space allows.
 % HOnestly, this whole paragraph could possibly be removed too...
 %If I do, remove the last sentence of the preceding paragraph too.
-Creating parallel processes subjects
-developers to new challenges. Many new issues can result from use of
-multi-threading. One example, relevant to GC, is that modifications to an 
+Creating multi-threaded processes can result in many new issues.
+One of these issues, relevant to GC, is that modifications to an 
 object can be lost. For example, consider an application keeping 
-track of people's moods and locations. People are stored as objects. 
-Thread $A$ moves people, and it does so by relocating them in data structures (DSs) 
-with a deep copy and delete operation. Thread $B$ updates people's moods. Suppose a person
+track of people's moods and locations. People are stored as objects.
+Thread $A$ moves people by relocating them in data structures (DSs) 
+with a copy operation. Thread $B$ updates people's moods. Suppose a person
 is about to go home from work, so their mood changes to happy.
 The person's change in mood could be lost if thread $A$ copies the person
-to the home DS, thread $B$ updates the person's mood while still expecting
-them to be in the work DS, and thread $A$ deletes the person from the work DS. 
+to the home DS, but thread $B$ updates the person's mood while still expecting
+them to be in the work DS. 
 While the example is fairly simple, it can be seen how such a problem
 applies to GC.
 
-To deal with multiple threads relying on use of the same data, \emph{synchronization}
-techniques are used. These ensure threads do not interfere
-with one another in a process-breaking manner. A \emph{memory barrier} (referred to 
-as a read barrier or simply barrier) is an instruction set enforced upon the 
+To deal with multiple threads relying on the same data, \emph{synchronization}
+techniques are used. These can prevent issues 
+like data corruption, described above, or even process-halting exceptions. 
+One such synchronization technique is a \emph{memory barrier} (referred to 
+as a read barrier or simply barrier), which is an instruction set enforced upon the 
 CPU to be performed before accessing memory~\cite{wiki:barrier}. Uses of this include ensuring threads
 meet certain requirements before accessing memory or disallowing a thread to
 access memory while another thread is using the memory.
@@ -238,8 +238,9 @@ multiple threads simultaneously to perform GC.~\cite{Puffitsch:background}
 All but one of the algorithms that we examine are parallel. A \emph{concurrent} garbage
 collector executes instructions in parallel to the application running. In other 
 words, the garbage collector does not entirely stop the world. A GC algorithm
-could be only partially concurrent or parallel. For example, one collector may
-only have the tracing phase be parallel while reclamation is concurrent.
+can be only partially concurrent or parallel. For example, a collector could
+only have the tracing phase be parallel while reclamation is concurrent, or 
+a collector could be entirely both parallel and concurrent.
 
 This paper focuses on
 concurrent compaction within GC. We do so due to the importance 
