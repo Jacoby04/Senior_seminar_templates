@@ -568,7 +568,7 @@ despite potentially limiting the amount of memory compacted.
 
 Last, we examine concurrent compaction in GC through a Field Pinning
 Protocol (FPP), designed by \"{O}sterlund and L\"{o}we~\cite{Osterlund:FPP}.
-FPP describes a lock-free process for performing the relocation aspect
+FPP describes a barrier-free process for performing the relocation aspect
 of concurrent compaction. The remapping phase as well as other portions
 of GC are left up to the host garbage collector this
 protocol is implemented within. FPP is compliant with the Java Native Interface
@@ -639,7 +639,7 @@ to attempt to copy the object will succeed.
 Reconsider the coffee example. Suppose
 someone is in charge of moving the coffee to the other room.
 Much like how a GC thread must relocate objects. They
-can try to, but others could still have cups and want more coffee.
+can try, but others could still have cups and want more coffee.
 The interrupted person has other tasks they could be doing, so they tell
 everyone with a cup to move the coffee when finished drinking it;
 they blame the others for not finishing the task and make them responsible
