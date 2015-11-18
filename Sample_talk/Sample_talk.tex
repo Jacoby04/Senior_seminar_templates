@@ -187,6 +187,80 @@ Use parallel processing to solve!
 
 \subsection[GC Basics]{Garbage Collection}
 
+\begin{frame}
+
+\frametitle{Memory}
+
+\emph{heap}: contiguous memory location for storing application objects
+
+\linespace
+\linespace
+
+\emph{stack}: memory the application directly has access to
+
+\linespace
+\linespace
+
+Objects are stored on the heap
+\begin{itemize}
+\item Application accesses via references
+\end{itemize}
+
+\linespace
+\linespace
+
+\begin{center}
+\includegraphics[width=.8\textwidth]{Illustrations/stack_and_heap.png}
+\end{center}
+
+\end{frame}
+
+\begin{frame}
+
+\frametitle{GC Cycle}
+
+\emph{Set condemnation} and \emph{reclamation}
+
+\linespace
+\linespace
+
+Set condemnation done by \emph{tracing}
+\begin{itemize}
+\item Detect all reachable objects by chaining references
+\end{itemize}
+
+\linespace
+\linespace
+
+Reclamation done by labeling memory as free
+
+\end{frame}
+
+\begin{frame}
+
+\frametitle{Compaction}
+
+\emph{compaction}: moving fragmented memory into a contiguous region
+
+\linespace
+
+Two new steps replace reclamation:
+\begin{itemize}
+\item \emph{relocation}: move objects 
+\begin{itemize}
+\item \emph{from-space} and \emph{to-space}
+\end{itemize}
+\item \emph{remapping}: update object references
+\end{itemize}
+
+\linespace
+
+\begin{center}
+\includegraphics[width=.70\textwidth]{Illustrations/bg_compaction.pdf}
+\end{center}
+
+\end{frame}
+
 
 
 \subsection[PP Basics]{Parallel Processing}
@@ -236,7 +310,7 @@ Commercially available through Azul Systems
 
 \begin{frame}
 
-\frametitle{The Loaded Value Barrier (LVB)}
+\frametitle{Loaded Value Barrier (LVB)}
 
 Read barrier protects from-space from application threads
 
@@ -499,7 +573,7 @@ $\xrightarrow{\text{Interrupted by application}}$
 \end{column}
 \begin{column}{0.3\textwidth}
 
-Mark object as non-individually transplantable (NIT)
+Mark object as \emph{non-individually transplantable} (NIT)
 
 \end{column}
 \end{columns}
@@ -905,6 +979,22 @@ Average GC Pauses
 E.~\"{O}sterlund and W.~L\"{o}we.
 \newblock Concurrent compaction using a field pinning protocol. 
 \newblock 2015 ACM SIGPLAN International Symposium on Memory Management (ISMM 2015). ACM, New York, NY, USA, 56-69.
+
+\bibitem{Tene:2011}
+G.~Tene, B.~Iyengar, and M.~Wolf.
+\newblock C4: the continuously concurrent compacting collector.
+\newblock 2011 ACM SIGPLAN International Symposium on Memory Management (ISMM 2011). ACM, New York, NY, USA, 79-88.
+
+\bibitem{Iyengar:2012}
+B.~Iyengar, G.~Tene, M.~Wolf, and E.~Gehringer.
+\newblock The Collie: a wait-free compacting collector.
+\newblock 2012 ACM SIGPLAN International Symposium on Memory Management (ISMM 2012). ACM, New York, NY, USA, 85-96.
+
+\linespace
+\begin{center}
+\color{black}See the UMM Opdahl Fall '15 paper for additional references.
+\end{center}
+
 
 \end{thebibliography}
 
