@@ -403,16 +403,17 @@ which would cause noticeable pauses for a users.
 \label{sec:collie}
 
 We now look at the concurrent compaction technique used by the single-threaded
-Collie garbage collector described by Iynegar et al.~\cite{Iyengar:Collie};
-with the exception of Gehringer, they were the researchers who worked on C4.
+Collie garbage collector described by Iynegar et al.~\cite{Iyengar:Collie}.
+With the exception of Gehringer, the same researchers worked on C4.
 As such, Collie utilizes modified versions of several techniques from C4, such as:
 the tracing algorithm, the LVB, page-granularity compaction, and quick-release behavior.
 Only the LVB is modified in significant ways as discussed below.
 Like C4, the Collie
-collector is also designed with server environments in mind. 
+collector is designed with server environments and large heaps in mind.
+However, it is not commercially available. 
 Collie is implemented and tested in 
 the same production-quality Azul JVM the Pauseless Garbage Collector is implemented 
-in~\cite{Click:Pauseless}. However, it is not commercially available.
+in~\cite{Click:Pauseless}. 
 
 
 \subsection{Transactional Memory}
@@ -428,34 +429,32 @@ they occur in an all-or-none manner.
 
 For example, consider updating sale prices of items in a store; this requires
 ensuring the store price matches the sale price advertised. 
-If a person updates the prices for an item, they want both the
-advertised price and the store price to be updated. Only updating the
+When updating the prices for an item, both the
+advertised price and the store price should be updated. Only updating the
 advertised price could lead to irate customers, and only updating the
 store price could lead to customers not knowing about the sale. A transaction
 ensures an item's prices are unchanged if the update process 
-is started and then aborted before completion.
+is started and then aborted before completion. Additionally, customers cannot
+see the prices mid-transaction; they only see the price from before the transaction began.
 
 % Might be too much detail. Consider cutting later.
 TM systems allow a series
 of operations modifying memory to be placed in
 a \emph{transactional procedure}, much like a database transaction.
-The TM system then monitors the access of concurrent threads to \emph{transactional variables},
-memory modified by a transactional procedure.
+The TM system monitors access of concurrent threads to \emph{transactional variables},
+variables modified by a transactional procedure.
 Concurrent threads will operate in parallel until they try to modify
-the same transactional variable. At this time, how 
+the same transactional variable. How 
 the conflict should resolve can be specified, but the general behavior would be for one transaction
 to be aborted and the other allowed to continue.
 When a transaction is completed, its changes are \emph{committed}; any changes 
 made to memory by the transaction are finalized~\cite{wiki:transactional-memory}.
 
-
-\subsection{Referrer Sets}
-\label{sec:collieReferrerSets}
-
 Each object on the heap has a \emph{referrer set}~\cite{Iyengar:Collie}. This is the precise set 
-of all references pointing to the object. Collie stores object's referrer sets as transactional variables
-so it can perform a single object's relocation and remapping as a transactional procedure 
-(simply referred to as a transaction).
+of all references pointing to the object. 
+Referrer sets are stored as transactional variables since they are used by a transactional procedure 
+(simply referred to as a transaction)
+that relocates and remaps a single object.
 An object must maintain a \emph{stable referrer set} throughout the GC process. That is,
 its referrer set cannot be modified or expanded. This is necessary to ensure all of an object's references
 are correctly remapped.
@@ -467,18 +466,18 @@ are correctly remapped.
 After a tracing phase at the start of GC, heap compaction
 happens during a \emph{transplantation phase}~\cite{Iyengar:Collie};
 transplantation is a term meaning the combination of relocation and remapping.
-Live objects and their referrer sets are known at this time. As mentioned, 
+Live objects and their referrer sets were determined during tracing. As mentioned, 
 the operations for object transplantation are stored as a
 transaction. Individual object transplantations are done only on objects 
 that maintain stable referrer sets throughout the process.
 An object is deemed \emph{non-individually transplantable} (NIT) if its transaction
-is aborted or if it fails to maintain a stable referrer set. 
+is aborted or it fails to maintain a stable referrer set. 
 
-Before beginning to perform the transactions to move individual objects, they
+Before performing the transactions to move individual objects, they
 need to be checked for having stable referrer sets. To do this, threads' stacks
 are checked for references to objects. Objects with references from stacks
 will be marked NIT since mutators are using the objects, which could cause referrer set modifications.
-This behavior is chosen so the GC process does not interfere with mutator work.
+This ensures GC does not interfere with mutator work.
 The LVB-style read barrier receives its first new purpose here. When a thread attempts to load a reference,
 and add it to its stack, the object the reference points to will be marked NIT as a mutator is using it.
 
@@ -511,13 +510,13 @@ Collie uses page-granularity compaction like C4. From-space is used here
 to refer to the set of from-pages with NIT objects. For compaction 
 termination purposes, mirrored-to-space is logically considered part of to-space.
 
-Zero-copy transplantation gets the compactor to believe it has finished for a cycle.
+Zero-copy transplantation gets the compactor to believe it has finished the cycle.
 Mirrored-to-space contains the same objects in physical memory as from-space.
 Thus, if references
 are remapped to mirrored-to-space from from-space,
 the objects appear to be relocated without physically moving. This technique
 is known as zero-copy transplantation. In Figure~\ref{fig:collieMirrored},
-we see all references are to from space for NIT objects. After zero-copy transplantation, they
+we see all references are to from-space for NIT objects. After zero-copy transplantation, they
 point to mirrored-to-space.
 
 Zero-copy transplantation
@@ -544,8 +543,8 @@ cease moving objects to allow mutator threads to continue working uninterrupted.
 
 The main goal of the Collie collector is to decrease latency
 during compaction~\cite{Iyengar:Collie}. The Collie was tested 
-against a modified variant of the Pauseless collector~\cite{Click:Pauseless}.
-Accordingly, both collectors were implemented on the same JVM. For hardware
+against a modified variant of the Pauseless Garbage Collector~\cite{Click:Pauseless}.
+Accordingly, both collectors were implemented within the same JVM. For hardware
 specifications used for testing, refer to~\cite{Iyengar:Collie}. The Collie
 utilizes several aspects of C4, which in turn builds upon the Pauseless
 collector. This provides an effective comparison to see how 
