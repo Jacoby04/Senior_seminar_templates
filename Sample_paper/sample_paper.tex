@@ -43,14 +43,14 @@ Jacob P. Opdahl\\
 
 \maketitle
 \begin{abstract}
-This paper provides a basic overview of both garbage collection (GC) 
+This paper provides a brief overview of both garbage collection (GC) 
 of memory and parallel processing. We then cover how 
 parallel processing applies to GC. Specifically, these
 concepts are focused within the context of the Java Virtual Machine (JVM).
 With that foundation, we look at various algorithms that perform compaction of fragmented 
 memory during the GC process. These algorithms are designed 
-to run concurrently to the application running.
-Such concurrently compacting GC behavior stems from a desire to reduce stop-the-world
+to run concurrent to the application running.
+Such concurrently compacting GC behavior stems from a desire to reduce ``stop-the-world''
 pauses of an application.
 % The current paper format *only* allows inline comments using the todo
 % macro. That's kind of a bummer, and it would be neat if someone figured
@@ -58,7 +58,7 @@ pauses of an application.
 % but there are quite a few details that have to be sorted out in synchrony.
 \end{abstract}
 
-\keywords{Garbage Collection (GC), Concurrency, Compaction, Continuously Concurrent Compacting Collector (C4), Collie, Field Pinning Protocol (FPP)}
+\keywords{Garbage collection (GC), concurrency, compaction, Continuously Concurrent Compacting Collector (C4), Collie, Field Pinning Protocol (FPP)}
 
 
 \section{Introduction}
@@ -73,15 +73,15 @@ prevents them from worrying about the details of memory allocation and deallocat
 However, programmers do not have control over how memory management occurs,
 which can have negative impacts on application performance.
 
-Since memory for a program is not an unlimited resource, automatic memory management
+Memory for a program is not an unlimited resource. Automatic memory management
 must remove unused objects from memory when appropriate.
 Dead objects, or \emph{garbage}, are objects that can be shown
 to be unreachable by the program~\cite{glossary:g}. Garbage should be deallocated to 
 save space for new objects that will be created. The algorithm used to perform implicit
-deallocation of garbage is referred to as a \emph{garbage collector}.
-A garbage collector is an algorithm designed to detect
-and remove dead objects. We will focus on
-garbage collection (GC) performed on Java Virtual Machines 
+deallocation of garbage, by detecting and removing dead objects, 
+is a \emph{garbage collector}.
+We will focus on
+garbage collection (GC) performed within Java Virtual Machines 
 (JVMs), software processes that run programs written in Java and other languages 
 on computing systems~\cite{Lindblom:2011}.
 
@@ -96,7 +96,7 @@ have more garbage to remove. Thus, stop-the-world pauses
 experienced by applications are increasing.
 
 In some environments,
-application pauses are unacceptable; for example, see the section on 
+application pauses are unacceptable; such a scenario is described within the section on 
 real-time GC in~\cite{Lindblom:2011}. In order to decrease or remove 
 pauses, we want to use multiple
 processors to share the workload of both running an application and its GC.
@@ -179,7 +179,7 @@ reclamation is often performed by marking from-spaces as freed.
 %The contiguous memory location is virtual, ie, on the heap.
 
 
-\subsection{Parallel Processing Basics}
+\subsection{Parallel Processing}
 \label{sec:parallelProcessing}
 
 To develop an understanding of parallel processing, we need to know 
