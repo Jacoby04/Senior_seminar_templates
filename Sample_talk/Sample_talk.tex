@@ -98,11 +98,64 @@ Languages: Java, C\#, Python, and more
 Abstracts details away from the developer
 
 \linespace
+
+\begin{center}
+\includegraphics[width=.3\textwidth]{Illustrations/garbage.jpg}
+\end{center}
+
+\end{frame}
+
+\begin{frame}
+
+\frametitle{Implicit Deallocation}
+
+Memory is a finite resource
+
+\linespace
+\linespace
+
+\emph{garbage}: objects that are no longer reachable
+
+\linespace
+\linespace
+
+\emph{garbage collector}: algorithm for detecting and removing garbage
+\begin{itemize}
+\item Performs garbage collection (GC)
+\end{itemize}
+
 \linespace
 
 \begin{center}
 \includegraphics[width=.3\textwidth]{Illustrations/garbage.jpg}
 \end{center}
+
+\end{frame}
+
+\begin{frame}
+
+\frametitle{Stopping the World}
+
+GC requires processing resources
+
+\linespace
+\linespace
+
+When only one processor is used, collectors stop the world
+
+\linespace
+\linespace
+
+Problem: applications today are subjected to increasing pauses
+\begin{itemize}
+\item More memory
+\item More strenuous applications
+\end{itemize}
+
+\linespace
+\linespace
+
+Use parallel processing to solve!
 
 \end{frame}
 
@@ -118,13 +171,13 @@ Abstracts details away from the developer
 
 
 
-\section[Introduction]{Introduction}
+\section[Background]{Background}
 
-\subsection[GC Basics]{Garbage Collection Basics}
+\subsection[GC Basics]{Garbage Collection}
 
 %Kristin liked the heap visualization I did when explaining it (did with my hands at the time).
 
-\subsection[PP Basics]{Parallel Processing Basics}
+\subsection[PP Basics]{Parallel Processing}
 
 
 
