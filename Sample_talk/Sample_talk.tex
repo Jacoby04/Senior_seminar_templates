@@ -265,6 +265,70 @@ Two new steps replace reclamation:
 
 \subsection[PP Basics]{Parallel Processing}
 
+\begin{frame}
+
+\frametitle{Processes and Threads}
+
+\emph{process}: instance of a program being run
+\begin{itemize}
+\item Examples: Java program, garbage collection
+\end{itemize}
+
+\linespace
+\linespace
+
+\emph{thread}: component of a process
+\begin{itemize}
+\item Performs portion of process instructions %Mention they are in order.
+\item Each has its own stack
+\end{itemize}
+
+\linespace
+\linespace
+
+\emph{parallel processing}: running multiple threads simultaneously
+
+\end{frame}
+
+\begin{frame}
+
+\frametitle{Synchronization}
+
+\only<1>{
+
+Threads do not communicate
+
+\linespace
+\linespace
+
+% Possibly beef up this example later.
+Poses new challenges
+\begin{itemize}
+\item Example: losing object modifications
+\end{itemize}
+
+\linespace
+\linespace
+
+Need to keep threads synchronized
+
+}
+
+\only<2>{
+\emph{read barrier}: instructions to run before a thread accesses memory
+
+\linespace
+\linespace
+\linespace
+
+\begin{center}
+\includegraphics[width=.70\textwidth]{Illustrations/read_barrier.png}
+\end{center}
+
+}
+
+\end{frame}
+
 
 
 \subsection[GC with PP]{Garbage Collection with Parallel Processing}
