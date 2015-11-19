@@ -402,8 +402,8 @@ which would cause noticeable pauses for a users.
 
 We now look at the concurrent compaction technique used by the single-threaded
 Collie garbage collector described by Iynegar et al.~\cite{Iyengar:Collie}.
-With the exception of Gehringer, the same researchers worked on C4.
-As such, Collie utilizes modified versions of several techniques from C4, such as:
+This is the same research group that worked on C4, so Collie utilizes modified 
+versions of several techniques from C4, such as:
 the tracing algorithm, the LVB, page-granularity compaction, and quick-release behavior.
 Only the LVB is modified in significant ways as discussed below.
 Like C4, the Collie
@@ -454,8 +454,10 @@ Referrer sets are stored as transactional variables since they are used by a tra
 (simply referred to as a transaction)
 that relocates and remaps a single object.
 An object must maintain a \emph{stable} referrer set throughout the GC process. That is,
-its referrer set cannot be modified or expanded. This is necessary to ensure all of an object's references
+its referrer set cannot be modified or expanded, which
+ensures all of an object's references
 are correctly remapped.
+
 
 
 \subsection{The Collie Protocol}
@@ -485,8 +487,8 @@ rendering the object NIT. Thus, only remapping by updating the referrer set
 is done in the transaction, which looks like:
 \begin{enumerate}
 \item Transaction is started
-\item Object is checked to not have been marked NIT at some point
-\item All references are changed to point to the objects to-space location
+\item Object is checked to not have been marked NIT
+\item All references are changed to point to the object's to-space location
 \item Memory transaction is committed
 \end{enumerate}
 If a transaction fails or is interrupted, as detected by the TM system, the object is rendered NIT.
@@ -495,26 +497,26 @@ If a transaction fails or is interrupted, as detected by the TM system, the obje
 \subsection{Aborting Compactor}
 \label{sec:collieAbortion}
 
-After all objects that could be transplanted are, we
+After all individually transplantable objects are transplanted, we
 are left with unmoved NIT objects.~\cite{Iyengar:Collie}.
-Compaction cannot terminate with objects in from-space.
+However, compaction cannot terminate with objects in from-space.
 The additions of a \emph{mirrored-to-space} and \emph{zero-copy transplantation} are necessary
 to terminate compaction without disrupting mutators.
 
-Mirrored-to-space is a virtual memory space corresponding to and the same
-size as from-space. It is mapped to the same physical
-memory as the corresponding from-space as can be seen in Figure~\ref{fig:collieMirrored}. As mentioned, 
+Mirrored-to-space is a virtual memory space corresponding to, and the same
+size as, from-space. It is mapped to the same physical
+memory as the corresponding from-space, as can be seen in Figure~\ref{fig:collieMirrored}. As mentioned, 
 Collie uses page-granularity compaction like C4. From-space is used here 
 to refer to the set of from-pages with NIT objects. For compaction 
-termination purposes, mirrored-to-space is logically considered part of to-space.
+termination purposes, mirrored-to-space is logically considered a part of to-space.
 
-Zero-copy transplantation gets the compactor to believe it has finished the cycle.
-Mirrored-to-space contains the same objects in physical memory as from-space.
+Zero-copy transplantation gets the compactor to believe it has finished a cycle.
+Mirrored-to-space holds the same objects in physical memory as from-space.
 Thus, if references
 are remapped to mirrored-to-space from from-space,
 the objects appear to be relocated without physically moving. This technique
-is known as zero-copy transplantation. In Figure~\ref{fig:collieMirrored},
-we see all references are to from-space for NIT objects. After zero-copy transplantation, they
+is zero-copy transplantation. In Figure~\ref{fig:collieMirrored},
+all references are to from-space for NIT objects. After zero-copy transplantation, they
 point to mirrored-to-space.
 
 Zero-copy transplantation
@@ -542,8 +544,8 @@ cease moving objects to allow mutator threads to continue working uninterrupted.
 The main goal of the Collie collector is to decrease latency
 during compaction~\cite{Iyengar:Collie}. The Collie was tested 
 against a modified variant of the Pauseless Garbage Collector~\cite{Click:Pauseless}.
-Accordingly, both collectors were implemented within the same JVM. For hardware
-specifications used for testing, refer to~\cite{Iyengar:Collie}. The Collie
+Accordingly, both collectors were implemented within the same JVM. For exact
+testing specifications, refer to~\cite{Iyengar:Collie}. The Collie
 utilizes several aspects of C4, which in turn builds upon the Pauseless
 collector. This provides an effective comparison to see how 
 use of transactional memory and an aborting compactor affect application performance. 
@@ -555,7 +557,7 @@ MMUs were taken from various time periods during which
 compaction was running and was compared between the two algorithms. Comparisons were done
 with a 128 megabyte (Mb) heap and a 512 Mb heap. For all time windows, the Collie compactor
 had higher MMUs than Pauseless. Collie did not go below a 70\% mutator utilization 
-level whereas Pauseless ranged over the whole spectrum of values. 
+level whereas Pauseless averaged between 40\% and 70\%. 
 This shows the aborting nature of Collie
 lends itself to ensuring mutator response time, and thus decreasing latency, 
 despite potentially limiting the amount of memory compacted.
@@ -567,12 +569,11 @@ despite potentially limiting the amount of memory compacted.
 Last, we examine concurrent compaction in GC through a Field Pinning
 Protocol (FPP), designed by \"{O}sterlund and L\"{o}we~\cite{Osterlund:FPP}.
 FPP describes a barrier-free process for performing the relocation aspect
-of concurrent compaction. The remapping phase as well as other portions
-of GC are left up to the host garbage collector this
-protocol is implemented within. FPP is compliant with the Java Native Interface
+of concurrent compaction. The remapping phase and other portions
+of GC are left up to the host garbage collector. FPP is compliant with the Java Native Interface
 to allow for integration into a JVM. For purposes of testing, FPP 
 is implemented within the Garbage-First GC algorithm in the HotSpot JVM 
-of OpenJDK 9~\cite{Detlefs:G1}.
+of OpenJDK 9~\cite{Detlefs:G1}, which lacks concurrent relocation.
 
 
 \subsection{Hazard Pointers}
