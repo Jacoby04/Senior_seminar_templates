@@ -127,19 +127,20 @@ the \emph{heap}~\cite{oracle:heap}; this memory is contiguous meaning it has no 
 Thus, when GC removes garbage, it cleans the heap.
 Applications access objects stored on the heap through \emph{references},
 fixed-size values that refer to virtual object locations in the heap~\cite{reilly:reference}. 
-An application process has a memory structure known
-as a \emph{stack}, which is separate from the heap. Objects are never actually
+An application uses a memory structure known
+as a \emph{stack} as a workplace for methods being called, 
+which is separate from the heap. Objects are never actually
 stored on a stack, only references to objects.
-Objects can also contain references to other objects, so references can also appear on the heap.
+Objects can contain references to other objects, so references can also appear on the heap.
 
 A full
-performance of the overall GC algorithm is known as a \emph{cycle}, and it
-is usually started when the heap is full. GC can be broken down into two major steps.
+performance of the overall GC algorithm is known as a \emph{cycle} and
+is usually started when the heap is full or nearly full. GC can be broken down into two major steps.
 First, a GC algorithm performs \emph{set condemnation} when deciding which objects are 
 garbage. The garbage collectors we examine perform set condemnation using a method 
 known as \emph{tracing}. During this, objects are determined to be reachable by 
 traversing references from global, root objects. Any objects reachable by chaining references
-from these global, root objects could still be used by the application. 
+from these objects could still be used by the application. 
 Unreachable objects are garbage. Then, the algorithm performs 
 \emph{reclamation} by recovering the memory held by garbage objects.
 
