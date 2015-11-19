@@ -606,8 +606,7 @@ be done safely when no one has cups any longer, so the coffee is not pinned.
 \label{sec:fppCopy}
 
 HPs prevent premature relocation of objects by serving as a distributed
-counter. Threads cannot relocate objects if the number of
-HPs pinning the objects is greater than zero.
+counter. Threads cannot relocate objects with a HP count greater than zero.
 A mutator thread \emph{impedes} a copying thread if
 its HP prevents the copying.
 The impeding thread is \emph{blamed} for the 
@@ -627,7 +626,7 @@ do so without worry
 attempt to copy the object:
 \begin{enumerate}
 \item Check other threads for HPs before copying. If HPs found,
-blame the threads and move along
+blame all the threads and move along
 \item Proceed to copy the object with further pins still impeding the copy
 \end{enumerate}
 \end{enumerate}
