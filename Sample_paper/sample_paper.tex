@@ -690,19 +690,21 @@ host garbage collector activities such as tracing and remapping.
 \label{sec:conclusions}
 
 We have examined three concurrent compaction techniques that are 
-effective in reducing latency of garbage collectors.
-The garbage collectors implemented in were tested for latency in
-different manners and against various algorithms, so it is difficult to 
-compare them to one another. Direct comparisons are made even more difficult since the
+effectively reduce latency of GC.
+The full GC algorithms were tested for latency in
+distinct environments, with different benchmarks, and against various algorithms, so it is difficult to 
+compare them to one another. Direct comparisons are especially difficult since the
 algorithms were not all designed for the same environment.
 
 The algorithms we have looked at achieved concurrency while maintaining low latency in various
-ways. C4 and Collie both use read barriers differently. C4 
+ways. C4 and Collie use read barriers differently. C4 
 uses a barrier to control mutator behavior, and Collie uses one to allow mutators to
-work without interruption. FPP takes a wholly different approach by focusing on 
-performing relocation alone without any barriers; it avoids standard synchronization methods by using HPs
-and thread collaboration instead.
-Regardless of approach, compaction is necessary for efficient GC with growing heaps and
+work without interruption. FPP takes a largely different approach by focusing on 
+performing solely relocation without barriers; it avoids standard synchronization methods by using HPs
+and thread collaboration instead. Overall, the transition from barrier 
+to mostly barrier-free concurrent compaction
+shows advancements in the field.
+Regardless of approach, concurrent compaction is necessary for efficient GC with growing heaps and
 increasing environmental demands. Ultimately,
 the approach for compaction used will depend on its intended environment.
 
