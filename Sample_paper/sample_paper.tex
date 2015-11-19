@@ -89,7 +89,7 @@ GC is not without cost.
 Just like the application, GC requires processing resources to run. When using a single processor, 
 we get a \emph{serial} garbage collector operating in a 
 \emph{stop-the-world} fashion~\cite{Lindblom:2011}; GC requires
-pausing the application in order to clean. 
+pausing the application in order to clean up. 
 Growing storage media is leading to more memory
 availability for programs, which means garbage collectors
 have more garbage to remove. Thus, stop-the-world pauses
@@ -99,17 +99,17 @@ In some environments,
 application pauses are unacceptable; such a scenario is described within the section on 
 real-time GC in~\cite{Lindblom:2011}. In order to decrease or remove 
 pauses, we want to use multiple
-processors to share the workload of both running an application and its GC.
+processors to share the work of both running an application and its GC.
 This is known as \emph{parallel processing}, and it can be used
-to enhance performance of both. With
+to enhance performance. With
 demand for faster responding applications coupled with more memory needing managing,
 it is paramount that GC be optimized using parallel processing. 
 
-In Section 2, we go over background information for GC, parallel processing,
-and a combination of the two.
+In Section 2, we cover background information on GC, parallel processing,
+and GC with parallel processing.
 From there, we focus our examination of parallel processing in GC.
 Section 3 covers the Continuously Concurrent Compacting Collector (C4), Section
-4 considers the Collie collector, and Section 5 looks at the Field Pinning Protocol (FPP).
+4 considers the Collie collector, and Section 5 looks at a Field Pinning Protocol (FPP).
 Discussion of each is focused on how one component of GC can run parallel to
 and independent of the application running. 
 
@@ -455,7 +455,7 @@ of all references pointing to the object.
 Referrer sets are stored as transactional variables since they are used by a transactional procedure 
 (simply referred to as a transaction)
 that relocates and remaps a single object.
-An object must maintain a \emph{stable referrer set} throughout the GC process. That is,
+An object must maintain a \emph{stable} referrer set throughout the GC process. That is,
 its referrer set cannot be modified or expanded. This is necessary to ensure all of an object's references
 are correctly remapped.
 
