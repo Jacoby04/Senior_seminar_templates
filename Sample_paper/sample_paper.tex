@@ -239,7 +239,7 @@ collector executes instructions in parallel to the application running. In other
 words, the garbage collector does not entirely stop the world. A GC algorithm
 can be only partially concurrent or parallel. For example, a collector could
 only have the tracing phase be parallel while reclamation is concurrent, or 
-a collector could be entirely both parallel and concurrent.
+a collector could be both entirely parallel and concurrent.
 
 This paper focuses on
 concurrent compaction within GC. We do so due to the importance 
@@ -610,7 +610,7 @@ be done safely when no one has cups any longer, so the coffee is not pinned.
 \label{sec:fppCopy}
 
 HPs prevent premature relocation of objects by serving as a distributed
-counter. Threads cannot relocate objects with a HP count greater than zero.
+counter. Threads cannot relocate objects with a non-zero HP count.
 A mutator thread \emph{impedes} a copying thread if
 its HP prevents the copying.
 The impeding thread is \emph{blamed} for the 
@@ -693,11 +693,11 @@ host garbage collector activities such as tracing and remapping.
 \section{Conclusions}
 \label{sec:conclusions}
 
-We have examined three concurrent compaction techniques that are 
+We have examined three concurrent compaction techniques that all 
 effectively reduce latency of GC.
 The full GC algorithms were tested for latency in
 distinct environments, with different benchmarks, and against various algorithms, so it is difficult to 
-compare them to one another. Direct comparisons are especially difficult since the
+compare them to one another. Additionally, direct comparisons are especially difficult since the
 algorithms were not all designed for the same environment.
 
 The algorithms we have looked at achieved concurrency while maintaining low latency in various
