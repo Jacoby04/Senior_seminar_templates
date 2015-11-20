@@ -269,7 +269,7 @@ researchers, Iyengar et al., describe how C4 is an enhanced, generational varian
 of the Pauseless GC algorithm~\cite{Click:Pauseless}. C4 is generational in 
 that the entire GC algorithm is independently utilized in both the young and old generations;
 in addition, both generations are concurrent with the application. 
-C4's intended environment is large servers with multiple gigabyte heaps.
+C4's intended environment consists of large servers with multiple gigabyte heaps.
 
 
 \subsection{Loaded Value Barrier}
@@ -277,10 +277,11 @@ C4's intended environment is large servers with multiple gigabyte heaps.
 
 \begin{figure}
 \centering
-\psfig{file=c4_page_rough_2.pdf,width =3in}
+\psfig{file=c4_page_rough_3.pdf,width =3in}
 \caption{In C4, memory is relocated
 page-by-page. Dead objects are represented with X.
-From-pages are protected from mutators by the LVB.}
+From-pages are protected from mutators by the LVB.
+To-pages would also hold objects in practice.}
 \label{fig:c4Memory}
 \end{figure}
 
@@ -308,7 +309,7 @@ backed by a contiguous block of physical storage~\cite{Tene:C4}.
 In such a model, from-space consists of \emph{from-pages}
 and to-space of \emph{to-pages}.
 To quickly empty pages, the most sparsely populated ones are relocated
-first. In the case of Figure~\ref{fig:c4Memory}, the left-most 
+first, which also moves objects in physical memory. In the case of Figure~\ref{fig:c4Memory}, the left-most 
 from-page is relocated to a to-page first as it has only one small object alive.
 
 From-pages are protected by the LVB as can be seen in Figure~\ref{fig:c4Memory}. 
@@ -328,12 +329,13 @@ not remap references at this time.
 
 When all live objects are relocated from a from-page,
 the C4 compactor will perform \emph{quick release}. 
-The physical memory backing the page will be freed
-once the last live object has been moved to a to-page. The objects have already 
-been transferred to new pages, so the contents of the from-pages are no longer needed. The from-page 
+The objects have already 
+been moved to to-pages, as shown by dashed circles in Figure~\ref{fig:c4Memory}, 
+so the contents of the from-pages are no longer needed. Thus, the physical 
+memory backing the page can be freed. The from-page 
 will be in use as it still has references to it, but the physical memory can be recycled efficiently. 
 In terms of Figure~\ref{fig:c4Memory}, the heap
-memory seen on top is in use until after the remapping phase, but the physical memory below 
+memory on top is used until after the remapping phase, but the physical memory below 
 can be paired with a different virtual page and used immediately.
 
 
@@ -349,7 +351,7 @@ This could go on indefinitely if lazy remapping alone is performed.
 
 To finish remapping, a traversal of live references must be performed to
 ensure all are updated; this is like the tracing traversal used to determine which
-objects are garbage as discussed in Section 2.1. No physical resources are being held due
+objects are garbage as discussed in Section~2.1. No physical resources are being held due
 to quick release and lazy remapping does not severely impact mutator operations. 
 As a result, the remapping traversal can wait until another GC cycle starts.
 C4 will perform the remapping of one GC cycle during tracing
