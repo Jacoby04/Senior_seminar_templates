@@ -58,7 +58,7 @@ pauses of an application.
 % but there are quite a few details that have to be sorted out in synchrony.
 \end{abstract}
 
-\keywords{Garbage Collection (GC), Concurrency, Compaction, Continuously Concurrent Compacting Collector (C4), Collie, Field Pinning Protocol (FPP)}
+\keywords{Garbage Collection (GC), Concurrency, Compaction, Continuously Concurrent Compacting Collector (C4), Field Pinning Protocol (FPP), Collie}
 
 
 \section{Introduction}
@@ -69,7 +69,7 @@ of memory for objects can be explicit or implicit. If done implicitly,
 a language is said to have \emph{automatic memory management}. Some languages 
 with automatic memory management are C\#, Java, and Python.
 Use of automatic memory management is beneficial to programmers as it 
-prevents them from worrying about the details of memory allocation and deallocation. 
+removes their need to worry about the details of memory allocation and deallocation. 
 However, programmers do not have control over how memory management occurs,
 which can have negative impacts on application performance.
 
@@ -141,8 +141,8 @@ garbage. The garbage collectors we examine perform set condemnation using a meth
 known as \emph{tracing}. During this, objects are determined to be reachable by 
 traversing references from global, root objects. Any objects reachable by chaining references
 from these objects could still be used by the application. 
-Unreachable objects are garbage. Then, the algorithm performs 
-\emph{reclamation} by recovering the memory held by garbage objects.
+Unreachable objects are garbage. Second, the algorithm performs 
+\emph{reclamation} by recovering the memory used by garbage objects.
 
 To optimize GC, a variant can be performed known as \emph{generational} GC.
 Generational collectors rely on most objects not living long on the 
@@ -160,19 +160,19 @@ on the heap becomes difficult to find and manage.
 
 Consider an example with an object that uses 2 megabytes (Mbs) of memory, 
 such as an array. Suppose that after several GC cycles,
-we have memory gaps of at most 1 Mb. 
+we have open memory spaces of at most 1 Mb. 
 The JVM experiences additional overhead in allocating space for this object
-as it has to store the object across non-contiguous locations. Additionally,
-more overhead is experienced as accessing the object requires locating
+as it must be stored across non-contiguous locations. Additionally,
+more overhead occurs as accessing the object requires locating
 all of its parts.
 
 \emph{Compaction} fights
-fragmentation of the heap by moving live objects into contiguous memory locations, and
+fragmentation of the heap by moving live objects into a contiguous memory location, and
 it is performed as part of GC. Two steps
 are typically involved in compaction. After set condemnation, \emph{relocation} moves live objects
 to a contiguous memory location.
 The contiguous memory location being moved to is often referred to as \emph{to-space}.
-Likewise, an object is moved from \emph{from-space}. While it is called 
+Likewise, an object is moved from \emph{from-space}. While called 
 relocation, objects are typically copied rather than moved. \emph{Remapping}
 occurs after objects have been relocated; the remapping phase 
 updates all references to moved objects to refer to their new locations. With this, 
@@ -217,11 +217,12 @@ To deal with multiple threads relying on the same data, \emph{synchronization}
 techniques are used. These can prevent issues 
 like data corruption, described above, or even process-halting exceptions. 
 One such synchronization technique is a \emph{memory barrier} (referred to 
-as a read barrier or simply barrier), which is an instruction set enforced upon the 
-CPU to be performed before accessing memory~\cite{wiki:barrier}. Uses of this include ensuring threads
+as a read barrier or simply a barrier), which is an instruction set
+that must be performed by a thread
+before accessing memory~\cite{wiki:barrier}. Uses of this include ensuring threads
 meet certain requirements before accessing memory or disallowing a thread to
 access memory while another thread is doing so. While barriers can help prevent 
-conflicts, the checks performed result in extra processing overhead for threads.
+conflicts, the checks performed result in extra processing overhead for the threads.
 
 
 \subsection{GC with Parallel Processing}
@@ -244,7 +245,7 @@ a collector could be both entirely parallel and concurrent.
 This paper focuses on
 concurrent compaction within GC. We do so due to the importance 
 of avoiding stop-the-world garbage collectors. Additionally, compacting
-collectors are vital to improving application performance. Thus,
+collectors are vital for efficient application performance. Thus,
 the intersection of these two enhancements to languages with automatic memory management leads
 to examining concurrent compaction methods within GC.
 
@@ -347,14 +348,14 @@ objects, the C4 compaction algorithm uses two techniques~\cite{Tene:C4}. The fir
 \emph{lazy remapping}. With this, mutator
 threads continue updating references as they trigger the LVB. In order for
 the remapping phase to end, all live references must be updated.
-This could go on indefinitely if lazy remapping alone is performed.
+However, remapping could go on indefinitely if lazy remapping alone is performed.
 
 To finish remapping, a traversal of live references must be performed to
 ensure all are updated; this is like the tracing traversal used to determine which
 objects are garbage as discussed in Section~2.1. No physical resources are being held due
 to quick release and lazy remapping does not severely impact mutator operations. 
 As a result, the remapping traversal can wait until another GC cycle starts.
-C4 will perform the remapping of one GC cycle during tracing
+C4 will perform the remapping of one GC cycle during the tracing
 of the next cycle since both tasks traverse
 the same references in memory. To
 visualize how this works, examine Figure~\ref{fig:c4Cycle}. Upon remapping completion, 
@@ -392,13 +393,13 @@ described, which provides a useful indicator of latency.
 C4 maintained the smallest 
 worst-case response times across the largest range of heap sizes.
 The worst-case response times were usually in the range of 0.01-0.1 secs;
-this is fast enough so an application user would not notice pauses. 
+an application user would not notice such short pauses. 
 The non-generational version of C4 could also reach low worst-case response times,
 but for a more limited range of heaps sizes. Standard
 C4 sustained the times for heap sizes of 5-35 Gbs; the modified C4 could
 only do so for heaps sizes of 15-35 Gbs. The non-concurrently compacting
 collectors had multi-second worst-case response times for all heap sizes,
-which would cause noticeable pauses for a users.
+which would cause noticeable pauses for a user.
 
 
 \section{The Collie Collector}
@@ -421,7 +422,7 @@ in~\cite{Click:Pauseless}.
 \subsection{Transactional Memory}
 \label{sec:collieTM}
 
-The Collie's compaction algorithm sets itself apart due to use 
+The Collie's compaction algorithm sets itself apart due to its use 
 of a \emph{transactional memory} (TM) system as a concurrency control 
 alternative to barriers~\cite{Iyengar:Collie}. TM systems allow
 sections of code to function 
@@ -535,7 +536,7 @@ cease moving objects to allow mutator threads to continue working uninterrupted.
 \begin{figure}
 \centering
 \psfig{file=collie_mirrored_rough.pdf,width =3in}
-\caption{Mirrored-to-space and zero-copy transplantation in Collie}
+\caption{Mirrored-to-space and zero-copy transplantation in the Collie collector.}
 \label{fig:collieMirrored}
 \end{figure}
 
@@ -639,8 +640,8 @@ no threads have the object pinned. At this time, the last thread
 to attempt to copy the object will succeed.
 
 Reconsider the coffee example. Suppose
-someone is in charge of moving the coffee to the other room.
-Much like how a GC thread must relocate objects. They
+someone is in charge of moving the coffee to the other room,
+much like how a GC thread must relocate objects. They
 can try, but others could still have cups and want more coffee.
 The interrupted person has other tasks they could be doing, so they tell
 everyone with a cup to move the coffee when finished drinking it;
@@ -665,7 +666,7 @@ this process goes until all objects are moved or another GC cycle starts.
 If objects have not relocated when another cycle begins, they are automatically
 marked for relocation again. Allowing mutators to continue passing blame works
 in G1 because, like C4 and Collie, the algorithm will roll up remapping into the next
-GC cycle's tracing phase. Possible alternatives include setting a max number of impediments
+GC cycle's tracing phase. Possible alternative approaches include setting a max number of impediments
 or setting a timer.
 
 
@@ -675,18 +676,18 @@ or setting a timer.
 % Tested against a concurrent collector that does NOT have concurrent compaction.
 
 As mentioned, FPP was implemented in the G1 garbage collector for testing purposes~\cite{Osterlund:FPP}. 
-Appropriately, the modified G1 collector utilizing FPP for relocation is tested against the
+Appropriately, the modified G1 collector that uses FPP for relocation is tested against the
 unmodified G1 collector. This was tested in a MacBook Pro; for the 
 hardware details, see~\cite{Osterlund:FPP}. We focus on the tests comparing
 latency of the two garbage collectors. For other tests performed and their results, see~\cite{Osterlund:FPP}.
 
-For latency, the h2 benchmark from DaCapo is used~\cite{Blackburn:DaCapo}.
+For examining latency, the h2 benchmark from DaCapo is used~\cite{Blackburn:DaCapo}.
 The benchmark was chosen due to being memory intensive,
 which makes latency issues apparent.
 Latency is measured using the jHiccup tool developed by Azul Systems.
 Compared to its host garbage collector, G1 with FPP improved latency at all time
 intervals examined. On average, latency was improved by around 50\%; application
-pause times were about half as long. Latency was also shown to mostly be caused by 
+pause times were about half as long. Latency was also shown to mostly come from
 host garbage collector activities such as tracing and remapping.
 
 
