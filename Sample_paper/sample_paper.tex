@@ -159,7 +159,7 @@ is an issue as space for new objects being allocated
 on the heap becomes difficult to find and manage. 
 
 Consider an example with an object that uses 2 megabytes (Mbs) of memory, 
-such as an array. After several cycles of GC,
+such as an array. Suppose that after several GC cycles,
 we have memory gaps of at most 1 Mb. 
 The JVM experiences additional overhead in allocating space for this object
 as it has to store the object across non-contiguous locations. Additionally,
@@ -185,9 +185,9 @@ reclamation is often performed by marking from-spaces as freed.
 
 To develop an understanding of parallel processing, we need to know 
 what \emph{processes} and \emph{threads} are~\cite{oracle:threads}.
-A process is an instance of a computer program being run. What we
-see as an application can actually incorporate multiple processes.
-For example, a Java application being run and GC being performed on the application are two processes.
+A process is an instance of a computer program being run. 
+For example, a Java application and a word processor are two processes. Additionally,
+the GC being run on the Java application is its own process.
 A thread, at a basic level, is a component of a process; it performs a sequence
 of instructions from the process it belongs to. 
 A process can involve a single thread or multiple threads. The order 
@@ -197,7 +197,7 @@ each thread has a personal stack to keep track of variables
 and references used within its specific set of tasks. 
 Parallel processing is the utilization of multiple
 cores of processors to run threads concurrently. If processes are set up
-to run with multiple threads, the extra processing power can be used to make 
+to run with multiple threads, the extra processing power can make 
 the process more efficient.
 
 Creating multi-threaded processes can result in many new issues.
