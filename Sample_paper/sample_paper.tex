@@ -105,11 +105,11 @@ to enhance performance. With
 demand for faster responding applications coupled with more memory needing managing,
 it is paramount that GC be optimized using parallel processing. 
 
-In Section 2, we cover background information on GC, parallel processing,
+In Section~2, we cover background information on GC, parallel processing,
 and GC with parallel processing.
 From there, we focus our examination of parallel processing in GC.
-Section 3 covers the Continuously Concurrent Compacting Collector (C4), Section
-4 considers the Collie collector, and Section 5 looks at a Field Pinning Protocol (FPP).
+Section~3 covers the Continuously Concurrent Compacting Collector (C4), 
+Section~4 considers the Collie collector, and Section~5 looks at a Field Pinning Protocol (FPP).
 Discussion of each is focused on how one component of GC can run parallel to
 and independent of the application running. 
 
@@ -153,7 +153,7 @@ enough GC cycles, they will move into the old generation. By not considering the
 heap with each GC cycle, an application experiences less disruptions.
 
 As memory is reclaimed by a garbage collector, the heap is subject to 
-\emph{fragmentation}~\cite{Tene:C4}~\cite{Iyengar:Collie}~\cite{Osterlund:FPP}. Fragmentation is the forming
+\emph{fragmentation}~\cite{Tene:C4,Iyengar:Collie,Osterlund:FPP}. Fragmentation is the forming
 of interspersed locations of used space in contiguous memory. This
 is an issue as space for new objects being allocated
 on the heap becomes difficult to find and manage. 
@@ -228,8 +228,8 @@ access memory while another thread is using the memory.
 
 We can now return to our original goal of applying parallel processing to GC.
 Threads that are part of the application process are referred to as \emph{mutator}
-threads (or mutators) because they mutate the data~\cite{Tene:C4}~\cite{Iyengar:Collie}
-\cite{Osterlund:FPP}. Threads used by the garbage collector are simply GC threads.
+threads (or mutators) because they mutate the data~\cite{Tene:C4,Iyengar:Collie,Osterlund:FPP}. 
+Threads used by the garbage collector are simply GC threads.
 
 A \emph{parallel} garbage collector uses
 multiple threads simultaneously to perform GC.~\cite{Puffitsch:background}
