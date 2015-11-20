@@ -305,10 +305,11 @@ the situation as we discuss in the next Subsections.
 The relocation phase of compaction in C4 occurs on a per-\emph{page}
 basis, where a page is a fixed-length, contiguous block of virtual memory in the heap
 backed by a contiguous block of physical storage~\cite{Tene:C4}.
+In such a model, from-space consists of \emph{from-pages}
+and to-space of \emph{to-pages}.
 To quickly empty pages, the most sparsely populated ones are relocated
 first. In the case of Figure~\ref{fig:c4Memory}, the left-most 
-\emph{from-page}, analogous to from-space, is relocated first as it has only one small object alive.
-The object is copied to a \emph{to-page}, which is analogous to to-space.
+from-page is relocated to a to-page first as it has only one small object alive.
 
 From-pages are protected by the LVB as can be seen in Figure~\ref{fig:c4Memory}. 
 LVB will trigger for mutator threads encountering a reference to an object
