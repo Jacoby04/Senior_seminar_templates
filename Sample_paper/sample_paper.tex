@@ -58,7 +58,7 @@ pauses of an application.
 % but there are quite a few details that have to be sorted out in synchrony.
 \end{abstract}
 
-\keywords{Garbage collection (GC), concurrency, compaction, Continuously Concurrent Compacting Collector (C4), Collie, Field Pinning Protocol (FPP)}
+\keywords{Garbage Collection (GC), Concurrency, Compaction, Continuously Concurrent Compacting Collector (C4), Collie, Field Pinning Protocol (FPP)}
 
 
 \section{Introduction}
@@ -265,7 +265,7 @@ The first concurrent compaction algorithm we examine is implemented in the
 Continuously Concurrent Compacting Collector (C4), which is a garbage collector 
 included in JVMs commercially shipped by Azul Systems~\cite{Tene:C4}. The 
 researchers, Iyengar et al., describe how C4 is an enhanced, generational variant
-of the Pauseless Garbage Collector~\cite{Click:Pauseless}. C4 is generational in 
+of the Pauseless GC algorithm~\cite{Click:Pauseless}. C4 is generational in 
 that the entire GC algorithm is independently utilized in both the young and old generations;
 in addition, both generations are concurrent with the application. 
 C4's intended environment is large servers with multiple gigabyte heaps.
@@ -410,7 +410,7 @@ Like C4, the Collie
 collector is designed with server environments and large heaps in mind.
 However, it is not commercially available. 
 Collie is implemented and tested in 
-the same production-quality Azul JVM the Pauseless Garbage Collector is implemented 
+the same production-quality Azul JVM the Pauseless GC algorithm is implemented 
 in~\cite{Click:Pauseless}. 
 
 
@@ -542,10 +542,10 @@ cease moving objects to allow mutator threads to continue working uninterrupted.
 % Tested primarily against Another concurrent that is also modified to run on a single thread.
 
 The main goal of the Collie collector is to decrease latency
-during compaction~\cite{Iyengar:Collie}. The Collie was tested 
-against a modified variant of the Pauseless Garbage Collector~\cite{Click:Pauseless}.
+during compaction~\cite{Iyengar:Collie}. Collie was tested 
+against a modified variant of the Pauseless GC algorithm~\cite{Click:Pauseless}.
 Accordingly, both collectors were implemented within the same JVM. For exact
-testing specifications, refer to~\cite{Iyengar:Collie}. The Collie
+testing specifications, refer to~\cite{Iyengar:Collie}. Collie
 utilizes several aspects of C4, which in turn builds upon the Pauseless
 collector. This provides an effective comparison to see how 
 use of transactional memory and an aborting compactor affect application performance. 
