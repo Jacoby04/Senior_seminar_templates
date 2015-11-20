@@ -86,7 +86,7 @@ garbage collection (GC) performed within Java Virtual Machines
 on computing systems~\cite{Lindblom:2011}.
 
 GC is not without cost.
-Just like the application, GC requires processing resources to run. When using a single processor, 
+Just like the application, GC requires processing resources to run. When using a single core of a processor, 
 we get a \emph{serial} garbage collector operating in a 
 \emph{stop-the-world} fashion~\cite{Lindblom:2011}; GC requires
 pausing the application in order to clean up. 
@@ -99,7 +99,7 @@ In some environments,
 application pauses are unacceptable; such a scenario is described within the section on 
 real-time GC in~\cite{Lindblom:2011}. In order to decrease or remove 
 pauses, we want to use multiple
-processors to share the work of both running an application and its GC.
+processors and cores to share the work of both running an application and its GC.
 This is known as \emph{parallel processing}, and it can be used
 to enhance performance. With
 demand for faster responding applications coupled with more memory needing managing,
@@ -196,7 +196,7 @@ not necessarily among multiple threads. In JVM languages,
 each thread has a personal stack to keep track of variables
 and references used within its specific set of tasks. 
 Parallel processing is the utilization of multiple
-cores of a CPU to run threads concurrently. If processes are set up
+cores of processors to run threads concurrently. If processes are set up
 to run with multiple threads, the extra processing power can be used to make 
 the process more efficient.
 
