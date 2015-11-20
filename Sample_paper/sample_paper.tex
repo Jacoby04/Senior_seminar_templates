@@ -220,7 +220,8 @@ One such synchronization technique is a \emph{memory barrier} (referred to
 as a read barrier or simply barrier), which is an instruction set enforced upon the 
 CPU to be performed before accessing memory~\cite{wiki:barrier}. Uses of this include ensuring threads
 meet certain requirements before accessing memory or disallowing a thread to
-access memory while another thread is using the memory.
+access memory while another thread is doing so. While barriers can help prevent 
+conflicts, the checks performed result in extra processing overhead for threads.
 
 
 \subsection{GC with Parallel Processing}
