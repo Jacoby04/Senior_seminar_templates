@@ -114,12 +114,12 @@ Memory is a finite resource
 \linespace
 \linespace
 
-\emph{garbage}: objects that are no longer reachable
+\emph{Garbage}: objects that are no longer reachable
 
 \linespace
 \linespace
 
-\emph{garbage collector}: algorithm for detecting and removing garbage
+\emph{Garbage Collector}: algorithm for detecting and removing garbage
 \begin{itemize}
 \item Performs garbage collection (GC)
 \end{itemize}
@@ -191,19 +191,19 @@ Use parallel processing to solve!
 
 \frametitle{Memory}
 
-\emph{heap}: contiguous memory location for storing application objects
+\emph{Heap}: contiguous memory location for storing application objects
 
 \linespace
 \linespace
 
-\emph{stack}: memory the application directly has access to
+\emph{Stack}: memory the application directly has access to
 
 \linespace
 \linespace
 
 Objects are stored on the heap
 \begin{itemize}
-\item Application accesses via references
+\item Application accesses via \emph{references}
 \end{itemize}
 
 \linespace
@@ -240,23 +240,23 @@ Reclamation done by labeling memory as free
 
 \frametitle{Compaction}
 
-\emph{compaction}: moving fragmented memory into a contiguous region
+\emph{Compaction}: moving fragmented memory into a contiguous region
 
 \linespace
 
 Two new steps replace reclamation:
 \begin{itemize}
-\item \emph{relocation}: move objects 
+\item \emph{Relocation}: move objects 
 \begin{itemize}
 \item \emph{from-space} and \emph{to-space}
 \end{itemize}
-\item \emph{remapping}: update object references
+\item \emph{Remapping}: update object references
 \end{itemize}
 
 \linespace
 
 \begin{center}
-\includegraphics[width=.70\textwidth]{Illustrations/bg_compaction.pdf}
+\includegraphics[width=.60\textwidth]{Illustrations/bg_compaction.pdf}
 \end{center}
 
 \end{frame}
@@ -269,7 +269,7 @@ Two new steps replace reclamation:
 
 \frametitle{Processes and Threads}
 
-\emph{process}: instance of a program being run
+\emph{Process}: instance of a program being run
 \begin{itemize}
 \item Examples: Java program, garbage collection
 \end{itemize}
@@ -277,7 +277,7 @@ Two new steps replace reclamation:
 \linespace
 \linespace
 
-\emph{thread}: component of a process
+\emph{Thread}: component of a process
 \begin{itemize}
 \item Performs portion of process instructions %Mention they are in order.
 \item Each has its own stack
@@ -286,7 +286,7 @@ Two new steps replace reclamation:
 \linespace
 \linespace
 
-\emph{parallel processing}: running multiple threads simultaneously
+\emph{Parallel Processing}: running multiple threads simultaneously
 
 \end{frame}
 
@@ -316,7 +316,7 @@ Need to keep threads synchronized
 
 \only<2>{
 
-\emph{read barrier}: instructions to run before a thread accesses memory
+\emph{Read Barrier}: instructions to run before a thread accesses memory
 
 \linespace
 \linespace
@@ -343,7 +343,7 @@ We distinguish between application threads and GC threads
 \linespace
 \linespace
 
-\emph{concurrent} GC: collector runs at the same time as the application
+\emph{Concurrent GC}: collector runs at the same time as the application
 \begin{itemize}
 \item Does not stop the world
 \end{itemize}
@@ -370,7 +370,7 @@ Concurrent compaction
 
 \frametitle{Latency}
 
-\emph{latency}: measure of negative impact from GC on application threads
+\emph{Latency}: measure of negative impact from GC on application threads
 \begin{itemize}
 \item Decrease in time spent processing application due to GC
 \end{itemize}
@@ -404,7 +404,7 @@ C4 is a full garbage collector
 \linespace
 \linespace
 
-\emph{generational}: performs GC on "young" and "old" generations
+\emph{Generational}: performs GC on "young" and "old" generations
 
 \linespace
 \linespace
@@ -468,10 +468,9 @@ All references point to from-space!
 \end{itemize}
 
 \linespace
-\linespace
 
 \begin{center}
-\includegraphics[width=.9\textwidth]{Illustrations/c4_lvb_relocation.png}
+\includegraphics[width=.80\textwidth]{Illustrations/c4_lvb_relocation.png}
 \end{center}
 
 }
@@ -499,7 +498,7 @@ In all cases, correct the source reference after
 \frametitle{Concurrent Remapping}
 
 \only<1>{
-\emph{lazy remapping}: application threads update references through LVB
+\emph{Lazy Remapping}: application threads update references through LVB
 \begin{itemize}
 \item "If the object was moved, find it"
 \item Correct the source reference after
@@ -566,7 +565,7 @@ Application Worst Case Response Times
 \begin{columns}
 \begin{column}{0.5\textwidth}
 
-\color[RGB]{176,30,186}C4 \color{black}:
+\color[RGB]{135,35,142}C4 \color{black}:
 \begin{itemize}
 \item Has shortest response times
 \item Maintains them for largest range of heap sizes
@@ -640,7 +639,7 @@ Major focus on improving latency
 \frametitle{Transactions}
 
 %Remember to emphasize the key point is interruptions will cause nothing to happen, or everything to.
-\emph{transaction}: series of operations performed in an all-or-none manner
+\emph{Transaction}: series of operations performed in an all-or-none manner
 
 \linespace
 \linespace
@@ -659,7 +658,7 @@ Protects data from interrupts
 \linespace
 \linespace
 
-\emph{transactional memory}: allows code sections to run like transactions
+\emph{Transactional Memory}: allows code sections to run like transactions
 \begin{itemize}
 \item Memory used by the code is protected
 \end{itemize}
@@ -670,7 +669,7 @@ Protects data from interrupts
 
 \frametitle{Transplantations}
 
-\emph{transplantation}: Relocating and remapping objects
+\emph{Transplantation}: relocating and remapping objects
 
 \linespace
 \linespace
@@ -723,7 +722,7 @@ Lie to the compactor:
 \linespace
 \linespace
 
-\emph{aborting} compactor: no progress guarantees
+\emph{Aborting Compactor}: no progress guarantees
 \end{column}
 \begin{column}{0.5\textwidth}
 
@@ -915,7 +914,7 @@ Main goal: safely access objects without worrying about relocation
 %If time allows and feedback demands, could break this into multiple slides to not have so much text
 %on one as well as to refer back to the example and characters more.
 
-\emph{blamed} thread: responsible for relocating an object
+\emph{Blamed Thread}: responsible for relocating an object
 \begin{itemize}
 \item Comes from hazard pointers (coffee cups) impeding copying
 \end{itemize}
