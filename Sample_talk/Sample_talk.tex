@@ -244,7 +244,7 @@ Reclamation done by labeling memory as free
 
 \linespace
 
-Two new steps replace reclamation:
+Two new steps replace reclamation
 \begin{itemize}
 \item \emph{Relocation}: move objects 
 \begin{itemize}
@@ -444,7 +444,7 @@ Rule: application can only use moved objects
 \linespace
 \linespace
 
-If a thread breaks this, the barrier will correct the situation:
+If a thread breaks this, the barrier will correct the situation
 \begin{itemize}
 \item This facilitates concurrent relocation and remapping
 \end{itemize}
@@ -477,7 +477,7 @@ All references point to from-space!
 
 \only<2>{
 
-How application threads cope:
+How application threads cope
 \begin{itemize}
 \item If the object was moved, find it
 \item If the object is being moved, wait
@@ -516,8 +516,8 @@ Combine remapping with next tracing phase
 }
 
 \only<2>{
-\begin{center}
 Remapping combined with tracing
+\begin{center}
 \includegraphics[width=.9\textwidth]{Illustrations/c4Mapping_rough_figure_4.pdf}
 \end{center}
 }
@@ -532,7 +532,7 @@ Remapping combined with tracing
 
 \frametitle{Testing Environment}
 
-Tested against three garbage collectors:
+Tested against three garbage collectors
 \begin{itemize}
 \item Non-generational version of C4
 \item Two algorithms with non-concurrent compaction
@@ -565,7 +565,7 @@ Application Worst Case Response Times
 \begin{columns}
 \begin{column}{0.5\textwidth}
 
-\color[RGB]{135,35,142}C4 \color{black}:
+\color[RGB]{135,35,142}C4\color{black}:
 \begin{itemize}
 \item Has shortest response times
 \item Maintains them for largest range of heap sizes
@@ -713,7 +713,7 @@ What happens to NIT objects?
 \linespace
 \linespace
 
-Lie to the compactor:
+Lie to the compactor
 \begin{itemize}
 \item Mirrored-to-space
 \item Zero-copy transplantation
@@ -741,7 +741,7 @@ Lie to the compactor:
 
 \frametitle{Testing Environment}
 
-Tested against the Pauseless Garbage Collector:
+Tested against the Pauseless Garbage Collector
 \begin{itemize}
 \item Ancestor of Collie
 \item Largely concurrent with some stop-the-world pauses
@@ -839,7 +839,6 @@ Performs concurrent relocation without barriers!
 \linespace
 \linespace
 \linespace
-\linespace
 
 \begin{center}
 \includegraphics[width=.85\textwidth]{Illustrations/gc_cycle_locator_relocation.png}
@@ -922,7 +921,7 @@ Main goal: safely access objects without worrying about relocation
 \linespace
 \linespace
 
-When relocation begins:
+When relocation begins
 \begin{itemize}
 \item GC threads attempt to relocate objects
 \begin{itemize}
@@ -942,7 +941,7 @@ When relocation begins:
 
 \frametitle{An Application Thread's Perspective}
 
-Process followed by an \color{red}{application thread}\color{black}{:}
+Process followed by an \color{red}{application thread}\color{black}
 \linespace
 
 \begin{columns}
@@ -977,7 +976,7 @@ Process followed by an \color{red}{application thread}\color{black}{:}
 
 \frametitle{Testing Environment}
 
-Implemented in the Garbage-First (G1) Garbage Collector:
+Implemented in the Garbage-First (G1) Garbage Collector
 \begin{itemize}
 \item Concurrent tracing and remapping
 \item Relocation requires stop-the-world pauses
@@ -993,7 +992,7 @@ Tested against the default G1 collector
 
 Standard JVM benchmarks used to test latency
 \begin{itemize}
-\item Improvements from concurrent relocation alone
+\item Improvements from solely concurrent relocation
 \item Feasibility of barrier-free relocation
 \end{itemize}
 
@@ -1021,14 +1020,12 @@ Average GC Pauses for Various Benchmarks
 \end{itemize}
 
 \linespace
-\linespace
 
 Concurrent relocation prioritizes application threads
 \begin{itemize}
 \item Most latency from host activities
 \end{itemize}
 
-\linespace
 \linespace
 
 Concurrent relocation without barriers is feasible
@@ -1054,7 +1051,7 @@ Average GC Pauses
 
 \frametitle{Breaking Down Barriers}
 
-Moving towards concurrent compaction without barriers:
+Moving towards concurrent compaction without barriers
 \begin{itemize}
 \item C4 - heavily relies on barriers
 \item Collie - barriers along with transactions
@@ -1064,7 +1061,7 @@ Moving towards concurrent compaction without barriers:
 \linespace
 \linespace
 
-No barriers are desirable as they add overheads
+No barriers are desirable as they add overhead
 
 \end{frame}
 
@@ -1082,9 +1079,9 @@ Different approaches to prioritizing GC vs application
 \linespace
 \linespace
 
-Tests for all show that concurrency improves latency
+All tests showed that concurrency can improve latency
 \begin{itemize}
-\item Focus used will depend on intended environment
+\item Approach used will depend on intended environment
 \end{itemize}
 
 \end{frame}
