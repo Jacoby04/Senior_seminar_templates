@@ -52,13 +52,13 @@
 
 % Delete this, if you do not want the table of contents to pop up at
 % the beginning of each subsection:
-%\AtBeginSection[]
-%{
-%  \begin{frame}<beamer>
-%    \frametitle{Outline}
-%    \tableofcontents[currentsection, hideothersubsections]
-%  \end{frame}
-%}
+\AtBeginSection[]
+{
+  \begin{frame}<beamer>
+    \frametitle{Outline}
+    \tableofcontents[currentsection, hideothersubsections]
+  \end{frame}
+}
 
 \begin{document}
 
@@ -361,7 +361,7 @@ Can have only partial concurrency
 \linespace
 \linespace
 
-Concurrent compaction
+Our focus: concurrent compaction
 \begin{itemize}
 \item Poses the most challenges
 \end{itemize}
@@ -402,11 +402,6 @@ Common assessment of concurrent collector performance
 \frametitle{Continuously Concurrent Compacting Collector (C4)}
 
 C4 is a full garbage collector
-
-\linespace
-\linespace
-
-\emph{Generational}: performs GC on "young" and "old" generations
 
 \linespace
 \linespace
