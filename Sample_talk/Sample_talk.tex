@@ -60,6 +60,14 @@
   \end{frame}
 }
 
+%\AtBeginSubsection[]
+%{
+%\begin{frame}<beamer>
+%    \frametitle{Outline}
+%    \tableofcontents[currentsection, currentsubsection]
+%  \end{frame}
+%}
+
 \begin{document}
 
 \begin{frame}
@@ -578,200 +586,200 @@ Worst Case Times
 
 
 
-\section[Collie]{Collie Collector}
-
-\begin{frame}
-
-\frametitle{Collie Garbage Collector}
-
-\begin{center}
-\includegraphics[width=.85\textwidth]{Illustrations/gc_cycle_locator_compaction.png}
-\end{center}
-
-\end{frame}
-
-
-
-\subsection*{Explanation}
-
-\begin{frame}
-
-\frametitle{Transactions}
-
-%Remember to emphasize the key point is interruptions will cause nothing to happen, or everything to.
-\emph{Transaction}: series of operations performed in an all-or-none manner
-
-\linespace
-\linespace
-
-Example: updating prices in a store for sales \\
-\begin{itemize}
-\item Update sale price
-\item Update store price
-\end{itemize}
-
-\linespace
-\linespace
-
-Protects data from interrupts
-
+%\section[Collie]{Collie Collector}
+%
+%\begin{frame}
+%
+%\frametitle{Collie Garbage Collector}
+%
+%\begin{center}
+%\includegraphics[width=.85\textwidth]{Illustrations/gc_cycle_locator_compaction.png}
+%\end{center}
+%
+%\end{frame}
+%
+%
+%
+%\subsection*{Explanation}
+%
+%\begin{frame}
+%
+%\frametitle{Transactions}
+%
+%%Remember to emphasize the key point is interruptions will cause nothing to happen, or everything to.
+%\emph{Transaction}: series of operations performed in an all-or-none manner
+%
 %\linespace
 %\linespace
 %
-%\emph{Transactional Memory}: allows code sections to run like transactions
+%Example: updating prices in a store for sales \\
 %\begin{itemize}
-%\item Memory used by the code is protected
+%\item Update sale price
+%\item Update store price
 %\end{itemize}
-
-\end{frame}
-
-\begin{frame}
-
-\frametitle{Transplantations}
-
-\emph{Transplantation}: relocating and remapping objects
-
-\linespace
-\linespace
-
-\begin{columns}
-\begin{column}{0.33\textwidth}
-
-Transaction:
-\begin{itemize}
-\item Start transaction
-%\item Check object
-\item Relocate object
-\item Remap references
-\item End Transaction
-\end{itemize}
-
-\end{column}
-\begin{column}{0.32\textwidth}
-
-$\xrightarrow{\text{Interrupted by application}}$
-
-\end{column}
-\begin{column}{0.3\textwidth}
-
-Mark object as \emph{non-individually transplantable} (NIT)
-
-\end{column}
-\end{columns}
-
-\end{frame}
-
-\begin{frame}
-%either cut talking about the details or mention that heap is virtual memory earlier.
-
-\frametitle{Leftovers}
-
-\begin{columns}
-\begin{column}{0.5\textwidth}
-What happens to NIT objects?
-
-\linespace
-\linespace
-
-Lie to the compactor
-\begin{itemize}
-\item Mirrored-to-space
-\item Zero-copy transplantation
-\end{itemize}
-
-\linespace
-\linespace
-
-\emph{Aborting Compactor}: no progress guarantees
-\end{column}
-\begin{column}{0.5\textwidth}
-
-\includegraphics[width=.95\textwidth]{Illustrations/collie_mirrored_rough.pdf}
-
-\end{column}
-\end{columns}
-
-\end{frame}
-
-
-
-\subsection*{Test Results}
-
-\begin{frame}
-
-\frametitle{Testing Environment}
-
-Tested against the Pauseless Garbage Collector
-\begin{itemize}
-\item Ancestor of Collie
-\item Largely concurrent with some stop-the-world pauses
-\item Also requires supportive hardware
-\end{itemize}
-
-\linespace
-\linespace
-
-Standard JVM benchmarks used to test latency
-\begin{itemize}
-\item Improvements from aborting nature and transactions
-\end{itemize}
-
-\end{frame}
-
-\begin{frame}
-
-\frametitle{Results}
-
-\only<3>{
-\begin{center}
-Minimum Mutator Utilization (MMU) Percentages \\for Various Time Windows\\
-\includegraphics[width=.65\textwidth]{Illustrations/collie_results.pdf}
-\end{center}
-}
-
-\only<1>{
-\begin{center}
-\includegraphics[width=.80\textwidth]{Illustrations/collie_mmu_explanation_1.png}
-\end{center}
-}
-
-\only<2>{
-\begin{center}
-\includegraphics[width=.80\textwidth]{Illustrations/collie_mmu_explanation_2.png}
-\end{center}
-}
-
-\only<4>{
-\begin{columns}
-\begin{column}{0.5\textwidth}
-
-\color{red}Collie \color{black}has higher MMU than \color{blue}Pauseless \color{black}across the board
-\begin{itemize}
-\item Application threads used more
-\end{itemize}
-
-\linespace
-\linespace
-
-Application threads have priority over GC threads
-
-\linespace
-\linespace
-
-Lends itself well to latency but no progress guarantees
-
-\end{column}
-
-\begin{column}{0.5\textwidth}
-\begin{center}
-MMU Percentages
-\includegraphics[width=.90\textwidth]{Illustrations/collie_results_2.pdf}
-\end{center}
-\end{column}
-\end{columns}
-}
-
-\end{frame}
+%
+%\linespace
+%\linespace
+%
+%Protects data from interrupts
+%
+%%\linespace
+%%\linespace
+%%
+%%\emph{Transactional Memory}: allows code sections to run like transactions
+%%\begin{itemize}
+%%\item Memory used by the code is protected
+%%\end{itemize}
+%
+%\end{frame}
+%
+%\begin{frame}
+%
+%\frametitle{Transplantations}
+%
+%\emph{Transplantation}: relocating and remapping objects
+%
+%\linespace
+%\linespace
+%
+%\begin{columns}
+%\begin{column}{0.33\textwidth}
+%
+%Transaction:
+%\begin{itemize}
+%\item Start transaction
+%%\item Check object
+%\item Relocate object
+%\item Remap references
+%\item End Transaction
+%\end{itemize}
+%
+%\end{column}
+%\begin{column}{0.32\textwidth}
+%
+%$\xrightarrow{\text{Interrupted by application}}$
+%
+%\end{column}
+%\begin{column}{0.3\textwidth}
+%
+%Mark object as \emph{non-individually transplantable} (NIT)
+%
+%\end{column}
+%\end{columns}
+%
+%\end{frame}
+%
+%\begin{frame}
+%%either cut talking about the details or mention that heap is virtual memory earlier.
+%
+%\frametitle{Leftovers}
+%
+%\begin{columns}
+%\begin{column}{0.5\textwidth}
+%What happens to NIT objects?
+%
+%\linespace
+%\linespace
+%
+%Lie to the compactor
+%\begin{itemize}
+%\item Mirrored-to-space
+%\item Zero-copy transplantation
+%\end{itemize}
+%
+%\linespace
+%\linespace
+%
+%\emph{Aborting Compactor}: no progress guarantees
+%\end{column}
+%\begin{column}{0.5\textwidth}
+%
+%\includegraphics[width=.95\textwidth]{Illustrations/collie_mirrored_rough.pdf}
+%
+%\end{column}
+%\end{columns}
+%
+%\end{frame}
+%
+%
+%
+%\subsection*{Test Results}
+%
+%\begin{frame}
+%
+%\frametitle{Testing Environment}
+%
+%Tested against the Pauseless Garbage Collector
+%\begin{itemize}
+%\item Ancestor of Collie
+%\item Largely concurrent with some stop-the-world pauses
+%\item Also requires supportive hardware
+%\end{itemize}
+%
+%\linespace
+%\linespace
+%
+%Standard JVM benchmarks used to test latency
+%\begin{itemize}
+%\item Improvements from aborting nature and transactions
+%\end{itemize}
+%
+%\end{frame}
+%
+%\begin{frame}
+%
+%\frametitle{Results}
+%
+%\only<3>{
+%\begin{center}
+%Minimum Mutator Utilization (MMU) Percentages \\for Various Time Windows\\
+%\includegraphics[width=.65\textwidth]{Illustrations/collie_results.pdf}
+%\end{center}
+%}
+%
+%\only<1>{
+%\begin{center}
+%\includegraphics[width=.80\textwidth]{Illustrations/collie_mmu_explanation_1.png}
+%\end{center}
+%}
+%
+%\only<2>{
+%\begin{center}
+%\includegraphics[width=.80\textwidth]{Illustrations/collie_mmu_explanation_2.png}
+%\end{center}
+%}
+%
+%\only<4>{
+%\begin{columns}
+%\begin{column}{0.5\textwidth}
+%
+%\color{red}Collie \color{black}has higher MMU than \color{blue}Pauseless \color{black}across the board
+%\begin{itemize}
+%\item Application threads used more
+%\end{itemize}
+%
+%\linespace
+%\linespace
+%
+%Application threads have priority over GC threads
+%
+%\linespace
+%\linespace
+%
+%Lends itself well to latency but no progress guarantees
+%
+%\end{column}
+%
+%\begin{column}{0.5\textwidth}
+%\begin{center}
+%MMU Percentages
+%\includegraphics[width=.90\textwidth]{Illustrations/collie_results_2.pdf}
+%\end{center}
+%\end{column}
+%\end{columns}
+%}
+%
+%\end{frame}
 
 
 
