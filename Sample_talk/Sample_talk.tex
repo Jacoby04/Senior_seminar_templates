@@ -1009,34 +1009,46 @@ Average GC Pauses
 
 \section[Conclusions]{Conclusions}
 
+%\begin{frame}
+%
+%\frametitle{Breaking Down Barriers}
+%
+%Moving toward concurrent compaction without barriers
+%\begin{itemize}
+%\item C4 - heavily relies on barriers
+%\item FPP - barrier-free
+%\end{itemize}
+%
+%\linespace
+%\linespace
+%
+%No barriers are desirable as they add overhead
+%
+%\end{frame}
+
 \begin{frame}
 
-\frametitle{Breaking Down Barriers}
+\frametitle{Conclusions}
 
-Moving towards concurrent compaction without barriers
+Moving toward concurrent compaction without barriers
 \begin{itemize}
 \item C4 - heavily relies on barriers
-\item Collie - barriers along with transactions
 \item FPP - barrier-free
 \end{itemize}
 
 \linespace
 \linespace
 
-No barriers are desirable as they add overhead
-
-\end{frame}
-
-\begin{frame}
-
-\frametitle{Priorities}
-
 Different approaches to prioritizing GC vs application
 \begin{itemize}
 \item C4 - focus on GC
-\item Collie - focus on application
-\item FPP - mixed but more focused on application
+\item FPP - focus on application
 \end{itemize}
+
+\linespace
+\linespace
+
+Tough to compare them directly
 
 \linespace
 \linespace
