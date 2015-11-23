@@ -876,7 +876,7 @@ Main goal: safely access objects without worrying about relocation
 
 \begin{frame}
 
-\frametitle{The Blame Game}
+\frametitle{Concurrent Relocation through Blame}
 
 %If time allows and feedback demands, could break this into multiple slides to not have so much text
 %on one as well as to refer back to the example and characters more.
@@ -889,17 +889,14 @@ Main goal: safely access objects without worrying about relocation
 \linespace
 \linespace
 
-When relocation begins
+Relocation with FPP
 \begin{itemize}
 \item GC threads attempt to relocate objects
+\item Impeding application threads are blamed
 \begin{itemize}
-\item No blame passed!
+\item When finished with the object, try to move
 \end{itemize}
-\item GC threads try again
-\begin{itemize}
-\item Blame interrupting threads
-\end{itemize}
-\item Blame passed to interrupting threads until relocation succeeds
+\item Blame passed to impeding threads until relocation succeeds
 \end{itemize}
 
 \end{frame}
