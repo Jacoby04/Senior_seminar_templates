@@ -153,6 +153,7 @@ GC requires processing resources
 \linespace
 
 When only one processor is used, collectors \emph{stop the world}
+% Need to get across that this can still be ueful.
 
 \linespace
 \linespace
@@ -227,7 +228,12 @@ Objects are stored on the heap
 
 \frametitle{GC Cycle}
 
-\emph{Set condemnation} and \emph{reclamation}
+\emph{Set Condemnation}: determine which objects are garbage 
+
+\linespace
+\linespace
+
+\emph{Reclamation}: take memory back from garbage
 
 \linespace
 \linespace
@@ -240,11 +246,14 @@ Set condemnation done by \emph{tracing}
 \linespace
 \linespace
 
-Reclamation done by labeling memory as free
+%Make sure to specify here that the collector does this.
+For reclamation, memory labeled as free
 
 \end{frame}
 
 \begin{frame}
+
+% Here's a word that looks familiar...
 
 \frametitle{Compaction}
 
@@ -265,9 +274,12 @@ Two new steps replace reclamation
 
 \linespace
 
+%Make sure to point out that this is the heap.
 \begin{center}
 \includegraphics[width=.60\textwidth]{Illustrations/bg_compaction.pdf}
 \end{center}
+
+% The compaction process will be our focus, but we want it done concurrently. In order to know what that means though, we need to understand a bit about parallel processing.
 
 \end{frame}
 
