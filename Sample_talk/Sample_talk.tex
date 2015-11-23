@@ -827,7 +827,7 @@ Worst Case Response Times
 
 \frametitle{Hazard Pointers}
 
-Point to objects an application thread is accessing
+\emph{Hazard Pointers}: values that show which objects an application thread is accessing
 \begin{itemize}
 \item \emph{Pin} the object
 \end{itemize}
@@ -836,11 +836,6 @@ Point to objects an application thread is accessing
 \linespace
 
 Inform other threads of objects that are in use
-
-\linespace
-\linespace
-
-Are maintained by the thread they belong to
 
 \linespace
 \linespace
@@ -910,36 +905,36 @@ When relocation begins
 \end{frame}
 
 
-\begin{frame}
-
-\frametitle{An Application Thread's Perspective}
-
-Process followed by an \color{red}{application thread}\color{black}
-\linespace
-
-\begin{columns}
-\begin{column}{0.5\textwidth}
-\begin{enumerate}
-\item Pin object with a hazard pointer
-\item Check if the object has been moved already
-\item Use the object without worry
-\item Unpin the object when done
-\item If blamed, try to relocate the object
-\end{enumerate}
-\end{column}
-
-\begin{column}{0.5\textwidth}
-\begin{enumerate}
-\item Get a coffee cup
-\item Check that the coffee is still in the room
-\item Drink all the coffee you want
-\item Discard your coffee cup
-\item If blamed, try to move the coffee
-\end{enumerate}
-\end{column}
-\end{columns}
-
-\end{frame}
+%\begin{frame}
+%
+%\frametitle{An Application Thread's Perspective}
+%
+%Process followed by an \color{red}{application thread}\color{black}
+%\linespace
+%
+%\begin{columns}
+%\begin{column}{0.5\textwidth}
+%\begin{enumerate}
+%\item Pin object with a hazard pointer
+%\item Check if the object has been moved already
+%\item Use the object without worry
+%\item Unpin the object when done
+%\item If blamed, try to relocate the object
+%\end{enumerate}
+%\end{column}
+%
+%\begin{column}{0.5\textwidth}
+%\begin{enumerate}
+%\item Get a coffee cup
+%\item Check that the coffee is still in the room
+%\item Drink all the coffee you want
+%\item Discard your coffee cup
+%\item If blamed, try to move the coffee
+%\end{enumerate}
+%\end{column}
+%\end{columns}
+%
+%\end{frame}
 
 
 
