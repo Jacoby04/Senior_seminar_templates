@@ -456,14 +456,14 @@ Read barrier protects from-space from application threads
 \linespace
 
 Rule: application can only use moved objects
-
-\linespace
-\linespace
-
-If a thread breaks this, the barrier will correct the situation
 \begin{itemize}
-\item This facilitates concurrent relocation and remapping
+\item If a thread breaks this, the barrier will correct the situation
 \end{itemize}
+
+\linespace
+\linespace
+
+This facilitates concurrent relocation and remapping
 
 \end{frame}
 
