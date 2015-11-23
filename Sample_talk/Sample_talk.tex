@@ -615,13 +615,13 @@ Example: updating prices in a store for sales \\
 
 Protects data from interrupts
 
-\linespace
-\linespace
-
-\emph{Transactional Memory}: allows code sections to run like transactions
-\begin{itemize}
-\item Memory used by the code is protected
-\end{itemize}
+%\linespace
+%\linespace
+%
+%\emph{Transactional Memory}: allows code sections to run like transactions
+%\begin{itemize}
+%\item Memory used by the code is protected
+%\end{itemize}
 
 \end{frame}
 
@@ -640,7 +640,7 @@ Protects data from interrupts
 Transaction:
 \begin{itemize}
 \item Start transaction
-\item Check object
+%\item Check object
 \item Relocate object
 \item Remap references
 \item End Transaction
@@ -722,20 +722,20 @@ Standard JVM benchmarks used to test latency
 
 \frametitle{Results}
 
-\only<1>{
+\only<3>{
 \begin{center}
 Minimum Mutator Utilization (MMU) Percentages \\for Various Time Windows\\
 \includegraphics[width=.65\textwidth]{Illustrations/collie_results.pdf}
 \end{center}
 }
 
-\only<2>{
+\only<1>{
 \begin{center}
 \includegraphics[width=.80\textwidth]{Illustrations/collie_mmu_explanation_1.png}
 \end{center}
 }
 
-\only<3>{
+\only<2>{
 \begin{center}
 \includegraphics[width=.80\textwidth]{Illustrations/collie_mmu_explanation_2.png}
 \end{center}
