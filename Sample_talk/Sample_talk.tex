@@ -450,6 +450,7 @@ Common assessment of concurrent collector performance
 
 \frametitle{Loaded Value Barrier (LVB)}
 
+%Mention that this is during compaction!
 Read barrier protects from-space from application threads
 
 \linespace
@@ -503,7 +504,7 @@ How application threads cope
 \linespace
 \linespace
 
-In all cases, correct the source reference after
+In all cases, correct the reference after
 
 }
 
@@ -517,7 +518,7 @@ In all cases, correct the source reference after
 \emph{Lazy Remapping}: application threads update references through LVB
 \begin{itemize}
 \item "If the object was moved, find it"
-\item Correct the source reference after
+\item Correct the reference after
 \end{itemize}
 
 \linespace
@@ -550,18 +551,14 @@ Remapping combined with tracing
 
 Tested against three garbage collectors
 \begin{itemize}
-\item Non-generational version of C4
+\item Modified version of C4
 \item Two algorithms with non-concurrent compaction
 \end{itemize}
 
 \linespace
 \linespace
 
-Custom benchmarks used to test latency
-\begin{itemize}
-\item Improvement from a generational collector
-\item Improvement from concurrent compaction
-\end{itemize}
+Shows improvement from concurrent compaction
 
 \end{frame}
 
@@ -570,20 +567,20 @@ Custom benchmarks used to test latency
 \frametitle{Results}
 
 %Show the figures from the paper here and start talking about them
-\only<1>{
-\begin{center}
-Application Worst Case Response Times
-\includegraphics[width=.80\textwidth]{Illustrations/c4_results.pdf}
-\end{center}
-}
+%\only<1>{
+%\begin{center}
+%Application Worst Case Response Times
+%\includegraphics[width=.80\textwidth]{Illustrations/c4_results.pdf}
+%\end{center}
+%}
 
-\only<2>{
+%\only<2>{
 \begin{columns}
 \begin{column}{0.5\textwidth}
 
 \color[RGB]{135,35,142}C4\color{black}:
 \begin{itemize}
-\item Has shortest response times
+\item Has fastest response times
 \item Maintains them for largest range of heap sizes
 \item Least impact on application
 \end{itemize}
@@ -602,12 +599,12 @@ Still has best application responsiveness
 
 \begin{column}{0.5\textwidth}
 \begin{center}
-Worst Case Times
+Worst Case Response Times
 \includegraphics[width=.89\textwidth]{Illustrations/c4_results.pdf}
 \end{center}
 \end{column}
 \end{columns}
-}
+%}
 
 \end{frame}
 
