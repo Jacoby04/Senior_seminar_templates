@@ -291,9 +291,12 @@ Two new steps replace reclamation
 
 \frametitle{Processes and Threads}
 
+\begin{columns}
+\begin{column}{0.7\textwidth}
+
 \emph{Process}: instance of a program being run
 \begin{itemize}
-\item Examples: Java program, garbage collection
+\item Examples: Java program, garbage collector, word processor
 \end{itemize}
 
 \linespace
@@ -302,13 +305,24 @@ Two new steps replace reclamation
 \emph{Thread}: component of a process
 \begin{itemize}
 \item Performs portion of process instructions %Mention they are in order.
-\item Each has its own stack
 \end{itemize}
 
 \linespace
 \linespace
 
 \emph{Parallel Processing}: running multiple threads simultaneously
+
+\end{column}
+
+\begin{column}{0.30\textwidth}
+
+\begin{center}
+\includegraphics[width=1.0\textwidth]{Illustrations/multithreading.png} \\
+{\small \url{wikipedia.org/wiki/Thread_\%28computing\%29}}
+\end{center}
+
+\end{column}
+\end{columns}
 
 \end{frame}
 
