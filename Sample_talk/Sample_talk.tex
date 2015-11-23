@@ -401,22 +401,6 @@ Common assessment of concurrent collector performance
 
 \frametitle{Continuously Concurrent Compacting Collector (C4)}
 
-C4 is a full garbage collector
-
-\linespace
-\linespace
-
-Intended for large server environments
-
-\linespace
-\linespace
-
-Commercially available through Azul Systems
-
-\linespace
-\linespace
-\linespace
-
 \begin{center}
 \includegraphics[width=.85\textwidth]{Illustrations/gc_cycle_locator_compaction.png}
 \end{center}
@@ -599,27 +583,6 @@ Worst Case Times
 \begin{frame}
 
 \frametitle{Collie Garbage Collector}
-
-Collie is a full garbage collector
-\begin{itemize}
-\item Uses most techniques from C4
-\end{itemize}
-
-\linespace
-
-Also intended for server environments
-
-\linespace
-
-Uses transactional memory for synchronization
-
-\linespace
-
-Major focus on improving latency
-
-\linespace
-\linespace
-\linespace
 
 \begin{center}
 \includegraphics[width=.85\textwidth]{Illustrations/gc_cycle_locator_compaction.png}
@@ -817,25 +780,6 @@ MMU Percentages
 \begin{frame}
 
 \frametitle{Field Pinning Protocol (FPP)}
-
-Solely describes concurrent relocation
-
-\linespace
-\linespace
-
-Implements into a host garbage collector
-\begin{itemize}
-\item Designed for flexibility
-\end{itemize}
-
-\linespace
-\linespace
-
-Performs concurrent relocation without barriers!
-
-\linespace
-\linespace
-\linespace
 
 \begin{center}
 \includegraphics[width=.85\textwidth]{Illustrations/gc_cycle_locator_relocation.png}
