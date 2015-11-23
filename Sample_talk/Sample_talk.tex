@@ -558,7 +558,7 @@ Tested against three garbage collectors
 \linespace
 \linespace
 
-Shows improvement from concurrent compaction
+Improvements from concurrent compaction
 
 \end{frame}
 
@@ -588,7 +588,7 @@ Shows improvement from concurrent compaction
 \linespace
 \linespace
 
-Priority given to GC process
+Priority given to GC threads
 
 \linespace
 \linespace
@@ -955,11 +955,7 @@ Tested against the default G1 collector
 \linespace
 \linespace
 
-Standard JVM benchmarks used to test latency
-\begin{itemize}
-\item Improvements from solely concurrent relocation
-\item Feasibility of barrier-free relocation
-\end{itemize}
+Improvements from solely concurrent relocation
 
 \end{frame}
 
@@ -968,14 +964,14 @@ Standard JVM benchmarks used to test latency
 \frametitle{Results}
 
 %Show the figures from the paper here and start talking about them
-\only<1>{
-\begin{center}
-Average GC Pauses for Various Benchmarks
-\includegraphics[width=.80\textwidth]{Illustrations/fpp_results.pdf}
-\end{center}
-}
+%\only<1>{
+%\begin{center}
+%Average GC Pauses for Various Benchmarks
+%\includegraphics[width=.80\textwidth]{Illustrations/fpp_results.pdf}
+%\end{center}
+%}
 
-\only<2>{
+%\only<2>{
 \begin{columns}
 \begin{column}{0.5\textwidth}
 
@@ -986,10 +982,11 @@ Average GC Pauses for Various Benchmarks
 
 \linespace
 
-Concurrent relocation prioritizes application threads
-\begin{itemize}
-\item Most latency from host activities
-\end{itemize}
+Most latency from host activities
+
+\linespace
+
+Priority given to application threads
 
 \linespace
 
@@ -1004,7 +1001,7 @@ Average GC Pauses
 \end{center}
 \end{column}
 \end{columns}
-}
+%}
 
 \end{frame}
 
