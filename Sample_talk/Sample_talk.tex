@@ -199,19 +199,19 @@ Use parallel processing to solve!
 
 \frametitle{Memory}
 
-\emph{Heap}: contiguous memory location for storing application objects
-
-\linespace
-\linespace
-
-\emph{Stack}: memory the application directly has access to
-
-\linespace
-\linespace
-
-Objects are stored on the heap
+% Mention this is the shared memory for the JVM process and all its tasks.
+\emph{Heap}: contiguous memory location used by the JVM
 \begin{itemize}
-\item Application accesses via \emph{references}
+\item Objects are stored here
+\end{itemize}
+
+\linespace
+\linespace
+
+% Mention it has more purposes, but for our sake, it's a way to access the heap.
+\emph{Stack}: memory for short-lived, method-specific values
+\begin{itemize}
+\item Stores references to objects for the application
 \end{itemize}
 
 \linespace
