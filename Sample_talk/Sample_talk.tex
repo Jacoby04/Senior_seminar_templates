@@ -232,37 +232,27 @@ Use parallel processing to solve!
 \linespace
 \linespace
 
-\emph{Reclamation}: take memory back from garbage
+\emph{Compaction}: reclaim memory while fighting heap fragmentation
 
 \linespace
 \linespace
+\linespace
 
+% Don't mention root-level, global objects. Just say objects reached by chaining references from main.
 Set condemnation done by \emph{tracing}
 \begin{itemize}
 \item Detect all reachable objects by chaining references
 \end{itemize}
 
-\linespace
-\linespace
-
-%Make sure to specify here that the collector does this.
-For reclamation, memory labeled as free
-
 \end{frame}
 
 \begin{frame}
-
-% Here's a word that looks familiar...
 
 \frametitle{Compaction}
 
 % Need to mention here how to-space and from-space can actually have some areas of memory in common. They are not always distinct places.
 
-\emph{Compaction}: moving fragmented memory into a contiguous region
-
-\linespace
-
-Two new steps replace reclamation
+Consists of two steps
 \begin{itemize}
 \item \emph{Relocation}: move objects 
 \begin{itemize}
