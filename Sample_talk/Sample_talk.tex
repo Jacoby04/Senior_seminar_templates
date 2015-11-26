@@ -873,6 +873,7 @@ Main goal: safely access objects without worrying about relocation
 	\only<3>{\includegraphics[width=.95\textwidth]{Illustrations/coffeeLineNew3.png}}
 	\only<4>{\includegraphics[width=.95\textwidth]{Illustrations/coffeeLineNew4.png}}
 	\only<5>{\includegraphics[width=.95\textwidth]{Illustrations/coffeeLineNew5.png}}
+	\only<6>{\includegraphics[width=.95\textwidth]{Illustrations/coffeeLineNew6.png}}
 \end{column}
 \end{columns}
 
@@ -881,12 +882,12 @@ Main goal: safely access objects without worrying about relocation
 
 \begin{frame}
 
-\frametitle{Concurrent Relocation through Blame}
+\frametitle{Concurrent Relocation and Responsibility}
 
 %If time allows and feedback demands, could break this into multiple slides to not have so much text
 %on one as well as to refer back to the example and characters more.
 
-\emph{Blamed Thread}: responsible for relocating an object
+\emph{Responsibility}: required to try relocating an object
 \begin{itemize}
 \item Comes from hazard pointers (coffee cups) impeding copying
 \end{itemize}
@@ -897,11 +898,11 @@ Main goal: safely access objects without worrying about relocation
 Relocation with FPP
 \begin{itemize}
 \item GC threads attempt to relocate objects
-\item Impeding application threads are blamed
+\item Impeding application threads are made responsible
 \begin{itemize}
 \item When finished with the object, try to move
 \end{itemize}
-\item Blame passed to impeding threads until relocation succeeds
+\item Responsibility passed to impeding threads until relocation succeeds
 \end{itemize}
 
 \end{frame}
