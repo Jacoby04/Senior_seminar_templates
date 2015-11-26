@@ -324,8 +324,11 @@ Consists of two steps
 \only<1>{
 
 \begin{columns}
-\begin{column}{0.65\textwidth}
-Threads do not communicate
+\begin{column}{0.60\textwidth}
+Threads do not coordinate automatically \\
+\begin{itemize}
+\item Independent instructions!
+\end{itemize}
 
 \linespace
 \linespace
@@ -342,9 +345,9 @@ Poses new challenges
 Need to keep threads synchronized
 \end{column}
 
-\begin{column}{0.3\textwidth}
+\begin{column}{0.4\textwidth}
 
-\includegraphics[width=1.0\textwidth]{Illustrations/multithreading.png}
+\includegraphics[width=1.0\textwidth]{Illustrations/sync_issue_example.png}
 
 \end{column}
 \end{columns}
@@ -353,6 +356,7 @@ Need to keep threads synchronized
 
 \only<2>{
 
+% DO NOT do the traffic example. Wastes time.
 \emph{Read Barrier}: instructions to run before a thread accesses memory
 
 \linespace
