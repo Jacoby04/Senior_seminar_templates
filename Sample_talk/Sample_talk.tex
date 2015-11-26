@@ -441,7 +441,11 @@ Many different ways to measure
 \frametitle{Loaded Value Barrier (LVB)}
 
 %Mention that this is during compaction!
+% REFRESHER ON FROM AND TO SPACE HERE!!!
 Read barrier protects from-space from application threads
+\begin{itemize}
+\item From-space: where objects were located before moving
+\end{itemize}
 
 \linespace
 \linespace
@@ -484,7 +488,7 @@ All references point to from-space!
 
 \only<2>{
 
-How application threads cope
+LVB instructions for applications threads
 \begin{itemize}
 \item If the object was moved, find it
 \item If the object is being moved, wait
