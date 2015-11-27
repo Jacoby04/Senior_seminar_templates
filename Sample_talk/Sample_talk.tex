@@ -528,7 +528,7 @@ Combine remapping with next tracing phase
 \only<2>{
 Remapping combined with tracing
 \begin{center}
-\includegraphics[width=.9\textwidth]{Illustrations/c4Mapping_rough_figure_4.pdf}
+\includegraphics[width=.9\textwidth]{Illustrations/c4Mapping_rough_figure_5.pdf}
 \end{center}
 }
 
@@ -678,7 +678,7 @@ Main goal: safely access objects without worrying about relocation
 %If time allows and feedback demands, could break this into multiple slides to not have so much text
 %on one as well as to refer back to the example and characters more.
 
-\emph{Responsibility}: required to try relocating an object
+\emph{Responsibility}: thread required to try relocating an object
 \begin{itemize}
 \item Comes from hazard pointers (coffee cups) impeding copying
 \end{itemize}
@@ -731,7 +731,7 @@ Improvements from solely concurrent relocation
 \begin{columns}
 \begin{column}{0.5\textwidth}
 
-\color{red}G1 with FPP \color{black}on average 50\% shorter pauses than \color{blue}standard G1\color{black}
+\color{red}G1 with FPP \color{black}on average 50\% shorter delays than \color{blue}standard G1\color{black}
 \begin{itemize}
 \item Less impact on application thread performance
 \end{itemize}
@@ -754,7 +754,7 @@ Concurrent relocation without barriers is feasible
 
 % EXPLAIN WHAT IS ON THIS TABLE BETTER. DON'T TALK ABOUT STUFF THAT ISN'T ON HERE UNLESS IT'S NEEDED.
 \begin{center}
-Average GC Pauses
+Average GC Delays
 \includegraphics[width=.90\textwidth]{Illustrations/fpp_results_2.pdf}
 \end{center}
 \end{column}
