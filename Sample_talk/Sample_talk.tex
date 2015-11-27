@@ -333,7 +333,6 @@ Threads do not coordinate automatically \\
 \linespace
 \linespace
 
-% Possibly beef up this example later.
 Poses new challenges
 \begin{itemize}
 \item Example: losing object modifications
@@ -560,15 +559,6 @@ Improvements from concurrent compaction
 
 \frametitle{Results}
 
-%Show the figures from the paper here and start talking about them
-%\only<1>{
-%\begin{center}
-%Application Worst Case Response Times
-%\includegraphics[width=.80\textwidth]{Illustrations/c4_results.pdf}
-%\end{center}
-%}
-
-%\only<2>{
 \begin{columns}
 \begin{column}{0.5\textwidth}
 
@@ -598,206 +588,8 @@ Worst Case Response Times
 \end{center}
 \end{column}
 \end{columns}
-%}
 
 \end{frame}
-
-
-
-%\section[Collie]{Collie Collector}
-%
-%\begin{frame}
-%
-%\frametitle{Collie Garbage Collector}
-%
-%\begin{center}
-%\includegraphics[width=.85\textwidth]{Illustrations/gc_cycle_locator_compaction.png}
-%\end{center}
-%
-%\end{frame}
-%
-%
-%
-%\subsection*{Explanation}
-%
-%\begin{frame}
-%
-%\frametitle{Transactions}
-%
-%%Remember to emphasize the key point is interruptions will cause nothing to happen, or everything to.
-%\emph{Transaction}: series of operations performed in an all-or-none manner
-%
-%\linespace
-%\linespace
-%
-%Example: updating prices in a store for sales \\
-%\begin{itemize}
-%\item Update sale price
-%\item Update store price
-%\end{itemize}
-%
-%\linespace
-%\linespace
-%
-%Protects data from interrupts
-%
-%%\linespace
-%%\linespace
-%%
-%%\emph{Transactional Memory}: allows code sections to run like transactions
-%%\begin{itemize}
-%%\item Memory used by the code is protected
-%%\end{itemize}
-%
-%\end{frame}
-%
-%\begin{frame}
-%
-%\frametitle{Transplantations}
-%
-%\emph{Transplantation}: relocating and remapping objects
-%
-%\linespace
-%\linespace
-%
-%\begin{columns}
-%\begin{column}{0.33\textwidth}
-%
-%Transaction:
-%\begin{itemize}
-%\item Start transaction
-%%\item Check object
-%\item Relocate object
-%\item Remap references
-%\item End Transaction
-%\end{itemize}
-%
-%\end{column}
-%\begin{column}{0.32\textwidth}
-%
-%$\xrightarrow{\text{Interrupted by application}}$
-%
-%\end{column}
-%\begin{column}{0.3\textwidth}
-%
-%Mark object as \emph{non-individually transplantable} (NIT)
-%
-%\end{column}
-%\end{columns}
-%
-%\end{frame}
-%
-%\begin{frame}
-%%either cut talking about the details or mention that heap is virtual memory earlier.
-%
-%\frametitle{Leftovers}
-%
-%\begin{columns}
-%\begin{column}{0.5\textwidth}
-%What happens to NIT objects?
-%
-%\linespace
-%\linespace
-%
-%Lie to the compactor
-%\begin{itemize}
-%\item Mirrored-to-space
-%\item Zero-copy transplantation
-%\end{itemize}
-%
-%\linespace
-%\linespace
-%
-%\emph{Aborting Compactor}: no progress guarantees
-%\end{column}
-%\begin{column}{0.5\textwidth}
-%
-%\includegraphics[width=.95\textwidth]{Illustrations/collie_mirrored_rough.pdf}
-%
-%\end{column}
-%\end{columns}
-%
-%\end{frame}
-%
-%
-%
-%\subsection*{Test Results}
-%
-%\begin{frame}
-%
-%\frametitle{Testing Environment}
-%
-%Tested against the Pauseless Garbage Collector
-%\begin{itemize}
-%\item Ancestor of Collie
-%\item Largely concurrent with some stop-the-world pauses
-%\item Also requires supportive hardware
-%\end{itemize}
-%
-%\linespace
-%\linespace
-%
-%Standard JVM benchmarks used to test latency
-%\begin{itemize}
-%\item Improvements from aborting nature and transactions
-%\end{itemize}
-%
-%\end{frame}
-%
-%\begin{frame}
-%
-%\frametitle{Results}
-%
-%\only<3>{
-%\begin{center}
-%Minimum Mutator Utilization (MMU) Percentages \\for Various Time Windows\\
-%\includegraphics[width=.65\textwidth]{Illustrations/collie_results.pdf}
-%\end{center}
-%}
-%
-%\only<1>{
-%\begin{center}
-%\includegraphics[width=.80\textwidth]{Illustrations/collie_mmu_explanation_1.png}
-%\end{center}
-%}
-%
-%\only<2>{
-%\begin{center}
-%\includegraphics[width=.80\textwidth]{Illustrations/collie_mmu_explanation_2.png}
-%\end{center}
-%}
-%
-%\only<4>{
-%\begin{columns}
-%\begin{column}{0.5\textwidth}
-%
-%\color{red}Collie \color{black}has higher MMU than \color{blue}Pauseless \color{black}across the board
-%\begin{itemize}
-%\item Application threads used more
-%\end{itemize}
-%
-%\linespace
-%\linespace
-%
-%Application threads have priority over GC threads
-%
-%\linespace
-%\linespace
-%
-%Lends itself well to latency but no progress guarantees
-%
-%\end{column}
-%
-%\begin{column}{0.5\textwidth}
-%\begin{center}
-%MMU Percentages
-%\includegraphics[width=.90\textwidth]{Illustrations/collie_results_2.pdf}
-%\end{center}
-%\end{column}
-%\end{columns}
-%}
-%
-%\end{frame}
 
 
 
@@ -847,9 +639,6 @@ Inform other threads of objects that are in use
 
 Main goal: safely access objects without worrying about relocation
 
-%\includegraphics[width=.95\textwidth]{Illustrations/FPP_HP_Illustration.png}
-
-
 \end{frame}
 
 
@@ -874,6 +663,8 @@ Main goal: safely access objects without worrying about relocation
 	\only<4>{\includegraphics[width=.95\textwidth]{Illustrations/coffeeLineNew4.png}}
 	\only<5>{\includegraphics[width=.95\textwidth]{Illustrations/coffeeLineNew5.png}}
 	\only<6>{\includegraphics[width=.95\textwidth]{Illustrations/coffeeLineNew6.png}}
+	%If anyone asks how this is bounded, it's because threads consume their blame atomically,
+	%so a thread gets rid of all its blame at once.
 \end{column}
 \end{columns}
 
@@ -908,38 +699,6 @@ Relocation with FPP
 \end{frame}
 
 
-%\begin{frame}
-%
-%\frametitle{An Application Thread's Perspective}
-%
-%Process followed by an \color{red}{application thread}\color{black}
-%\linespace
-%
-%\begin{columns}
-%\begin{column}{0.5\textwidth}
-%\begin{enumerate}
-%\item Pin object with a hazard pointer
-%\item Check if the object has been moved already
-%\item Use the object without worry
-%\item Unpin the object when done
-%\item If blamed, try to relocate the object
-%\end{enumerate}
-%\end{column}
-%
-%\begin{column}{0.5\textwidth}
-%\begin{enumerate}
-%\item Get a coffee cup
-%\item Check that the coffee is still in the room
-%\item Drink all the coffee you want
-%\item Discard your coffee cup
-%\item If blamed, try to move the coffee
-%\end{enumerate}
-%\end{column}
-%\end{columns}
-%
-%\end{frame}
-
-
 
 \subsection*{Test Results}
 
@@ -969,15 +728,6 @@ Improvements from solely concurrent relocation
 
 \frametitle{Results}
 
-%Show the figures from the paper here and start talking about them
-%\only<1>{
-%\begin{center}
-%Average GC Pauses for Various Benchmarks
-%\includegraphics[width=.80\textwidth]{Illustrations/fpp_results.pdf}
-%\end{center}
-%}
-
-%\only<2>{
 \begin{columns}
 \begin{column}{0.5\textwidth}
 
@@ -1009,30 +759,12 @@ Average GC Pauses
 \end{center}
 \end{column}
 \end{columns}
-%}
 
 \end{frame}
 
 
 
 \section[Conclusions]{Conclusions}
-
-%\begin{frame}
-%
-%\frametitle{Breaking Down Barriers}
-%
-%Moving toward concurrent compaction without barriers
-%\begin{itemize}
-%\item C4 - heavily relies on barriers
-%\item FPP - barrier-free
-%\end{itemize}
-%
-%\linespace
-%\linespace
-%
-%No barriers are desirable as they add overhead
-%
-%\end{frame}
 
 \begin{frame}
 
@@ -1091,27 +823,6 @@ All tests showed that concurrency can improve latency
 
 \begin{frame} 
 	\frametitle{References} 
-	
-%	\begin{thebibliography}{lskdjf}
-%	
-%	\bibitem{McPhee:2009:gecco}
-%N.~F. McPhee, E.~Crane, S.~Lahr, and R.~Poli.
-%\newblock Developmental Plasticity in Linear Genetic Programming.
-%\newblock In G\"unther Raidl, \emph{et al}, editors, {\em GECCO '09}, pages 1019--1026, Montr\'eal, Qu\'ebec, Canada, 2009.
-%	
-%	\bibitem{citeulike:3452411}
-%	R.~Poli and N.~McPhee.
-%\newblock A linear estimation-of-distribution {GP} system.
-%\newblock In M.~O'Neill, \emph{et al}, editors, {\em EuroGP 2008}, volume
-%  4971 of {\em LNCS}, pages 206--217, Naples,
-%  26-28 Mar. 2008. Springer.
-%  
-%  	\end{thebibliography}
-%	
-%	\linespace
-%	\begin{center}
-%	See the GECCO '09 paper for additional references.
-%	\end{center}
 
 \begin{thebibliography}{lskdjf}
 
