@@ -395,27 +395,27 @@ Our focus: concurrent compaction!
 
 \end{frame}
 
-\begin{frame}
-
-\frametitle{Latency}
-
-\emph{Latency}: measure of negative impact from GC on application threads
-\begin{itemize}
-\item Decrease in time spent processing application due to GC
-\end{itemize}
-
-\linespace
-\linespace
-
-With concurrent GC, resources split between GC and application
-
-\linespace
-\linespace
-
-Many different ways to measure
-
-
-\end{frame}
+%\begin{frame}
+%
+%\frametitle{Latency}
+%
+%\emph{Latency}: measure of negative impact from GC on application threads
+%\begin{itemize}
+%\item Decrease in time spent processing application due to GC
+%\end{itemize}
+%
+%\linespace
+%\linespace
+%
+%With concurrent GC, resources split between GC and application
+%
+%\linespace
+%\linespace
+%
+%Many different ways to measure
+%
+%
+%\end{frame}
 
 
 
@@ -562,22 +562,14 @@ Improvements from concurrent compaction
 \begin{columns}
 \begin{column}{0.5\textwidth}
 
+%When explaining the test results, explain the intended environment is large server software.
+
 \color[RGB]{135,35,142}C4\color{black}:
 \begin{itemize}
-\item Has fastest response times
+\item Fastest response times
 \item Maintains them for largest range of heap sizes
 \item Least impact on application
 \end{itemize}
-
-\linespace
-\linespace
-
-Priority given to GC threads
-
-\linespace
-\linespace
-
-Still has best application responsiveness
 
 \end{column}
 
@@ -604,6 +596,8 @@ Implemented into a \emph{host} GC algorithm
 \linespace
 \linespace
 
+%Mention that it also differs in that since it is designed for a host gc algorithm,
+%it is designed with less-specialized jvm environments in mind (not just server)
 Differs from C4 - barrier-free!
 
 \linespace
@@ -737,16 +731,9 @@ Improvements from solely concurrent relocation
 \end{itemize}
 
 \linespace
-
-Most latency from host activities
-
 \linespace
 
-Priority given to application threads
-
-\linespace
-
-Concurrent relocation without barriers is feasible
+Concurrent relocation without barriers is feasible!
 
 \end{column}
 
