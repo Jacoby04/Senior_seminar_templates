@@ -211,7 +211,7 @@ Use parallel processing to solve!
 % Mention it has more purposes, but for our sake, it's a way to access the heap.
 \emph{Stack}: memory for short-lived, method-specific values
 \begin{itemize}
-\item Stores references to objects for the application
+\item Stores \emph{references} to objects for the application
 \end{itemize}
 
 \linespace
@@ -728,7 +728,7 @@ Improvements from solely concurrent relocation
 
 \color{red}G1 with FPP \color{black}on average 50\% shorter delays than \color{blue}standard G1\color{black}
 \begin{itemize}
-\item Less impact on application thread performance
+\item Less impact on application performance
 \end{itemize}
 
 \linespace
@@ -781,7 +781,7 @@ Tough to compare them directly
 \linespace
 \linespace
 
-All tests showed that concurrency can improve latency
+All tests showed that concurrency can improve application performance
 \begin{itemize}
 % MENTION C4 is server-targeting and FPP is more general.
 \item Approach used will depend on intended environment
