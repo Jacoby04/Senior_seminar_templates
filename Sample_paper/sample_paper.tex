@@ -282,8 +282,7 @@ C4's intended environment consists of large servers with multiple gigabyte heaps
 \psfig{file=c4_page_rough_3.pdf,width =3in}
 \caption{In C4, memory is relocated
 page-by-page. Dead objects are represented with X.
-From-pages are protected from mutators by the LVB.
-To-pages would also hold objects in practice.}
+From-pages are protected from mutators by the LVB.}
 \label{fig:c4Memory}
 \end{figure}
 
@@ -510,10 +509,8 @@ The additions of a \emph{mirrored-to-space} and \emph{zero-copy transplantation}
 to terminate compaction without disrupting mutators.
 
 Mirrored-to-space is a virtual memory space corresponding to, and the same
-size as, from-space. It is mapped to the same physical
-memory as the corresponding from-space, as can be seen in Figure~\ref{fig:collieMirrored}. As mentioned, 
-Collie uses page-granularity compaction like C4. From-space is used here 
-to refer to the set of from-pages with NIT objects. For compaction 
+size as, from-space. It maps to the same physical
+memory as the corresponding from-space, as can be seen in Figure~\ref{fig:collieMirrored}. For compaction 
 termination purposes, mirrored-to-space is logically considered a part of to-space.
 
 Zero-copy transplantation gets the compactor to believe it has finished a cycle.
