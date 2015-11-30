@@ -629,7 +629,7 @@ attempt to copy the object:
 \begin{enumerate}
 \item Check other threads for HPs before copying. If HPs found,
 blame all the threads and move along
-\item Proceed to copy the object with further pins still impeding the copy
+\item Proceed to copy the object with new pins to the object impeding the copy attempt
 \end{enumerate}
 \end{enumerate}
 Mutators will continually bounce blame around until
@@ -646,25 +646,26 @@ they blame the others for not finishing the task and make them responsible
 for it. When those blamed finish their coffee, they will try to
 move it as well. If interrupted by others with coffee cups, HPs, they
 pass the blame along. This continues until a last person finishes 
-their coffee.
+their coffee and moves it to another room.
 
 At the start of FPP relocation, GC threads will attempt to copy
-objects marked for relocation. At this time, blaming is 
+live objects. At this time, blaming is 
 disabled. 
-After the first round of attempting to copy objects, the GC threads
-will again try to copy the remaining objects. If a mutator 
-thread impedes the copy attempt this time, it will be blamed.
+After a first round of attempting to copy objects, GC threads
+will again try to copy the remaining objects. 
+Any mutator threads impeding copy attempts at this time will be blamed.
 Blame continues to be passed until the objects are relocated. 
 
 It is possible for an
-object not to move because it is continually pinned. How this terminates 
+object not to move because of being continually pinned. How this terminates 
 depends on the host GC algorithm used. When using the Garbage-First (G1) algorithm,
 this process goes until all objects are moved or another GC cycle starts.
 If objects have not relocated when another cycle begins, they are automatically
 marked for relocation again. Allowing mutators to continue passing blame works
 in G1 because, like C4 and Collie, the algorithm will roll up remapping into the next
 GC cycle's tracing phase. Possible alternative approaches include setting a max number of impediments
-or setting a timer.
+or setting a timer; after such a threshold is reached, the mutator threads 
+pinning the object will be stopped and the object will be relocated.
 
 
 \subsection{FPP Results Summary}
@@ -682,10 +683,11 @@ For examining latency, the h2 benchmark from DaCapo is used~\cite{Blackburn:DaCa
 The benchmark was chosen due to being memory intensive,
 which makes latency issues apparent.
 Latency is measured using the jHiccup tool developed by Azul Systems.
-Compared to its host garbage collector, G1 with FPP improved latency at all time
+Compared to its host garbage collector, G1 with FPP improved latency for all time
 intervals examined. On average, latency was improved by around 50\%; application
-pause times were about half as long. Latency was also shown to mostly come from
-host garbage collector activities such as tracing and remapping.
+pause times were about half as long. Latency was shown to mostly come from
+host garbage collector activities such as tracing and remapping rather than
+delay from dealing with pins.
 
 
 \section{Conclusions}
@@ -716,8 +718,8 @@ the approach for compaction used will depend on its intended environment.
 
 % To be updated as time goes on.
 
-Thank you Elena Machkasova and Jeff Lindblom for the great advice and feedback.
-Thank you Jeremy Eberhardt for the infinite words of wisdom.
+Thank you Elena Machkasova, Jeff Lindblom, and Jeremy Eberhardt for the great advice and feedback.
+%Thank you Jeremy Eberhardt for the infinite words of wisdom.
 
 
 % The following two commands are all you need in the
