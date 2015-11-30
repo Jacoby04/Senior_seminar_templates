@@ -265,7 +265,7 @@ during GC.
 The first concurrent compaction algorithm we examine is implemented in the 
 Continuously Concurrent Compacting Collector (C4), which is a garbage collector 
 included in JVMs commercially shipped by Azul Systems~\cite{Tene:C4}. The 
-researchers, Iyengar et al., describe how C4 is an enhanced, generational variant
+researchers, Iyengar et al., describe C4 as an enhanced, generational variant
 of the Pauseless GC algorithm~\cite{Click:Pauseless}. C4 is generational in 
 that the entire GC algorithm is independently utilized in both the young and old generations;
 in addition, both generations are concurrent with the application. 
@@ -291,12 +291,12 @@ C4 uses a read barrier called the \emph{Loaded Value Barrier} (LVB) to
 synchronize concurrent threads throughout the GC process~\cite{Tene:C4}. The LVB 
 places \emph{invariants}, properties to be maintained, on each reference as it is loaded from memory.
 One of the invariants relates to the tracing portion of the GC algorithm, so
-it is not discussed here. The other invariant ensures
-references loaded by a mutator during compaction must point to safely
+it is not discussed here. The other invariant ensures that
+references loaded by a mutator during compaction point to safely
 accessible objects: objects that have already been moved.
 If the invariant does not hold
 when a reference is loaded, the barrier will trigger and correct
-the situation as we discuss in the next Subsections.
+the situation as we discuss in the next subsections.
 
 
 \subsection{Concurrent Relocation}
@@ -308,8 +308,8 @@ backed by a contiguous block of physical storage~\cite{Tene:C4}.
 In such a model, from-space consists of \emph{from-pages}
 and to-space of \emph{to-pages}.
 To quickly empty pages, the most sparsely populated ones are relocated
-first, which also moves objects in physical memory. In the case of Figure~\ref{fig:c4Memory}, the left-most 
-from-page is relocated to a to-page first as it has only one small object alive.
+first, which also moves objects in physical memory. In Figure~\ref{fig:c4Memory}, the left-most 
+from-page's live contents are relocated to a to-page first as the from-page has only one small object alive.
 
 From-pages are protected by the LVB as can be seen in Figure~\ref{fig:c4Memory}. 
 LVB will trigger for mutator threads encountering a reference to an object
@@ -362,7 +362,7 @@ are freed and reclamation of memory is now complete.
 
 \begin{figure}
 \centering
-\psfig{file=c4Mapping_rough_figure_4.pdf,width =3in}
+\psfig{file=c4Mapping_rough_figure_5.pdf,width =3in}
 \caption{C4 GC cycle. Remapping and Tracing are rolled into one traversal.
 (adapted from \cite{Tene:C4})}
 \label{fig:c4Cycle}
@@ -374,7 +374,7 @@ are freed and reclamation of memory is now complete.
 
 % Tested primarily against also concurrent, but non-generational.
 
-Experiments done with C4 were meant to show improvements
+Experiments done with C4 evaluated improvements
 of using an algorithm that is simultaneously generational and concurrent~\cite{Tene:C4}.
 C4 is tested against a modified, non-generational C4 algorithm as well as
 two algorithms that do not perform concurrent compaction. 
@@ -458,7 +458,7 @@ Referrer sets are stored as transactional variables since they are used by a tra
 that relocates and remaps a single object.
 An object must maintain a \emph{stable} referrer set throughout the GC process. That is,
 its referrer set cannot be modified or expanded, which
-ensures all of an object's references
+ensures all of the object's references
 are correctly remapped.
 
 
