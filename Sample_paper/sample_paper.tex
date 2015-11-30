@@ -111,7 +111,8 @@ and GC with parallel processing.
 From there, we focus our examination of parallel processing in GC.
 Section~3 covers the Continuously Concurrent Compacting Collector (C4), 
 Section~4 considers the Collie collector, and Section~5 looks at a Field Pinning Protocol (FPP).
-Discussion of each is focused on how one component of GC can run parallel to
+Discussion of each is focused on how \emph{compaction}, moving live objects to 
+adjacent memory locations, in GC can run parallel to
 and independent of the application running. 
 
 
