@@ -476,10 +476,11 @@ that maintain stable referrer sets throughout the process.
 An object is deemed \emph{non-individually transplantable} (NIT) if its transaction
 is aborted or it fails to maintain a stable referrer set. 
 
-Before performing the transactions to move individual objects, they
+Before performing the transactions to move individual objects, the objects
 need to be checked for having stable referrer sets. To do this, threads' stacks
-are checked for references to objects. Objects with references from stacks
-will be marked NIT since mutators are using the objects, which could cause referrer set modifications.
+are checked for references to objects. An object with references to it from the stack
+of any active mutator thread
+will be marked NIT since the object is in use, which could cause referrer set modifications.
 This ensures GC does not interfere with mutator work.
 The LVB-style read barrier receives its first new purpose here. When a thread attempts to load a reference,
 and add it to its stack, the object the reference points to will be marked NIT as a mutator is using it.
@@ -559,7 +560,7 @@ compaction was running and was compared between the two algorithms. Comparisons 
 with a 128 megabyte (Mb) heap and a 512 Mb heap. For all time windows, the Collie compactor
 had higher MMUs than Pauseless. Collie did not go below a 70\% mutator utilization 
 level whereas Pauseless averaged between 40\% and 70\%. 
-This shows the aborting nature of Collie
+This shows that the aborting nature of Collie
 lends itself to ensuring mutator response time, and thus decreasing latency, 
 despite potentially limiting the amount of memory compacted.
 
