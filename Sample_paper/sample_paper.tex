@@ -231,7 +231,7 @@ conflicts, the checks performed result in extra processing overhead for the thre
 
 We can now return to our original goal of applying parallel processing to GC.
 Threads that are part of the application process are referred to as \emph{mutator}
-threads (or mutators) because they mutate the data~\cite{Tene:C4,Iyengar:Collie,Osterlund:FPP}. 
+threads (or mutators) because they can mutate data~\cite{Tene:C4,Iyengar:Collie,Osterlund:FPP}. 
 Threads used by the garbage collector are simply GC threads.
 
 A \emph{parallel} garbage collector uses
@@ -245,10 +245,8 @@ a collector could be both entirely parallel and concurrent.
 
 This paper focuses on
 concurrent compaction within GC. We do so due to the importance 
-of avoiding stop-the-world garbage collectors. Additionally, compacting
-collectors are vital for efficient application performance. Thus,
-the intersection of these two enhancements to languages with automatic memory management leads
-to examining concurrent compaction methods within GC.
+of avoiding stop-the-world pauses in garbage collectors. Additionally, compacting
+collectors are vital for efficient application performance. 
 
 One important metric for considering
 how a collector is affecting an application is \emph{latency}~\cite{Lindblom:2011}.
@@ -257,7 +255,7 @@ application processing performance. A higher latency implies the collector
 uses more processing resources that the application could be using. It 
 can be measured in various ways but is consistently measured across 
 collectors during a set of tests. As an example, one way to
-examine latency is viewing how a server responding to requests is slowed
+examine latency is viewing how server response times are slowed
 during GC.
 
 
@@ -502,6 +500,13 @@ If a transaction fails or is interrupted, as detected by the TM system, the obje
 \subsection{Aborting Compactor}
 \label{sec:collieAbortion}
 
+\begin{figure}
+\centering
+\psfig{file=collie_mirrored_rough.pdf,width =3in}
+\caption{Mirrored-to-space and zero-copy transplantation in the Collie collector.}
+\label{fig:collieMirrored}
+\end{figure}
+
 After all individually transplantable objects are transplanted, we
 are left with unmoved NIT objects.~\cite{Iyengar:Collie}.
 However, compaction cannot terminate with objects in from-space.
@@ -530,13 +535,6 @@ C4, entirely finishing zero-copy transplantation, which is just remapping, is ro
 up into the next GC cycle's tracing phase. In the end, NIT objects are not actually compacted;
 for this reason, Collie is said to have an \emph{aborting} compactor. It will
 cease moving objects to allow mutator threads to continue working uninterrupted.
-
-\begin{figure}
-\centering
-\psfig{file=collie_mirrored_rough.pdf,width =3in}
-\caption{Mirrored-to-space and zero-copy transplantation in the Collie collector.}
-\label{fig:collieMirrored}
-\end{figure}
 
 
 \subsection{Collie Results Summary}
