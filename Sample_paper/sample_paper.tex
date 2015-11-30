@@ -363,7 +363,7 @@ are freed and reclamation of memory is now complete.
 \begin{figure}
 \centering
 \psfig{file=c4Mapping_rough_figure_5.pdf,width =3in}
-\caption{C4 GC cycle. Remapping and Tracing are rolled into one traversal.
+\caption{C4 GC cycle. Remapping and tracing are rolled into one traversal.
 (adapted from \cite{Tene:C4})}
 \label{fig:c4Cycle}
 \end{figure}
@@ -376,9 +376,9 @@ are freed and reclamation of memory is now complete.
 
 Experiments done with C4 evaluated improvements
 of using an algorithm that is simultaneously generational and concurrent~\cite{Tene:C4}.
-C4 is tested against a modified, non-generational C4 algorithm as well as
-two algorithms that do not perform concurrent compaction. 
-All GC algorithms were tested on the same hardware; for specifications, see~\cite{Tene:C4}. 
+C4 is tested against a non-generational C4 algorithm as well as
+two algorithms that perform non-concurrent compaction. 
+All garbage collectors were tested on the same hardware; for specifications, see~\cite{Tene:C4}. 
 The test exhibited live sets of objects on 
 the heap consistently at a size of around 2.5 gigabytes (Gbs); the actual heap size was allowed 
 to grow, indicating greater amounts of garbage on the heap. The applications were run long
@@ -458,7 +458,7 @@ Referrer sets are stored as transactional variables since they are used by a tra
 that relocates and remaps a single object.
 An object must maintain a \emph{stable} referrer set throughout the GC process. That is,
 its referrer set cannot be modified or expanded, which
-ensures all of the object's references
+ensures that all of the object's references
 are correctly remapped.
 
 
