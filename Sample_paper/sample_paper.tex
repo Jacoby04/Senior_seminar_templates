@@ -163,7 +163,7 @@ on the heap becomes difficult to find and manage.
 
 Consider an example with an object that uses 2 megabytes (Mbs) of memory, 
 such as an array. Suppose that after several GC cycles,
-we have open memory spaces of at most 1 Mb. 
+we have open memory spaces of at most 1~Mb. 
 The JVM experiences additional overhead in allocating space for this object
 as it must be stored across non-contiguous locations. Additionally,
 more overhead occurs as accessing the object requires locating
@@ -394,8 +394,8 @@ The worst-case response times were usually in the range of 0.01-0.1 secs;
 an application user would not notice such short pauses. 
 The non-generational version of C4 could also reach low worst-case response times,
 but for a more limited range of heaps sizes. Standard
-C4 sustained the times for heap sizes of 5-35 Gbs; the modified C4 could
-only do so for heaps sizes of 15-35 Gbs. The non-concurrently compacting
+C4 sustained the times for heap sizes of 5-35 Gbs; however, the modified C4 could
+only do so for heaps sizes of 15-35~Gbs. The non-concurrently compacting
 collectors had multi-second worst-case response times for all heap sizes,
 which would cause noticeable pauses for a user.
 
@@ -557,7 +557,7 @@ MMU is the minimum percentage of mutators being utilized over a period of time. 
 MMU would always be at 100\% so all mutators are being used. 
 MMUs were taken from various time periods during which
 compaction was running and was compared between the two algorithms. Comparisons were done
-with a 128 megabyte (Mb) heap and a 512 Mb heap. For all time windows, the Collie compactor
+with a 128 megabyte~(Mb) heap and a 512 Mb heap. For all time windows, the Collie compactor
 had higher MMUs than Pauseless. Collie did not go below a 70\% mutator utilization 
 level whereas Pauseless averaged between 40\% and 70\%. 
 This shows that the aborting nature of Collie
