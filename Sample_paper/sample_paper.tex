@@ -675,7 +675,7 @@ pinning the object will be stopped and the object will be relocated.
 
 As mentioned, FPP was implemented in the G1 garbage collector for testing purposes~\cite{Osterlund:FPP}. 
 Appropriately, the modified G1 collector that uses FPP for relocation is tested against the
-unmodified G1 collector. This was tested in a MacBook Pro; for the 
+unmodified G1 collector. Tests were run in a MacBook Pro; for the 
 hardware details, see~\cite{Osterlund:FPP}. We focus on the tests comparing
 latency of the two garbage collectors. For other tests performed and their results, see~\cite{Osterlund:FPP}.
 
@@ -693,7 +693,7 @@ delay from dealing with pins.
 \section{Conclusions}
 \label{sec:conclusions}
 
-We have examined three concurrent compaction techniques that all 
+We have examined three techniques for concurrent compaction that all 
 effectively reduce latency of GC.
 The full GC algorithms were tested for latency in
 distinct environments, with different benchmarks, and against various algorithms, so it is difficult to 
