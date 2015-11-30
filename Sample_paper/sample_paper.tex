@@ -137,7 +137,7 @@ are stored on a stack.
 Objects can contain references to other objects, so references can also appear on the heap.
 
 A full
-performance of the overall GC algorithm is known as a \emph{cycle} and
+performance of an entire GC algorithm is known as a \emph{cycle} and
 is usually started when the heap is full or nearly full. GC can be broken down into two major steps.
 First, a GC algorithm performs \emph{set condemnation} when deciding which objects are 
 garbage. The garbage collectors we examine perform set condemnation using a method 
@@ -153,7 +153,7 @@ heap~\cite{Tene:C4}. Thus, GC efforts are focused on these objects. Typically, t
 by dividing the heap into two generations. One generation contains younger objects and
 is collected more frequently. If objects in the young generation of the heap survive
 enough GC cycles, they will move into the old generation. By not considering the entire
-heap with each GC cycle, an application experiences less disruptions.
+heap with each GC cycle, an application experiences shorter disruptions.
 
 As memory is reclaimed by a garbage collector, the heap is subject to 
 \emph{fragmentation}~\cite{Tene:C4,Iyengar:Collie,Osterlund:FPP}. Fragmentation is the forming
@@ -195,11 +195,11 @@ of instructions from the process it belongs to.
 The order of instructions are preserved within a single thread, but 
 not necessarily among multiple threads.
 
-A process can involve a single thread or multiple threads.  In JVM languages,
+A process can involve a single thread or multiple threads.  In the JVM,
 each thread has a personal stack to keep track of variables
 and references used within its specific set of tasks. 
 Parallel processing is the utilization of multiple
-cores of processors to run threads concurrently. If processes are set up
+cores of processors to run threads concurrently. If processes are designed
 to run with multiple threads, the extra processing power can make 
 the process more efficient.
 
@@ -245,7 +245,7 @@ a collector could be both entirely parallel and concurrent.
 
 This paper focuses on
 concurrent compaction within GC. We do so due to the importance 
-of avoiding stop-the-world pauses in garbage collectors. Additionally, compacting
+of avoiding stop-the-world pauses caused by garbage collectors. Additionally, compacting
 collectors are vital for efficient application performance. 
 
 One important metric for considering
