@@ -205,16 +205,14 @@ the process more efficient.
 
 Creating multi-threaded processes can result in many new issues.
 One of these issues, relevant to GC, is that modifications to an 
-object can be lost. For example, consider an application keeping 
-track of people's moods and locations. People are stored as objects.
-Thread $A$ moves people by relocating them in data structures (DSs) 
-with a copy operation. Thread $B$ updates people's moods. Suppose a person
-is about to go home from work, so their mood changes to happy.
-The person's change in mood could be lost if thread $A$ copies the person
-to the home DS, but thread $B$ updates the person's mood while still expecting
-them to be in the work DS. 
+object can be lost. For example, consider a process with two threads, $A$ and $B$.
+Suppose that thread $A$ relocates objects in memory with copy operations,
+and thread $B$ modifies properties of objects.
+A modification by thread $B$ to an object could be lost if
+thread $A$ relocates the object, but thread $B$ modifies the 
+object at the old location due to not knowing it was relocated.
 While the example is fairly simple, it can be seen how such a problem
-applies to GC.
+applies to the relocation phase of compaction within GC.
 
 To deal with multiple threads relying on the same data, \emph{synchronization}
 techniques are used. These can prevent issues 
