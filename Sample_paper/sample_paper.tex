@@ -189,13 +189,13 @@ reclamation is often done by marking from-spaces as freed.
 To develop an understanding of parallel processing, we need to know 
 what \emph{processes} and \emph{threads} are~\cite{oracle:threads}.
 A process is an instance of a computer program being run. 
-For example, a Java application and a word processor are two processes. Additionally,
-the GC being run on the Java application is its own process.
-A thread, at a basic level, is a component of a process; it performs a sequence
+For example, a JVM and a word processor are two processes.
+A thread, at a basic level, is a component of a process; it performs an independent sequence
 of instructions from the process it belongs to. 
-A process can involve a single thread or multiple threads. The order 
-of instructions are preserved within a single thread, but 
-not necessarily among multiple threads. In JVM languages,
+The order of instructions are preserved within a single thread, but 
+not necessarily among multiple threads.
+
+A process can involve a single thread or multiple threads.  In JVM languages,
 each thread has a personal stack to keep track of variables
 and references used within its specific set of tasks. 
 Parallel processing is the utilization of multiple
