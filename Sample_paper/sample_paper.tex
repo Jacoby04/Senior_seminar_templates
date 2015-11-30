@@ -176,10 +176,10 @@ are typically involved in compaction. After set condemnation, \emph{relocation} 
 to a contiguous memory location.
 The contiguous memory location being moved to is often referred to as \emph{to-space}.
 Likewise, an object is moved from \emph{from-space}. While called 
-relocation, objects are typically copied rather than moved. \emph{Remapping}
-occurs after objects have been relocated; the remapping phase 
-updates all references to moved objects to refer to their new locations. With this, 
-reclamation is often performed by marking from-spaces as freed.
+relocation, objects are typically copied rather than moved. 
+After relocation, a \emph{remapping} phase 
+updates all references to moved objects to refer to their new locations. When compaction is performed, 
+reclamation is often done by marking from-spaces as freed.
 %The contiguous memory location is virtual, ie, on the heap.
 
 
