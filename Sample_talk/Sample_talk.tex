@@ -283,10 +283,11 @@ Consists of two steps
 \begin{columns}
 \begin{column}{0.7\textwidth}
 
+% Mention two word processors being open means two processes.
 \emph{Process}: instance of a program being run
 \begin{itemize}
-\item Has its own memory space
 \item Examples: JVM, word processor
+\item Has its own memory space
 \end{itemize}
 
 \linespace
@@ -294,7 +295,7 @@ Consists of two steps
 
 \emph{Thread}: sequence of independent instructions that can run on its own
 \begin{itemize}
-\item Component of a process
+\item Component of a process %MENTION HERE THAT THREADS SHARE THE HEAP (Or the memory the process has). That's why the JVM has Stacks, so threads can do their own work.
 \item Possible to run multiple in parallel
 \end{itemize}
 
@@ -497,7 +498,7 @@ LVB instructions for applications threads
 \linespace
 \linespace
 
-In all cases, correct the reference after
+In all cases, update the reference after using the object in to-space
 
 }
 
