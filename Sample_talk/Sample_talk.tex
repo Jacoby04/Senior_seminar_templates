@@ -508,30 +508,16 @@ In all cases, update the reference after using the object in to-space
 
 \frametitle{Concurrent Remapping}
 
-\only<1>{
-\emph{Lazy Remapping}: application threads update references through LVB
-\begin{itemize}
-\item "If the object was moved, find it"
-\item Correct the reference after
-\end{itemize}
-
-\linespace
-\linespace
-
 To update all references, need to traverse all reachable ones
 
 \linespace
 \linespace
 
 Combine remapping with next tracing phase
-}
 
-\only<2>{
-Remapping combined with tracing
 \begin{center}
-\includegraphics[width=.9\textwidth]{Illustrations/c4Mapping_rough_figure_5.pdf}
+\includegraphics[width=.8\textwidth]{Illustrations/c4Mapping_rough_figure_5.pdf}
 \end{center}
-}
 
 \end{frame}
 
