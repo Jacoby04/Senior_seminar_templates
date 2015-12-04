@@ -562,6 +562,7 @@ Server environments used
 \end{column}
 
 %Really emphasive and say that higher values means faster response times.
+%Also, point out that it's a log scale.
 \begin{column}{0.5\textwidth}
 \begin{center}
 Worst Case Response Times
@@ -642,14 +643,18 @@ Main goal: safely access objects without worrying about relocation
 	\end{itemize}
 \end{column}
 \begin{column}{0.55\textwidth}
+\begin{center}
 	\only<1>{\includegraphics[width=.95\textwidth]{Illustrations/coffeeLineNew1.png}}
 	\only<2>{\includegraphics[width=.95\textwidth]{Illustrations/coffeeLineNew2.png}}
 	\only<3>{\includegraphics[width=.95\textwidth]{Illustrations/coffeeLineNew3.png}}
 	\only<4>{\includegraphics[width=.95\textwidth]{Illustrations/coffeeLineNew4.png}}
 	\only<5>{\includegraphics[width=.95\textwidth]{Illustrations/coffeeLineNew5.png}}
 	\only<6>{\includegraphics[width=.95\textwidth]{Illustrations/coffeeLineNew6.png}}
+\end{center}
 	%If anyone asks how this is bounded, it's because threads consume their blame atomically,
 	%so a thread gets rid of all its blame at once.
+	%Remember to mention that bob is moving coffee to another break room.
+	%Remember to mention explicitly that all impeding people are made responsible.
 \end{column}
 \end{columns}
 
@@ -754,15 +759,7 @@ Moving toward concurrent compaction without barriers
 \item C4 - heavily relies on barriers
 \item FPP - barrier-free
 \end{itemize}
-
-%\linespace
-%\linespace
-%
-%Different approaches to prioritizing GC vs application
-%\begin{itemize}
-%\item C4 - focus on GC
-%\item FPP - focus on application
-%\end{itemize}
+%Say HP checks also add some overhead, but it is less.
 
 \linespace
 \linespace
