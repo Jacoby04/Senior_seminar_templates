@@ -337,8 +337,6 @@ Consists of two steps
 
 \frametitle{Synchronization}
 
-\only<1>{
-
 \begin{columns}
 \begin{column}{0.60\textwidth}
 Threads do not coordinate automatically \\
@@ -366,23 +364,6 @@ Need to keep threads synchronized
 
 \end{column}
 \end{columns}
-
-}
-
-\only<2>{
-
-% DO NOT do the traffic example. Wastes time.
-\emph{Read Barrier}: instructions to run before a thread accesses memory
-
-\linespace
-\linespace
-\linespace
-
-\begin{center}
-\includegraphics[width=.70\textwidth]{Illustrations/read_barrier.png}
-\end{center}
-
-}
 
 \end{frame}
 
@@ -440,15 +421,22 @@ Researchers: G.~Tene, B.~Iyengar, and M.~Wolf at Azul Systems
 
 \frametitle{Loaded Value Barrier (LVB)}
 
-%Mention that this is during compaction!
-% REFRESHER ON FROM AND TO SPACE HERE!!!
-Read barrier protects from-space from application threads
-\begin{itemize}
-\item From-space: where objects were located before moving
-\end{itemize}
+\only<1>{
+
+\emph{Read Barrier}: instructions to run before a thread accesses memory
 
 \linespace
 \linespace
+
+%Mention that this is during compaction!
+% REFRESHER ON FROM AND TO SPACE HERE!!!
+LVB protects from-space from application threads
+\begin{itemize}
+\item From-space: where objects were located before moving
+\end{itemize}
+}
+
+\only<2>{
 
 Rule: application can only use moved objects
 \begin{itemize}
@@ -459,6 +447,16 @@ Rule: application can only use moved objects
 \linespace
 
 This facilitates concurrent relocation and remapping
+}
+
+\linespace
+\linespace
+\linespace
+\linespace
+
+\begin{center}
+\includegraphics[width=.70\textwidth]{Illustrations/read_barrier.png}
+\end{center}
 
 \end{frame}
 
