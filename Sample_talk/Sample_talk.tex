@@ -563,7 +563,7 @@ Server environments used
 
 %Really emphasive and say that higher values means faster response times.
 %Also, point out that it's a log scale.
-\begin{column}{0.5\textwidth}
+\begin{column}{0.53\textwidth}
 \begin{center}
 Worst Case Response Times
 \includegraphics[width=.89\textwidth]{Illustrations/c4_results.pdf}
@@ -720,7 +720,7 @@ Improvements from solely concurrent relocation
 \frametitle{Results}
 
 \begin{columns}
-\begin{column}{0.5\textwidth}
+\begin{column}{0.40\textwidth}
 
 \color{red}G1 with FPP \color{black}on average 50\% shorter delays than \color{blue}standard G1\color{black}
 \begin{itemize}
@@ -734,12 +734,24 @@ Concurrent relocation without barriers is feasible!
 
 \end{column}
 
-\begin{column}{0.5\textwidth}
+\begin{column}{0.55\textwidth}
 
 % EXPLAIN WHAT IS ON THIS TABLE BETTER. DON'T TALK ABOUT STUFF THAT ISN'T ON HERE UNLESS IT'S NEEDED.
+% Mention this is a subset of the tests performed.
 \begin{center}
-Average GC Delays
-\includegraphics[width=.90\textwidth]{Illustrations/fpp_results_3.pdf}
+%\includegraphics[width=.90\textwidth]{Illustrations/fpp_results_3.pdf}
+\begin{table}
+\begin{tabular}{l | c | c }
+Benchmark & \color{blue}G1 & \color{red}G1 w/ FPP \color{black}\\
+\hline \hline
+pmd & 40.82 ms & 5.02 ms \\ 
+lusearch & 2.73 ms & 2.72 ms \\
+tomcat & 12.31 ms & 5.48 ms \\
+tradebeans & 31.73 ms & 11.81 ms \\
+fop & 37.39 ms & 13.22 ms 
+\end{tabular}
+\caption{Average GC Delays}
+\end{table}
 \end{center}
 \end{column}
 \end{columns}
