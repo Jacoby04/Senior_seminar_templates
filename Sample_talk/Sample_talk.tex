@@ -92,6 +92,9 @@
 
 \frametitle{Automatic Memory Management}
 
+\begin{columns}
+\begin{column}{0.65\textwidth}
+
 Implicit allocation and deallocation of memory
 
 \linespace
@@ -107,17 +110,24 @@ Languages: Java, C\#, Python, and more
 
 Abstracts details away from the developer
 
-\linespace
+\end{column}
+\begin{column}{0.35\textwidth}
 
 \begin{center}
-\includegraphics[width=.3\textwidth]{Illustrations/garbage.jpg}
+\includegraphics[width=.9\textwidth]{Illustrations/garbage.jpg}
 \end{center}
+
+\end{column}
+\end{columns}
 
 \end{frame}
 
 \begin{frame}
 
 \frametitle{Implicit Deallocation}
+
+\begin{columns}
+\begin{column}{0.65\textwidth}
 
 Memory is a finite resource
 
@@ -131,22 +141,24 @@ Memory is a finite resource
 
 \emph{Garbage Collection (GC)}: detecting and removing garbage
 
-\linespace
-\linespace
-\linespace
+\end{column}
+\begin{column}{0.35\textwidth}
 
 \begin{center}
-\includegraphics[width=.3\textwidth]{Illustrations/garbage.jpg}
+\includegraphics[width=.9\textwidth]{Illustrations/garbage.jpg}
 \end{center}
+
+\end{column}
+\end{columns}
 
 \end{frame}
 
 \begin{frame}
 
+\frametitle{Stopping the World}
+
 \begin{columns}
 \begin{column}{0.65\textwidth}
-
-\frametitle{Stopping the World}
 
 GC requires processing resources
 
@@ -162,7 +174,7 @@ When only one processor is used, collectors \emph{stop the world}
 Problem: applications today are subjected to increasing pauses
 \begin{itemize}
 \item More memory
-\item More strenuous applications
+\item More strenuous applications % Give specific real-time example. eg - plane landing.
 \end{itemize}
 
 \linespace
@@ -204,7 +216,7 @@ Use parallel processing to solve!
 % Mention this is the shared memory for the JVM process and all its tasks.
 \emph{Heap}: contiguous memory location used by the JVM
 \begin{itemize}
-\item Objects are stored here
+\item Objects are stored here % In the technical sense, for example, instances of classes in OOP.
 \end{itemize}
 
 \linespace
@@ -234,6 +246,7 @@ Use parallel processing to solve!
 \linespace
 \linespace
 
+% Mention it's okay if people don't know what this is, we'll cover it in a moment.
 \emph{Compaction}: reclaim memory while fighting heap fragmentation
 
 \linespace
